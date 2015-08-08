@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class SatelliteLaunch implements Parcelable {
+class SatelliteLaunch implements Parcelable {
 
     private final String key;
     private final Bundle arguments;

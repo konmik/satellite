@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class DataCenter implements Parcelable {
+class DataCenter implements Parcelable {
 
     private static final ClassLoader CLASS_LOADER = DataCenter.class.getClassLoader();
 
