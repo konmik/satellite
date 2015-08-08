@@ -1,0 +1,20 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "23.0.0 rc3"
+
+    defaultConfig {
+        applicationId "satellite.example"
+        minSdkVersion 14
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+    compile project(':satellite')
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'io.reactivex:rxandroid:1.0.0'
+}
