@@ -13,11 +13,11 @@ to do the same job. If you're not familiar with Nucleus, then read further.
 ### Problem
 
 There are some defects in our Android applications and because of these defects we can not call
-our aplication reliable:
+our application reliable:
 
 1. An application is unable to continue a background task execution after a configuration change.
 
-And, if a developer is smart enougth to handle the previous problem, there is a second one:
+And, if a developer is smart enough to handle the previous problem, there is a second one:
 
 2. An application does not automatically restart a background task after a process restart.
 
@@ -52,7 +52,7 @@ the application is still reliable.
 * The entire library has been built keeping [The Kiss Principle](https://people.apache.org/~fhanik/kiss.html) in mind.
 Anyone who is familiar with RxJava can read and understand it easily.
 
-### Arthitecture
+### Architecture
 
 Satellite is full of cosmic analogies. Why? Because this is fun and because this allows
 to construct an OOP model that is very close to what is going on. Reactive satellites are awesome. :)
@@ -66,8 +66,8 @@ satellites. It connects satellites with activities and fragments, providing an `
 
 We also have `MissionControlCenter` - this is our land base inside of fragment/activity which manages all
 the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
-`MissionControlCenter` is the only thing that we need persist within the activity state bundle.
-In implements `Parcelable` interface, so this is trivial. [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
+`MissionControlCenter` is the only thing that we need to persist within the activity state bundle.
+It implements `Parcelable` interface, so this is a trivial task. [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
 
 For every launch we need to provide a "mission statement". This means that we supply a `Bundle`
 with arguments for the launch.
