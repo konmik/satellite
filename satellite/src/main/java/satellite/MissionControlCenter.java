@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import rx.Notification;
 import rx.Observable;
+import rx.functions.Action1;
 
 public class MissionControlCenter implements Parcelable {
 
@@ -23,8 +24,16 @@ public class MissionControlCenter implements Parcelable {
         factories.put(dataCenter.provideKey(id), factory);
     }
 
-    public <T> Observable<Notification<T>> connection(final Integer id) {
-        return SpaceStation.INSTANCE.connection(dataCenter.provideKey(id));
+    public <T> Observable<Notification<T>> connection(final Integer id, final SessionType sessionType) {
+        return SpaceStation.INSTANCE.<T>connection(dataCenter.provideKey(id), sessionType)
+            .compose(sessionType.<T>transformer())
+            .doOnNext(new Action1<Notification<T>>() {
+                @Override
+                public void call(Notification<T> tNotification) {
+                    if (sessionType == SessionType.FIRST)
+                        dropSatellite(id);
+                }
+            });
     }
 
     public void launch(Integer id, Bundle missionStatement) {

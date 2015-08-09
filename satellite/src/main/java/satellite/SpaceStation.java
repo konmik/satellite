@@ -5,26 +5,26 @@ import java.util.HashMap;
 
 import rx.Notification;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 import satellite.util.LogTransformer;
 
-public enum SpaceStation {
+@SuppressWarnings("unchecked")
+enum SpaceStation {
 
     INSTANCE;
 
-    private HashMap<String, Subject> earthConnections = new HashMap<>();
+    private HashMap<String, Subject> earthConnectionSubject = new HashMap<>();
     private HashMap<String, Subscription> satelliteConnections = new HashMap<>();
 
-    public <T> Observable<Notification<T>> connection(String key) {
-        if (earthConnections.get(key) == null)
-            earthConnections.put(key, PublishSubject.create());
-
-        //noinspection unchecked
-        return earthConnections.get(key);
+    public <T> Observable<Notification<T>> connection(String key, SessionType session) {
+        if (earthConnectionSubject.get(key) == null) {
+            earthConnectionSubject.put(key, session.createSubject());
+        }
+        return earthConnectionSubject.get(key);
     }
 
     public boolean satelliteConnectionExist(String key) {
@@ -32,9 +32,8 @@ public enum SpaceStation {
         return subscription != null && !subscription.isUnsubscribed();
     }
 
-    @SuppressWarnings("unchecked")
-    public void connectWithSatellite(String key, Observable satellite) {
-        final Subject subject = earthConnections.get(key);
+    public void connectWithSatellite(final String key, Observable satellite) {
+        final Observer subject = earthConnectionSubject.get(key);
         satelliteConnections.put(key, satellite
             .compose(new LogTransformer("Satellite " + key + " -->"))
             .materialize()
@@ -63,7 +62,7 @@ public enum SpaceStation {
     public void clear(Collection<String> keys) {
         for (String key : keys.toArray(new String[keys.size()])) {
             disconnectFromSatellite(key);
-            earthConnections.remove(key);
+            earthConnectionSubject.remove(key);
         }
     }
 }

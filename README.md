@@ -72,7 +72,7 @@ It implements `Parcelable` interface, so this is a trivial task. [MissionControl
 For every launch we need to provide a "mission statement". This means that we supply a `Bundle`
 with arguments for the launch.
 
-There is `SatelliteFactory` interface - we're extending it to implement our satellite code
+There is `SatelliteFactory` interface - we're extending it to instantiate our satellite code
 from a given `Bundle` argument. [SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
                                                              
 ## Installation
