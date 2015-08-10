@@ -3,6 +3,7 @@ package satellite;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Printer;
 
 import java.util.HashMap;
 
@@ -38,7 +39,7 @@ public class MissionControlCenter implements Parcelable {
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
                 public void call(Notification<T> tNotification) {
-                    if (sessionType == SessionType.FIRST)
+                    if (sessionType == SessionType.SINGLE)
                         dropSatellite(id);
                 }
             });
@@ -100,4 +101,8 @@ public class MissionControlCenter implements Parcelable {
             return new MissionControlCenter[size];
         }
     };
+
+    public void printSpaceStation(Printer printer) {
+        SpaceStation.INSTANCE.print(printer);
+    }
 }

@@ -69,7 +69,7 @@ enum SpaceStation {
         }
     }
 
-    public void print(Printer printer) {
+    void print(Printer printer) {
         printer.println("satellite connection keys:");
         for (String key : satelliteConnections.keySet())
             printer.println(key);

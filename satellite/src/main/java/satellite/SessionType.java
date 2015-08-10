@@ -8,7 +8,7 @@ import rx.subjects.Subject;
 
 public enum SessionType {
 
-    FIRST {
+    SINGLE {
         @Override
         public <T> Subject<Notification<T>, Notification<T>> createSubject() {
             return PublishSubject.create();

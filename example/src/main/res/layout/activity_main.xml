@@ -14,6 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Single" />
+
         <Button
             android:id="@+id/launch"
             android:layout_width="wrap_content"
@@ -36,7 +42,8 @@
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/textView"
@@ -44,5 +51,10 @@
             android:layout_height="wrap_content" />
 
     </ScrollView>
+
+    <TextView
+        android:id="@+id/stationReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
