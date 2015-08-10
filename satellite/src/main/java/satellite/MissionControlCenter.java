@@ -9,6 +9,8 @@ import java.util.HashMap;
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.subjects.Subject;
 
 public class MissionControlCenter implements Parcelable {
 
@@ -25,8 +27,14 @@ public class MissionControlCenter implements Parcelable {
     }
 
     public <T> Observable<Notification<T>> connection(final Integer id, final SessionType sessionType) {
-        return SpaceStation.INSTANCE.<T>connection(dataCenter.provideKey(id), sessionType)
-            .compose(sessionType.<T>transformer())
+        return SpaceStation.INSTANCE.<T>connection(
+            dataCenter.provideKey(id),
+            new Func0<Subject>() {
+                @Override
+                public Subject call() {
+                    return sessionType.createSubject();
+                }
+            })
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
                 public void call(Notification<T> tNotification) {
@@ -36,18 +44,27 @@ public class MissionControlCenter implements Parcelable {
             });
     }
 
-    public void launch(Integer id, Bundle missionStatement) {
+    public void launch(Integer id, final Bundle missionStatement) {
         dropSatellite(id);
-        String key = dataCenter.provideKey(id);
+        final String key = dataCenter.provideKey(id);
         dataCenter.registerLaunch(id, new SatelliteLaunch(key, missionStatement));
-        SpaceStation.INSTANCE.connectWithSatellite(key, factories.get(key).call(missionStatement));
+        SpaceStation.INSTANCE.connectSatellite(key, new Func0<Observable>() {
+            @Override
+            public Observable call() {
+                return factories.get(key).call(missionStatement);
+            }
+        });
     }
 
     public void restoreSatellites() {
-        for (SatelliteLaunch launch : dataCenter.launches()) {
-            String key = launch.getKey();
-            if (!SpaceStation.INSTANCE.satelliteConnectionExist(key))
-                SpaceStation.INSTANCE.connectWithSatellite(key, factories.get(key).call(launch.getArguments()));
+        for (final SatelliteLaunch launch : dataCenter.launches()) {
+            final String key = launch.getKey();
+            SpaceStation.INSTANCE.connectSatellite(key, new Func0<Observable>() {
+                @Override
+                public Observable call() {
+                    return factories.get(key).call(launch.getArguments());
+                }
+            });
         }
     }
 
@@ -56,7 +73,7 @@ public class MissionControlCenter implements Parcelable {
     }
 
     public void dropSatellite(Integer id) {
-        SpaceStation.INSTANCE.disconnectFromSatellite(dataCenter.provideKey(id));
+        SpaceStation.INSTANCE.disconnectSatellite(dataCenter.provideKey(id));
         dataCenter.deleteLaunch(id);
     }
 

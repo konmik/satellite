@@ -2,6 +2,7 @@ package satellite.example;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setup();
 
         findViewById(R.id.launch)
             .setOnClickListener(new View.OnClickListener() {
@@ -54,33 +54,54 @@ public class MainActivity extends BaseActivity {
                         .subscribe(new Action1<Integer>() {
                             @Override
                             public void call(Integer integer) {
-                                setup();
+                                setupUpdates();
                             }
                         });
                 }
             });
     }
 
-    private void setup() {
-        final TextView log = (TextView)findViewById(R.id.log);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupUpdates();
+        if (isFirstOnResume()) {
+            // run subscriptions here
+        }
+    }
+
+    private void setupUpdates() {
 
         controlCenter().satelliteFactory(SATELLITE_ID, new ExampleSatelliteFactory());
 
-        connections.add(controlCenter().<Integer>connection(SATELLITE_ID, SessionType.FIRST)
-            .compose(new LogTransformer<Notification<Integer>>("Earth " + TAG + " <--"))
-            .subscribe(split(
-                new Action1<Integer>() {
-                    @Override
-                    public void call(Integer o) {
-                        log.setText(log.getText() + "\n" + "onNext " + o);
-                    }
-                },
-                new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        log.setText(log.getText() + "\n" + "onError " + throwable);
-                    }
-                })));
+        connections.add(
+            controlCenter().<Integer>connection(SATELLITE_ID, SessionType.FIRST)
+                .compose(new LogTransformer<Notification<Integer>>("Earth " + TAG + " <--"))
+                .subscribe(split(
+                    new Action1<Integer>() {
+                        @Override
+                        public void call(Integer o) {
+                            log("onNext " + o);
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            log("onError " + throwable);
+                        }
+                    })));
+    }
+
+    private void log(String message) {
+        TextView textView = (TextView)findViewById(R.id.textView);
+        textView.setText(textView.getText() + "\n" + message);
+        final ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 
     @Override

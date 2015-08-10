@@ -12,6 +12,7 @@ public class BaseActivity extends AppCompatActivity {
     private static final String CONTROL_CENTER = "control_center";
 
     private MissionControlCenter controlCenter;
+    private boolean isFirstOnResume;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,17 @@ public class BaseActivity extends AppCompatActivity {
             controlCenter = savedInstanceState.getParcelable(CONTROL_CENTER);
         else
             controlCenter = new MissionControlCenter();
+        isFirstOnResume = savedInstanceState != null;
+    }
+
+    public boolean isFirstOnResume() {
+        return isFirstOnResume;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isFirstOnResume = false;
     }
 
     public MissionControlCenter controlCenter() {
