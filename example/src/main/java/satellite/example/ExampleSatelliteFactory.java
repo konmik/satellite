@@ -21,8 +21,7 @@ public class ExampleSatelliteFactory implements SatelliteFactory<Integer> {
 
     @Override
     public Observable<Integer> call(final Bundle missionStatement) {
-        return Observable.interval(0, 1, TimeUnit.SECONDS)
-            .observeOn(mainThread())
+        return Observable.interval(0, 1, TimeUnit.SECONDS, mainThread())
             .map(new Func1<Long, Integer>() {
                 @Override
                 public Integer call(Long aLong) {

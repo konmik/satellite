@@ -16,5 +16,5 @@ android {
 dependencies {
     compile project(':satellite')
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'io.reactivex:rxandroid:1.0.0'
+    compile 'io.reactivex:rxandroid:1.0.1'
 }
