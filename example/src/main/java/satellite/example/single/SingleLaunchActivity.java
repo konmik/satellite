@@ -2,6 +2,7 @@ package satellite.example.single;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.SessionType;
@@ -46,6 +47,7 @@ public class SingleLaunchActivity extends BaseLaunchActivity {
                         new Action1<Integer>() {
                             @Override
                             public void call(Integer o) {
+                                ((TextView)findViewById(R.id.result)).setText(Integer.toString(o));
                                 log("SINGLE: onNext " + o);
                             }
                         },

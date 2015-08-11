@@ -1,15 +1,17 @@
-package satellite.example.single;
+package satellite.example.cache;
 
 import android.os.Bundle;
 
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.functions.Func1;
 import satellite.SatelliteFactory;
+import satellite.util.LogTransformer;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleSingleSatelliteFactory implements SatelliteFactory<Integer> {
+public class ExampleCacheSatelliteFactory implements SatelliteFactory<Integer> {
 
     public static final String FROM_KEY = "from";
 
@@ -21,7 +23,12 @@ public class ExampleSingleSatelliteFactory implements SatelliteFactory<Integer> 
 
     @Override
     public Observable<Integer> call(final Bundle missionStatement) {
-        return Observable.just(missionStatement.getInt(FROM_KEY))
-            .delay(1, TimeUnit.SECONDS, mainThread());
+        return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
+            .map(new Func1<Long, Integer>() {
+                @Override
+                public Integer call(Long time) {
+                    return (int)(time + missionStatement.getInt(FROM_KEY));
+                }
+            });
     }
 }

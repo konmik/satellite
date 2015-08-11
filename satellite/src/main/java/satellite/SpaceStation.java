@@ -11,11 +11,11 @@ import rx.Notification;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.Subject;
-import satellite.util.LogTransformer;
 
 @SuppressWarnings("unchecked")
 enum SpaceStation {
@@ -25,7 +25,7 @@ enum SpaceStation {
     private HashMap<String, Subject> earthConnections = new HashMap<>();
     private HashMap<String, Subscription> satelliteConnections = new HashMap<>();
 
-    public <T> Observable<Notification<T>> connection(String key, Func0<Subject> connectionFactory) {
+    public <T> Observable<Notification<T>> connection(final String key, Func0<Subject> connectionFactory) {
         if (earthConnections.get(key) == null) {
             earthConnections.put(key, connectionFactory.call());
         }
@@ -37,8 +37,13 @@ enum SpaceStation {
         if (subscription == null || subscription.isUnsubscribed()) {
             final Observer subject = earthConnections.get(key);
             satelliteConnections.put(key, satelliteFactory.call()
-                .compose(new LogTransformer("Satellite " + key + " -->"))
                 .materialize()
+                .doOnUnsubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        satelliteConnections.remove(key);
+                    }
+                })
                 .filter(new Func1<Notification, Boolean>() {
                     @Override
                     public Boolean call(Notification notification) {
@@ -56,10 +61,8 @@ enum SpaceStation {
 
     public void disconnectSatellite(String key) {
         Subscription subscription = satelliteConnections.get(key);
-        if (subscription != null) {
+        if (subscription != null)
             subscription.unsubscribe();
-            satelliteConnections.remove(key);
-        }
     }
 
     public void clear(Collection<String> keys) {

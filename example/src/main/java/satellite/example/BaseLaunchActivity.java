@@ -2,12 +2,19 @@ package satellite.example;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.StringBuilderPrinter;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.internal.util.SubscriptionList;
 import satellite.MissionControlCenter;
+
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class BaseLaunchActivity extends AppCompatActivity {
 
@@ -67,8 +74,20 @@ public class BaseLaunchActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isFirstOnResume)
+        if (isFirstOnResume) {
             controlCenter.restoreSatellites();
+
+            add(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long ignored) {
+                        StringBuilder builder = new StringBuilder();
+                        controlCenter().printSpaceStation(new StringBuilderPrinter(builder));
+                        TextView report = (TextView)findViewById(R.id.stationReport);
+                        report.setText(builder.toString());
+                    }
+                }));
+        }
     }
 
     @Override

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import satellite.example.cache.CacheLaunchActivity;
+import satellite.example.single.SingleLaunchActivity;
 
 public class LauncherActivity extends AppCompatActivity {
     @Override
@@ -16,7 +16,7 @@ public class LauncherActivity extends AppCompatActivity {
         findViewById(R.id.button_single).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LauncherActivity.this, CacheLaunchActivity.class));
+                startActivity(new Intent(LauncherActivity.this, SingleLaunchActivity.class));
             }
         });
     }

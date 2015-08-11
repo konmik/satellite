@@ -28,17 +28,18 @@ public class MissionControlCenter implements Parcelable {
     }
 
     public <T> Observable<Notification<T>> connection(final Integer id, final SessionType sessionType) {
-        return SpaceStation.INSTANCE.<T>connection(
+        Observable<Notification<T>> connection = SpaceStation.INSTANCE.connection(
             dataCenter.provideKey(id),
             new Func0<Subject>() {
                 @Override
                 public Subject call() {
                     return sessionType.createSubject();
                 }
-            })
+            });
+        return connection
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
-                public void call(Notification<T> tNotification) {
+                public void call(Notification<T> notification) {
                     if (sessionType == SessionType.SINGLE)
                         dropSatellite(id);
                 }

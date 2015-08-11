@@ -33,10 +33,7 @@ class DataCenter implements Parcelable {
     }
 
     public List<String> keys() {
-        ArrayList<String> list = new ArrayList<>();
-        for (SatelliteLaunch start : launches.values())
-            list.add(start.getKey());
-        return list;
+        return new ArrayList<>(keys.values());
     }
 
     public String provideKey(Integer id) {

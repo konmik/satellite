@@ -6,9 +6,9 @@ to properly connect background tasks with visual parts of an application.
 
 ## Introduction
 
-If you are familiar with my [Nucleus](https://github.com/konmik/nucleus) library:
+If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
 Satellite is basically the same but is much simpler because it does NOT utilize MVP pattern
-to do the same job. If you're not familiar with Nucleus, then read further.
+to do the same job.
 
 ### Problem
 
