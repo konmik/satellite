@@ -3,6 +3,7 @@ package satellite.example;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.StringBuilderPrinter;
+import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -87,6 +88,13 @@ public class BaseLaunchActivity extends AppCompatActivity {
                         report.setText(builder.toString());
                     }
                 }));
+
+            findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
         }
     }
 

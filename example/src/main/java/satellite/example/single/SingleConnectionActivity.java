@@ -1,23 +1,24 @@
-package satellite.example.cache;
+package satellite.example.single;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.SessionType;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.example.single.ExampleSingleSatelliteFactory;
 import satellite.util.RxNotification;
 
-public class CacheLaunchActivity extends BaseLaunchActivity {
+public class SingleConnectionActivity extends BaseLaunchActivity {
 
     private static final int SATELLITE_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single);
+        setContentView(R.layout.activity_satellite);
+        ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
         findViewById(R.id.launch)
             .setOnClickListener(new View.OnClickListener() {
@@ -40,13 +41,14 @@ public class CacheLaunchActivity extends BaseLaunchActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isFirstOnResume())
+        if (isFirstOnResume()) {
             add(
                 controlCenter().<Integer>connection(SATELLITE_ID, SessionType.SINGLE)
                     .subscribe(RxNotification.split(
                         new Action1<Integer>() {
                             @Override
                             public void call(Integer o) {
+                                ((TextView)findViewById(R.id.result)).setText(Integer.toString(o));
                                 log("SINGLE: onNext " + o);
                             }
                         },
@@ -56,5 +58,6 @@ public class CacheLaunchActivity extends BaseLaunchActivity {
                                 log("SINGLE: onError " + throwable);
                             }
                         })));
+        }
     }
 }

@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Satellite</string>
-    <string name="single_description">Single result satellite is appropriate when there is only one value needs to be returned.
-        \n\nActions like "Sign in", "Upload profile image" are single result.</string>
+    <string name="single_description">Single connection is appropriate when there is only one value needs to be returned.
+        \n\nActions like \"Sign in\", \"Upload profile image\" have a single result.
+        \n\nThe value returned by the satellite will be delivered only once.</string>
+    <string name="cache_description">Cache connection fits situations where you need to show updatable data or
+        data that needs to be cached for orientation change events.
+        \n\n\"Observe database table\", \"Get user profile from server\" are such cases.
+        \n\nIf the mission control center is connected to the space station the value returned by the satellite will be delivered immediately.
+        \n\nIt the mission control center is not connected, then only the latest value will be delivered when such connection occurs.</string>
 </resources>

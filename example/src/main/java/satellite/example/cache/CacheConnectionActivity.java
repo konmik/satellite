@@ -1,4 +1,4 @@
-package satellite.example.single;
+package satellite.example.cache;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,20 +10,21 @@ import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
 
-public class SingleLaunchActivity extends BaseLaunchActivity {
+public class CacheConnectionActivity extends BaseLaunchActivity {
 
     private static final int SATELLITE_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single);
+        setContentView(R.layout.activity_satellite);
+        ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
         findViewById(R.id.launch)
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().launch(SATELLITE_ID, ExampleSingleSatelliteFactory.missionStatement(10));
+                    controlCenter().launch(SATELLITE_ID, ExampleCacheSatelliteFactory.missionStatement(10));
                 }
             });
         findViewById(R.id.drop)
@@ -34,15 +35,15 @@ public class SingleLaunchActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter().satelliteFactory(SATELLITE_ID, new ExampleSingleSatelliteFactory());
+        controlCenter().satelliteFactory(SATELLITE_ID, new ExampleCacheSatelliteFactory());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (isFirstOnResume()) {
+        if (isFirstOnResume())
             add(
-                controlCenter().<Integer>connection(SATELLITE_ID, SessionType.SINGLE)
+                controlCenter().<Integer>connection(SATELLITE_ID, SessionType.CACHE)
                     .subscribe(RxNotification.split(
                         new Action1<Integer>() {
                             @Override
@@ -57,6 +58,5 @@ public class SingleLaunchActivity extends BaseLaunchActivity {
                                 log("SINGLE: onError " + throwable);
                             }
                         })));
-        }
     }
 }

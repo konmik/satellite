@@ -11,16 +11,24 @@
         android:background="@color/primary_material_dark"
         android:padding="4dp">
 
+        <ImageView
+            android:id="@+id/button_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="center"
+            android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha" />
+
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="28dp"
-            android:layout_marginStart="28dp"
-            android:text="Single result satellite"
+            android:layout_marginLeft="8dp"
             android:textColor="@color/primary_text_default_material_dark"
             android:textSize="20dp"
-            tools:ignore="SpUsage" />
+            tools:ignore="SpUsage"
+            tools:text="@string/app_name" />
 
     </LinearLayout>
 
@@ -83,8 +91,8 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="Space station report" />
 
         <TextView

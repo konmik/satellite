@@ -14,8 +14,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".single.SingleLaunchActivity" />
-        <activity android:name=".cache.CacheLaunchActivity" />
+        <activity android:name=".single.SingleConnectionActivity" />
+        <activity android:name=".cache.CacheConnectionActivity" />
     </application>
 
 </manifest>
