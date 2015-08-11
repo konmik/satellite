@@ -10,6 +10,8 @@ If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
 Satellite is basically the same but is much simpler because it does NOT utilize MVP pattern
 to do the same job.
 
+**WARNING!** This is an early proof-of-concept, please do not use it on production! :)
+
 ### Problem
 
 There are some defects in our Android applications and because of these defects we can not call
