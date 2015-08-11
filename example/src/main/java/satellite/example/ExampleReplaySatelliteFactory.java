@@ -11,7 +11,7 @@ import satellite.util.LogTransformer;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleSatelliteFactory implements SatelliteFactory<Integer> {
+public class ExampleReplaySatelliteFactory implements SatelliteFactory<Integer> {
 
     public static Bundle missionStatement(int from) {
         Bundle statement = new Bundle();
@@ -28,6 +28,6 @@ public class ExampleSatelliteFactory implements SatelliteFactory<Integer> {
                     return (int)(long)(aLong + missionStatement.getInt("from"));
                 }
             })
-            .compose(new LogTransformer<Integer>("ExampleSatellite -->"));
+            .compose(new LogTransformer<Integer>(getClass().getSimpleName() + " -->"));
     }
 }

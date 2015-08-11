@@ -18,9 +18,9 @@ import satellite.util.RxNotification;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class MainActivity extends BaseActivity {
+public class SingleActivity extends BaseActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "SingleActivity";
     private static final int SATELLITE_ID = 1;
 
     private Subscription stationSubscription;
