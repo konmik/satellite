@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Satellite</string>
-    <string name="single_description">Single result satellite is appropriate when there is only one value need to be returned.\n\nActions like SignIn fit here.</string>
+    <string name="single_description">Single result satellite is appropriate when there is only one value needs to be returned.
+        \n\nActions like "Sign in", "Upload profile image" are single result.</string>
 </resources>

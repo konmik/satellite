@@ -1,18 +1,18 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="satellite.example.SingleActivity">
+    tools:context="satellite.example.cache.CacheLaunchActivity">
 
     <LinearLayout
+        android:id="@+id/buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_centerHorizontal="true">
 
         <TextView
             android:layout_width="wrap_content"
@@ -31,19 +31,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="drop" />
-
-        <Button
-            android:id="@+id/hide"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="hide" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/stationReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textSize="12sp" />
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:layout_above="@id/stationReport"
+        android:layout_below="@id/buttons">
 
         <TextView
             android:id="@+id/textView"
@@ -52,9 +54,4 @@
 
     </ScrollView>
 
-    <TextView
-        android:id="@+id/stationReport"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</LinearLayout>
+</RelativeLayout>

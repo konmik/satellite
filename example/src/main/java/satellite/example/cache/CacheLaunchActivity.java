@@ -1,9 +1,8 @@
-package satellite.example;
+package satellite.example.cache;
 
 import android.os.Bundle;
 import android.util.StringBuilderPrinter;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
@@ -13,14 +12,17 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import satellite.SessionType;
+import satellite.example.BaseLaunchActivity;
+import satellite.example.R;
+import satellite.example.single.ExampleSingleSatelliteFactory;
 import satellite.util.LogTransformer;
 import satellite.util.RxNotification;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class SingleActivity extends BaseActivity {
+public class CacheLaunchActivity extends BaseLaunchActivity {
 
-    private static final String TAG = "SingleActivity";
+    private static final String TAG = "CacheLaunchActivity";
     private static final int SATELLITE_ID = 1;
 
     private Subscription stationSubscription;
@@ -28,7 +30,7 @@ public class SingleActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_single);
 
         findViewById(R.id.launch)
             .setOnClickListener(new View.OnClickListener() {
@@ -42,22 +44,6 @@ public class SingleActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     controlCenter().dropSatellite(SATELLITE_ID);
-                }
-            });
-        findViewById(R.id.hide)
-            .setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    stationSubscription.unsubscribe();
-                    Observable.just(1)
-                        .delay(5, TimeUnit.SECONDS, mainThread())
-                        .subscribe(new Action1<Integer>() {
-                            @Override
-                            public void call(Integer integer) {
-                                if (!isDestroyed())
-                                    setupSingle();
-                            }
-                        });
                 }
             });
 
@@ -104,17 +90,5 @@ public class SingleActivity extends BaseActivity {
                         log("SINGLE: onError " + throwable);
                     }
                 }));
-    }
-
-    private void log(String message) {
-        TextView textView = (TextView)findViewById(R.id.textView);
-        textView.setText(textView.getText() + "\n" + message);
-        final ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
-        scrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
     }
 }

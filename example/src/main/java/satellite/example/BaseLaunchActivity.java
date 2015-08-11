@@ -2,12 +2,14 @@ package satellite.example;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import rx.Subscription;
 import rx.internal.util.SubscriptionList;
 import satellite.MissionControlCenter;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseLaunchActivity extends AppCompatActivity {
 
     private static final String CONTROL_CENTER = "control_center";
 
@@ -73,5 +75,17 @@ public class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         isFirstOnResume = false;
+    }
+
+    protected void log(String message) {
+        TextView textView = (TextView)findViewById(R.id.textView);
+        textView.setText(textView.getText() + "\n" + message);
+        final ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 }
