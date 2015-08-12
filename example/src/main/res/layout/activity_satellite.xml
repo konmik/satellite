@@ -45,42 +45,64 @@
         <LinearLayout
             android:id="@+id/buttons"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_height="wrap_content">
 
             <Button
                 android:id="@+id/launch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="launch" />
+                android:text="Launch satellite" />
 
             <Button
                 android:id="@+id/drop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="drop" />
+                android:text="Drop satellite" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:padding="8dp"
-                android:text="Result:" />
+                android:text="Log:" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:padding="8dp"
+                android:text="Last result:" />
 
             <TextView
                 android:id="@+id/result"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp" />
+                android:layout_marginLeft="8dp"
+                android:padding="8dp"
+                tools:background="#4f00"
+                tools:text="99" />
 
         </LinearLayout>
+
 
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            tools:background="#20f0">
 
             <TextView
                 android:id="@+id/textView"
@@ -93,7 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Space station report" />
+            android:text="Space station report:" />
 
         <TextView
             android:id="@+id/stationReport"

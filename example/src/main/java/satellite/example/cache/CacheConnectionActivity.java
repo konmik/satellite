@@ -47,9 +47,9 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                     .subscribe(RxNotification.split(
                         new Action1<Integer>() {
                             @Override
-                            public void call(Integer o) {
-                                ((TextView)findViewById(R.id.result)).setText(Integer.toString(o));
-                                log("SINGLE: onNext " + o);
+                            public void call(Integer value) {
+                                log("SINGLE: onNext " + value);
+                                onNext(value);
                             }
                         },
                         new Action1<Throwable>() {

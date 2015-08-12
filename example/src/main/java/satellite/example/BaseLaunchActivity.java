@@ -1,5 +1,7 @@
 package satellite.example;
 
+import android.animation.ObjectAnimator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.StringBuilderPrinter;
@@ -106,7 +108,8 @@ public class BaseLaunchActivity extends AppCompatActivity {
 
     protected void log(String message) {
         TextView textView = (TextView)findViewById(R.id.textView);
-        textView.setText(textView.getText() + "\n" + message);
+        String text = textView.getText().toString();
+        textView.setText(text + (text.length() == 0 ? "" : "\n") + message);
         final ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
         scrollView.post(new Runnable() {
             @Override
@@ -114,5 +117,14 @@ public class BaseLaunchActivity extends AppCompatActivity {
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+    }
+
+    protected void onNext(Integer value) {
+        TextView result = (TextView)findViewById(R.id.result);
+        result.setText(Integer.toString(value));
+
+        ObjectAnimator.ofInt(result, "backgroundColor", Color.RED, Color.TRANSPARENT)
+            .setDuration(500)
+            .start();
     }
 }
