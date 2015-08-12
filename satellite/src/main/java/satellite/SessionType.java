@@ -2,7 +2,6 @@ package satellite;
 
 import rx.Notification;
 import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 import rx.subjects.Subject;
 
@@ -11,7 +10,7 @@ public enum SessionType {
     SINGLE {
         @Override
         public <T> Subject<Notification<T>, Notification<T>> createSubject() {
-            return PublishSubject.create();
+            return BehaviorSubject.create();
         }
     },
 
