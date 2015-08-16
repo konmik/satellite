@@ -19,11 +19,9 @@ import satellite.MissionControlCenter;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class BaseLaunchActivity extends AppCompatActivity {
+public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
 
-    private static final String CONTROL_CENTER = "control_center";
-
-    private MissionControlCenter controlCenter;
+    private MissionControlCenter<T> controlCenter;
     private boolean isFirstOnCreate = true;
     private boolean isFirstOnResume = true;
     private boolean isDestroyed = false;
@@ -32,17 +30,16 @@ public class BaseLaunchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null)
-            controlCenter = savedInstanceState.getParcelable(CONTROL_CENTER);
-        else
-            controlCenter = new MissionControlCenter();
+        controlCenter = new MissionControlCenter<>(getSessionType(), savedInstanceState);
         isFirstOnCreate = savedInstanceState == null;
     }
+
+    protected abstract MissionControlCenter.SessionType getSessionType();
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(CONTROL_CENTER, controlCenter);
+        controlCenter.saveInstanceState(outState);
     }
 
     @Override
@@ -66,7 +63,7 @@ public class BaseLaunchActivity extends AppCompatActivity {
         return isDestroyed;
     }
 
-    public MissionControlCenter controlCenter() {
+    public MissionControlCenter<T> controlCenter() {
         return controlCenter;
     }
 
@@ -78,8 +75,6 @@ public class BaseLaunchActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (isFirstOnResume) {
-            controlCenter.restoreSatellites();
-
             add(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
                 .subscribe(new Action1<Long>() {
                     @Override

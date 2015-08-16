@@ -8,4 +8,8 @@
         \n\n\"Observe database table\", \"Get user profile from server\" are such cases.
         \n\nIf the mission control center is connected to the space station the value returned by the satellite will be delivered immediately.
         \n\nIt the mission control center is not connected, then only the latest value will be delivered when such connection occurs.</string>
+    <string name="replay_description">Replay connection can be used for replaying items that was fetched with paging.
+        \n\nIf the mission control center is connected to the space station the value will be delivered immediately.
+        \n\nIf he mission control center is not connected,
+        then all items that has been received from the beginning will be replayed on connection again.</string>
 </resources>

@@ -1,4 +1,4 @@
-package satellite.example.cache;
+package satellite.example.replay;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +10,7 @@ import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
 
-public class CacheConnectionActivity extends BaseLaunchActivity<Integer> {
+public class ReplayConnectionActivity extends BaseLaunchActivity<Integer> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity<Integer> {
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().launch(ExampleCacheSatelliteFactory.missionStatement(10));
+                    controlCenter().launch(ExampleReplaySatelliteFactory.missionStatement(10));
                 }
             });
         findViewById(R.id.drop)
@@ -36,7 +36,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity<Integer> {
 
     @Override
     protected MissionControlCenter.SessionType getSessionType() {
-        return MissionControlCenter.SessionType.CACHE;
+        return MissionControlCenter.SessionType.REPLAY;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity<Integer> {
         super.onResume();
         if (isFirstOnResume())
             add(
-                controlCenter().connection(new ExampleCacheSatelliteFactory())
+                controlCenter().connection(new ExampleReplaySatelliteFactory())
                     .subscribe(RxNotification.split(
                         new Action1<Integer>() {
                             @Override

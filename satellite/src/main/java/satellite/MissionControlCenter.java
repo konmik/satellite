@@ -1,107 +1,113 @@
 package satellite;
 
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Printer;
-
-import java.util.HashMap;
 
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.subjects.Subject;
+import rx.functions.Func1;
+import rx.subjects.BehaviorSubject;
 
-public class MissionControlCenter implements Parcelable {
+public class MissionControlCenter<T> {
 
-    private DataCenter dataCenter;
-
-    private HashMap<String, SatelliteFactory> factories = new HashMap<>();
-
-    public MissionControlCenter() {
-        dataCenter = new DataCenter();
+    public interface SessionTypeOnSubscribe<T> extends Observable.OnSubscribe<Notification<T>> {
+        void recycle();
     }
 
-    public <T> void satelliteFactory(Integer id, SatelliteFactory<T> factory) {
-        factories.put(dataCenter.provideKey(id), factory);
+    public enum SessionType {
+        SINGLE {
+            @Override
+            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+                return new SingleResultConnectionOnSubscribe<>(key, factory, missionStatement);
+            }
+        },
+        CACHE {
+            @Override
+            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+                return new CacheResultConnectionOnSubscribe<>(key, factory, missionStatement);
+            }
+        },
+        REPLAY {
+            @Override
+            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+                return new ReplayResultConnectionOnSubscribe<>(key, factory, missionStatement);
+            }
+        };
+
+        protected abstract <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement);
     }
 
-    public <T> Observable<Notification<T>> connection(final Integer id, final SessionType sessionType) {
-        Observable<Notification<T>> connection = SpaceStation.INSTANCE.connection(
-            dataCenter.provideKey(id),
-            new Func0<Subject>() {
+    private final SessionType type;
+    private final String key;
+
+    private BehaviorSubject<Bundle> launches = BehaviorSubject.create();
+    private boolean restore;
+    private Bundle missionStatement;
+    private SessionTypeOnSubscribe<T> onSubscribe;
+
+    private static long id;
+
+    public MissionControlCenter(SessionType type, Bundle state) {
+        this.type = type;
+        if (state == null)
+            key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
+        else {
+            key = state.getString("key");
+            restore = state.getBoolean("restore");
+            missionStatement = state.getBundle("missionStatement");
+            if (restore)
+                launches.onNext(missionStatement);
+        }
+    }
+
+    public void saveInstanceState(Bundle bundle) {
+        bundle.putString("key", key);
+        bundle.putBoolean("restore", restore);
+        bundle.putBundle("missionStatement", missionStatement);
+    }
+
+    public Observable<Notification<T>> connection(final SatelliteFactory<T> factory) {
+        return launches
+            .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
-                public Subject call() {
-                    return sessionType.createSubject();
+                public Observable<Notification<T>> call(final Bundle bundle) {
+                    if (onSubscribe != null)
+                        onSubscribe.recycle();
+                    onSubscribe = type.createOnSubscribe(key, factory, missionStatement);
+                    return Observable.create(onSubscribe);
                 }
-            });
-        return connection
+            })
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
-                public void call(Notification<T> notification) {
-                    if (sessionType == SessionType.SINGLE)
-                        dropSatellite(id);
+                public void call(Notification<T> tNotification) {
+                    if (tNotification.isOnCompleted())
+                        dismiss();
                 }
-            });
-    }
-
-    public void launch(Integer id, final Bundle missionStatement) {
-        dropSatellite(id);
-        final String key = dataCenter.provideKey(id);
-        dataCenter.registerLaunch(id, new SatelliteLaunch(key, missionStatement));
-        SpaceStation.INSTANCE.connectSatellite(key, new Func0<Observable>() {
-            @Override
-            public Observable call() {
-                return factories.get(key).call(missionStatement);
-            }
-        });
-    }
-
-    public void restoreSatellites() {
-        for (final SatelliteLaunch launch : dataCenter.launches()) {
-            final String key = launch.getKey();
-            SpaceStation.INSTANCE.connectSatellite(key, new Func0<Observable>() {
+            })
+            .filter(new Func1<Notification<T>, Boolean>() {
                 @Override
-                public Observable call() {
-                    return factories.get(key).call(launch.getArguments());
+                public Boolean call(Notification<T> notification) {
+                    return !notification.isOnCompleted();
                 }
             });
-        }
+    }
+
+    public void launch(Bundle missionStatement) {
+        dismiss();
+        this.restore = true;
+        this.missionStatement = missionStatement;
+        launches.onNext(missionStatement);
     }
 
     public void dismiss() {
-        SpaceStation.INSTANCE.clear(dataCenter.keys());
-    }
-
-    public void dropSatellite(Integer id) {
-        SpaceStation.INSTANCE.disconnectSatellite(dataCenter.provideKey(id));
-        dataCenter.deleteLaunch(id);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {dest.writeParcelable(dataCenter, flags);}
-
-    protected MissionControlCenter(Parcel in) {
-        dataCenter = in.readParcelable(DataCenter.class.getClassLoader());
-    }
-
-    public static final Creator<MissionControlCenter> CREATOR = new Creator<MissionControlCenter>() {
-        @Override
-        public MissionControlCenter createFromParcel(Parcel in) {
-            return new MissionControlCenter(in);
+        restore = false;
+        missionStatement = null;
+        if (onSubscribe != null) {
+            onSubscribe.recycle();
+            onSubscribe = null;
         }
-
-        @Override
-        public MissionControlCenter[] newArray(int size) {
-            return new MissionControlCenter[size];
-        }
-    };
+    }
 
     public void printSpaceStation(Printer printer) {
         SpaceStation.INSTANCE.print(printer);

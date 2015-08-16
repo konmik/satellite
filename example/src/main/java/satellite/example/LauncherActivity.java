@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import satellite.example.cache.CacheConnectionActivity;
+import satellite.example.replay.ReplayConnectionActivity;
 import satellite.example.single.SingleConnectionActivity;
 
 public class LauncherActivity extends AppCompatActivity {
@@ -24,6 +25,12 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LauncherActivity.this, CacheConnectionActivity.class));
+            }
+        });
+        findViewById(R.id.button_replay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LauncherActivity.this, ReplayConnectionActivity.class));
             }
         });
     }

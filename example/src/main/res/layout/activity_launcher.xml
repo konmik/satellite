@@ -59,6 +59,19 @@
                 android:layout_marginTop="16dp"
                 android:text="Cache result connection example" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/replay_description" />
+
+            <Button
+                android:id="@+id/button_replay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Replay result connection example" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

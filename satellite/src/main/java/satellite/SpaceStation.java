@@ -24,6 +24,25 @@ enum SpaceStation {
 
     private HashMap<String, Subject> earthConnections = new HashMap<>();
     private HashMap<String, Subscription> satelliteConnections = new HashMap<>();
+    private HashMap<String, Object> raw = new HashMap<>();
+
+    public <T> T provide(String key, Func0<T> factory) {
+        if (!raw.containsKey(key))
+            raw.put(key, factory.call());
+        return (T)raw.get(key);
+    }
+
+    public <T> T get(String key) {
+        return (T)raw.get(key);
+    }
+
+    public <T> void put(String key, T value) {
+        raw.put(key, value);
+    }
+
+    public void remove(String key) {
+        raw.remove(key);
+    }
 
     public <T> Observable<Notification<T>> connection(final String key, Func0<Subject> connectionFactory) {
         if (earthConnections.get(key) == null) {
@@ -78,6 +97,9 @@ enum SpaceStation {
             printer.println(key);
         printer.println("earth connection keys:");
         for (String key : earthConnections.keySet())
+            printer.println(key);
+        printer.println("raw keys:");
+        for (String key : raw.keySet())
             printer.println(key);
     }
 

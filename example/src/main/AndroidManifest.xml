@@ -16,6 +16,7 @@
         </activity>
         <activity android:name=".single.SingleConnectionActivity" />
         <activity android:name=".cache.CacheConnectionActivity" />
+        <activity android:name=".replay.ReplayConnectionActivity" />
     </application>
 
 </manifest>

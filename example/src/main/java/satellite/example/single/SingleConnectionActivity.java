@@ -5,14 +5,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import rx.functions.Action1;
-import satellite.SessionType;
+import satellite.MissionControlCenter;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
 
-public class SingleConnectionActivity extends BaseLaunchActivity {
-
-    private static final int SATELLITE_ID = 1;
+public class SingleConnectionActivity extends BaseLaunchActivity<Integer> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,18 +22,21 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().launch(SATELLITE_ID, ExampleSingleSatelliteFactory.missionStatement(10));
+                    controlCenter().launch(ExampleSingleSatelliteFactory.missionStatement(10));
                 }
             });
         findViewById(R.id.drop)
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().dropSatellite(SATELLITE_ID);
+                    controlCenter().dismiss();
                 }
             });
+    }
 
-        controlCenter().satelliteFactory(SATELLITE_ID, new ExampleSingleSatelliteFactory());
+    @Override
+    protected MissionControlCenter.SessionType getSessionType() {
+        return MissionControlCenter.SessionType.SINGLE;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onResume();
         if (isFirstOnResume()) {
             add(
-                controlCenter().<Integer>connection(SATELLITE_ID, SessionType.SINGLE)
+                controlCenter().connection(new ExampleSingleSatelliteFactory())
                     .subscribe(RxNotification.split(
                         new Action1<Integer>() {
                             @Override
