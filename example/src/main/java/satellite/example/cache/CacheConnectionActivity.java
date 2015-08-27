@@ -40,24 +40,24 @@ public class CacheConnectionActivity extends BaseLaunchActivity<Integer> {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (isFirstOnResume())
-            add(
-                controlCenter().connection(new ExampleCacheSatelliteFactory())
-                    .subscribe(RxNotification.split(
-                        new Action1<Integer>() {
-                            @Override
-                            public void call(Integer value) {
-                                log("SINGLE: onNext " + value);
-                                onNext(value);
-                            }
-                        },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                log("SINGLE: onError " + throwable);
-                            }
-                        })));
+    protected void onCreateConnections() {
+        super.onCreateConnections();
+
+        add(
+            controlCenter().connection(new ExampleCacheSatelliteFactory())
+                .subscribe(RxNotification.split(
+                    new Action1<Integer>() {
+                        @Override
+                        public void call(Integer value) {
+                            log("SINGLE: onNext " + value);
+                            onNext(value);
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            log("SINGLE: onError " + throwable);
+                        }
+                    })));
     }
 }

@@ -22,7 +22,6 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
 
     private MissionControlCenter<T> controlCenter;
-    private boolean isFirstOnCreate = true;
     private boolean isFirstOnResume = true;
     private boolean isDestroyed = false;
     private SubscriptionList subscriptions = new SubscriptionList();
@@ -31,7 +30,6 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controlCenter = new MissionControlCenter<>(getSessionType(), savedInstanceState);
-        isFirstOnCreate = savedInstanceState == null;
     }
 
     protected abstract MissionControlCenter.SessionType getSessionType();
@@ -51,14 +49,6 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
             controlCenter.dismiss();
     }
 
-    public boolean isFirstOnCreate() {
-        return isFirstOnCreate;
-    }
-
-    public boolean isFirstOnResume() {
-        return isFirstOnResume;
-    }
-
     public boolean isDestroyed() {
         return isDestroyed;
     }
@@ -75,24 +65,29 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (isFirstOnResume) {
-            add(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long ignored) {
-                        StringBuilder builder = new StringBuilder();
-                        controlCenter().printSpaceStation(new StringBuilderPrinter(builder));
-                        TextView report = (TextView)findViewById(R.id.stationReport);
-                        report.setText(builder.toString());
-                    }
-                }));
-
-            findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
+            onCreateConnections();
+            isFirstOnResume = false;
         }
+    }
+
+    protected void onCreateConnections() {
+        add(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
+            .subscribe(new Action1<Long>() {
+                @Override
+                public void call(Long ignored) {
+                    StringBuilder builder = new StringBuilder();
+                    controlCenter().printSpaceStation(new StringBuilderPrinter(builder));
+                    TextView report = (TextView)findViewById(R.id.stationReport);
+                    report.setText(builder.toString());
+                }
+            }));
+
+        findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
