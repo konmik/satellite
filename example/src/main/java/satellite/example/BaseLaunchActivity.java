@@ -16,6 +16,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.internal.util.SubscriptionList;
 import satellite.MissionControlCenter;
+import satellite.connections.SpaceStation;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -30,6 +31,13 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controlCenter = new MissionControlCenter<>(getSessionType(), savedInstanceState);
+
+        findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     protected abstract MissionControlCenter.SessionType getSessionType();
@@ -76,18 +84,11 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
                 @Override
                 public void call(Long ignored) {
                     StringBuilder builder = new StringBuilder();
-                    controlCenter().printSpaceStation(new StringBuilderPrinter(builder));
+                    SpaceStation.INSTANCE.print(new StringBuilderPrinter(builder));
                     TextView report = (TextView)findViewById(R.id.stationReport);
                     report.setText(builder.toString());
                 }
             }));
-
-        findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
     }
 
     @Override

@@ -1,4 +1,4 @@
-package satellite;
+package satellite.connections;
 
 import android.os.Bundle;
 
@@ -8,6 +8,8 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func0;
 import rx.subjects.ReplaySubject;
+import satellite.MissionControlCenter;
+import satellite.SatelliteFactory;
 
 public class ReplayResultConnectionOnSubscribe<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
 

@@ -1,13 +1,15 @@
 package satellite;
 
 import android.os.Bundle;
-import android.util.Printer;
 
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
+import satellite.connections.CacheResultConnectionOnSubscribe;
+import satellite.connections.ReplayResultConnectionOnSubscribe;
+import satellite.connections.SingleResultConnectionOnSubscribe;
 
 public class MissionControlCenter<T> {
 
@@ -107,9 +109,5 @@ public class MissionControlCenter<T> {
             onSubscribe.recycle();
             onSubscribe = null;
         }
-    }
-
-    public void printSpaceStation(Printer printer) {
-        SpaceStation.INSTANCE.print(printer);
     }
 }

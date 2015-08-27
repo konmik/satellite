@@ -10,6 +10,7 @@ import java.util.List;
 import rx.functions.Func0;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
+import satellite.connections.SpaceStation;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;

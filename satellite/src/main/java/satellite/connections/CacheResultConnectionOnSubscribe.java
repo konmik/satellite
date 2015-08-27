@@ -1,4 +1,4 @@
-package satellite;
+package satellite.connections;
 
 import android.os.Bundle;
 
@@ -6,17 +6,18 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.subjects.BehaviorSubject;
+import satellite.MissionControlCenter;
+import satellite.SatelliteFactory;
 
-public class SingleResultConnectionOnSubscribe<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
+public class CacheResultConnectionOnSubscribe<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
 
     private final String key;
     private final SatelliteFactory<T> factory;
     private final Bundle missionStatement;
 
-    public SingleResultConnectionOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+    public CacheResultConnectionOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
         this.key = key;
         this.factory = factory;
         this.missionStatement = missionStatement;
@@ -33,7 +34,6 @@ public class SingleResultConnectionOnSubscribe<T> implements MissionControlCente
                     BehaviorSubject<Notification<T>> subject = BehaviorSubject.create();
 
                     SpaceStation.INSTANCE.put(key + "/subscription", factory.call(missionStatement)
-                        .first()
                         .materialize()
                         .subscribe(subject));
 
@@ -44,6 +44,7 @@ public class SingleResultConnectionOnSubscribe<T> implements MissionControlCente
         subscriber.add(subject.subscribe(subscriber));
     }
 
+    @Override
     public void recycle() {
         SpaceStation.INSTANCE.remove(key + "/subject");
         Subscription subscription = SpaceStation.INSTANCE.get(key + "/subscription");
