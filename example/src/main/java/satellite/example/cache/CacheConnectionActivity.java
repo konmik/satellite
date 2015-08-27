@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import rx.functions.Action1;
+import satellite.EarthBase;
 import satellite.MissionControlCenter;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
@@ -12,7 +13,9 @@ import satellite.util.RxNotification;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
-    private MissionControlCenter controlCenter;
+    public static final int SATELLITE_ID = 1;
+
+    private EarthBase earthBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,20 +28,20 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter.launch(ExampleCacheSatelliteFactory.missionStatement(10));
+                    earthBase.launch(SATELLITE_ID, ExampleCacheSatelliteFactory.missionStatement(10));
                 }
             });
         findViewById(R.id.drop)
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter.dismiss();
+                    earthBase.dismiss(SATELLITE_ID);
                 }
             });
 
-        controlCenter = new MissionControlCenter(
-            MissionControlCenter.SessionType.CACHE,
-            savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
+        earthBase = new EarthBase.Builder(savedInstanceState == null ? null : savedInstanceState.getBundle("center"))
+            .controlCenter(SATELLITE_ID, MissionControlCenter.SessionType.CACHE)
+            .build();
     }
 
     @Override
@@ -46,7 +49,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new ExampleCacheSatelliteFactory())
+            earthBase.connection(SATELLITE_ID, new ExampleCacheSatelliteFactory())
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override
@@ -67,12 +70,12 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing())
-            controlCenter.dismiss();
+            earthBase.dismissAll();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle("center", controlCenter.saveInstanceState());
+        outState.putBundle("center", earthBase.saveInstanceState());
     }
 }

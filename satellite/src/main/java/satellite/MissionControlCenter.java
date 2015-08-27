@@ -6,7 +6,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 import satellite.connections.CacheResultConnectionOnSubscribe;
 import satellite.connections.ReplayResultConnectionOnSubscribe;
 import satellite.connections.SingleResultConnectionOnSubscribe;
@@ -46,9 +46,9 @@ public class MissionControlCenter {
     private final SessionType type;
     private final String key;
 
-    private BehaviorSubject<Bundle> launches = BehaviorSubject.create();
+    private PublishSubject<Bundle> launches = PublishSubject.create();
     private boolean restore;
-    private Bundle missionStatement;
+    private Bundle statement;
     private SessionTypeOnSubscribe<?> onSubscribe;
 
     private static long id;
@@ -60,9 +60,7 @@ public class MissionControlCenter {
         else {
             key = state.getString("key");
             restore = state.getBoolean("restore");
-            missionStatement = state.getBundle("missionStatement");
-            if (restore)
-                launches.onNext(missionStatement);
+            statement = state.getBundle("statement");
         }
     }
 
@@ -70,18 +68,18 @@ public class MissionControlCenter {
         Bundle bundle = new Bundle();
         bundle.putString("key", key);
         bundle.putBoolean("restore", restore);
-        bundle.putBundle("missionStatement", missionStatement);
+        bundle.putBundle("statement", statement);
         return bundle;
     }
 
     public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory) {
-        return launches
+        return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
                     if (onSubscribe != null)
                         onSubscribe.recycle();
-                    SessionTypeOnSubscribe<T> onSubscribe1 = type.createOnSubscribe(key, factory, missionStatement);
+                    SessionTypeOnSubscribe<T> onSubscribe1 = type.createOnSubscribe(key, factory, statement);
                     onSubscribe = onSubscribe1;
                     return Observable.create(onSubscribe1);
                 }
@@ -101,16 +99,16 @@ public class MissionControlCenter {
             });
     }
 
-    public void launch(Bundle missionStatement) {
+    public void launch(Bundle statement) {
         dismiss();
         this.restore = true;
-        this.missionStatement = missionStatement;
-        launches.onNext(missionStatement);
+        this.statement = statement;
+        launches.onNext(statement);
     }
 
     public void dismiss() {
         restore = false;
-        missionStatement = null;
+        statement = null;
         if (onSubscribe != null) {
             onSubscribe.recycle();
             onSubscribe = null;
