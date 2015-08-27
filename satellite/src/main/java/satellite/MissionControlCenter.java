@@ -13,9 +13,8 @@ import satellite.connections.SingleResultConnectionOnSubscribe;
 
 /**
  * MissionControlCenter controls only one satellite.
- * @param <T> a type of onNext satellite events.
  */
-public class MissionControlCenter<T> {
+public class MissionControlCenter {
 
     public interface SessionTypeOnSubscribe<T> extends Observable.OnSubscribe<Notification<T>> {
         void recycle();
@@ -50,7 +49,7 @@ public class MissionControlCenter<T> {
     private BehaviorSubject<Bundle> launches = BehaviorSubject.create();
     private boolean restore;
     private Bundle missionStatement;
-    private SessionTypeOnSubscribe<T> onSubscribe;
+    private SessionTypeOnSubscribe<?> onSubscribe;
 
     private static long id;
 
@@ -67,21 +66,24 @@ public class MissionControlCenter<T> {
         }
     }
 
-    public void saveInstanceState(Bundle bundle) {
+    public Bundle saveInstanceState() {
+        Bundle bundle = new Bundle();
         bundle.putString("key", key);
         bundle.putBoolean("restore", restore);
         bundle.putBundle("missionStatement", missionStatement);
+        return bundle;
     }
 
-    public Observable<Notification<T>> connection(final SatelliteFactory<T> factory) {
+    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory) {
         return launches
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
                     if (onSubscribe != null)
                         onSubscribe.recycle();
-                    onSubscribe = type.createOnSubscribe(key, factory, missionStatement);
-                    return Observable.create(onSubscribe);
+                    SessionTypeOnSubscribe<T> onSubscribe1 = type.createOnSubscribe(key, factory, missionStatement);
+                    onSubscribe = onSubscribe1;
+                    return Observable.create(onSubscribe1);
                 }
             })
             .doOnNext(new Action1<Notification<T>>() {

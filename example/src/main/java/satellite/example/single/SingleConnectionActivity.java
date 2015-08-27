@@ -12,7 +12,7 @@ import satellite.util.RxNotification;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private MissionControlCenter<Integer> controlCenter;
+    private MissionControlCenter controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,9 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter = new MissionControlCenter<>(MissionControlCenter.SessionType.SINGLE, savedInstanceState);
+        controlCenter = new MissionControlCenter(
+            MissionControlCenter.SessionType.SINGLE,
+            savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
     }
 
     @Override
@@ -71,6 +73,6 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        controlCenter.saveInstanceState(outState);
+        outState.putBundle("center", controlCenter.saveInstanceState());
     }
 }
