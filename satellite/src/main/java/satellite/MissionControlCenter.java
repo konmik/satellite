@@ -11,6 +11,10 @@ import satellite.connections.CacheResultConnectionOnSubscribe;
 import satellite.connections.ReplayResultConnectionOnSubscribe;
 import satellite.connections.SingleResultConnectionOnSubscribe;
 
+/**
+ * MissionControlCenter controls only one satellite.
+ * @param <T> a type of onNext satellite events.
+ */
 public class MissionControlCenter<T> {
 
     public interface SessionTypeOnSubscribe<T> extends Observable.OnSubscribe<Notification<T>> {

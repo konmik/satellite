@@ -10,11 +10,14 @@ import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
 
-public class ReplayConnectionActivity extends BaseLaunchActivity<Integer> {
+public class ReplayConnectionActivity extends BaseLaunchActivity {
+
+    private MissionControlCenter<Integer> controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
@@ -22,29 +25,26 @@ public class ReplayConnectionActivity extends BaseLaunchActivity<Integer> {
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().launch(ExampleReplaySatelliteFactory.missionStatement(10));
+                    controlCenter.launch(ExampleReplaySatelliteFactory.missionStatement(10));
                 }
             });
         findViewById(R.id.drop)
             .setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    controlCenter().dismiss();
+                    controlCenter.dismiss();
                 }
             });
-    }
 
-    @Override
-    protected MissionControlCenter.SessionType getSessionType() {
-        return MissionControlCenter.SessionType.REPLAY;
+        controlCenter = new MissionControlCenter<>(MissionControlCenter.SessionType.REPLAY, savedInstanceState);
     }
 
     @Override
     protected void onCreateConnections() {
         super.onCreateConnections();
 
-        add(
-            controlCenter().connection(new ExampleReplaySatelliteFactory())
+        unsubscribeOnDestroy(
+            controlCenter.connection(new ExampleReplaySatelliteFactory())
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override
@@ -59,5 +59,18 @@ public class ReplayConnectionActivity extends BaseLaunchActivity<Integer> {
                             log("SINGLE: onError " + throwable);
                         }
                     })));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing())
+            controlCenter.dismiss();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        controlCenter.saveInstanceState(outState);
     }
 }

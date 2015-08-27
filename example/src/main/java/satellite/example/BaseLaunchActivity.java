@@ -15,22 +15,19 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.internal.util.SubscriptionList;
-import satellite.MissionControlCenter;
 import satellite.connections.SpaceStation;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
+public abstract class BaseLaunchActivity extends AppCompatActivity {
 
-    private MissionControlCenter<T> controlCenter;
     private boolean isFirstOnResume = true;
     private boolean isDestroyed = false;
-    private SubscriptionList subscriptions = new SubscriptionList();
+    private SubscriptionList unsubscribeOnDestroy = new SubscriptionList();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        controlCenter = new MissionControlCenter<>(getSessionType(), savedInstanceState);
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,33 +37,19 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
         });
     }
 
-    protected abstract MissionControlCenter.SessionType getSessionType();
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        controlCenter.saveInstanceState(outState);
-    }
-
     @Override
     protected void onDestroy() {
         isDestroyed = true;
         super.onDestroy();
-        subscriptions.unsubscribe();
-        if (isFinishing())
-            controlCenter.dismiss();
+        unsubscribeOnDestroy.unsubscribe();
     }
 
     public boolean isDestroyed() {
         return isDestroyed;
     }
 
-    public MissionControlCenter<T> controlCenter() {
-        return controlCenter;
-    }
-
-    public void add(Subscription subscription) {
-        subscriptions.add(subscription);
+    public void unsubscribeOnDestroy(Subscription subscription) {
+        unsubscribeOnDestroy.add(subscription);
     }
 
     @Override
@@ -79,7 +62,7 @@ public abstract class BaseLaunchActivity<T> extends AppCompatActivity {
     }
 
     protected void onCreateConnections() {
-        add(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
+        unsubscribeOnDestroy(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
             .subscribe(new Action1<Long>() {
                 @Override
                 public void call(Long ignored) {
