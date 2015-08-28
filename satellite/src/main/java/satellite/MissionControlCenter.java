@@ -1,7 +1,5 @@
 package satellite;
 
-import android.os.Bundle;
-
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
@@ -9,47 +7,46 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import satellite.connections.Connection;
+import satellite.io.InputMap;
+import satellite.io.OutputMap;
 
 /**
  * MissionControlCenter controls only one satellite.
  */
 public class MissionControlCenter {
 
-    public interface ConnectionFactory<T> extends Func2<String, Bundle, Connection<T>> {
+    public interface ConnectionFactory<T> extends Func2<String, InputMap, Connection<T>> {
     }
 
     private final String key;
+    private final boolean restore;
+    private final InputMap statement;
+    private final OutputMap out;
 
-    private PublishSubject<Bundle> launches = PublishSubject.create();
-    private boolean restore;
-    private Bundle statement;
+    private final PublishSubject<InputMap> launches = PublishSubject.create();
 
     private static long id;
 
-    public MissionControlCenter(Bundle state) {
-        if (state == null)
-            key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
-        else {
-            key = state.getString("key");
-            restore = state.getBoolean("restore");
-            statement = state.getBundle("statement");
-        }
+    public MissionControlCenter(InputMap inA) {
+        InputMap in = inA != null ? inA :
+            new InputMap("key", "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE));
+
+        key = in.get("key");
+        restore = in.get("restore", false);
+        statement = in.get("statement");
+        out = in.toOutput();
     }
 
-    public Bundle saveInstanceState() {
-        Bundle bundle = new Bundle();
-        bundle.putString("key", key);
-        bundle.putBoolean("restore", restore);
-        bundle.putBundle("statement", statement);
-        return bundle;
+    public OutputMap saveInstanceState() {
+        return out;
     }
 
     public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> factory) {
         return (restore ? launches.startWith(statement) : launches)
-            .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
+            .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
                 @Override
-                public Observable<Notification<T>> call(final Bundle bundle) {
-                    return Observable.create(factory.call(key, statement));
+                public Observable<Notification<T>> call(InputMap input) {
+                    return Observable.create(factory.call(key, input));
                 }
             })
             .doOnNext(new Action1<Notification<T>>() {
@@ -61,16 +58,16 @@ public class MissionControlCenter {
             });
     }
 
-    public void launch(Bundle statement) {
+    public void launch(InputMap statement) {
         Connection.recycle(key);
-        this.restore = true;
-        this.statement = statement;
+        out.put("restore", true);
+        out.put("statement", statement);
         launches.onNext(statement);
     }
 
     public void dismiss() {
-        restore = false;
-        statement = null;
+        out.remove("restore");
+        out.remove("statement");
         Connection.recycle(key);
     }
 }

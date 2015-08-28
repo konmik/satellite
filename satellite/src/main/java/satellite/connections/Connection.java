@@ -1,13 +1,12 @@
 package satellite.connections;
 
-import android.os.Bundle;
-
 import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func0;
 import rx.subjects.Subject;
 import satellite.SatelliteFactory;
+import satellite.io.InputMap;
 
 public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
 
@@ -15,21 +14,19 @@ public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
     }
 
     private final String key;
-    private final SatelliteFactory<T> factory;
+    private final SatelliteFactory<T> satelliteFactory;
     private final SubjectFactory<T> subjectFactory;
-    private final Bundle missionStatement;
+    private final InputMap missionStatement;
 
-    public Connection(String key, SatelliteFactory<T> factory, SubjectFactory<T> subjectFactory, Bundle missionStatement) {
+    public Connection(String key, SatelliteFactory<T> satelliteFactory, SubjectFactory<T> subjectFactory, InputMap missionStatement) {
         this.key = key;
-        this.factory = factory;
+        this.satelliteFactory = satelliteFactory;
         this.subjectFactory = subjectFactory;
         this.missionStatement = missionStatement;
     }
 
     @Override
     public void call(Subscriber<? super Notification<T>> subscriber) {
-        recycle(key);
-
         Observable<Notification<T>> subject = SpaceStation.INSTANCE
             .provideSubject(key, new Func0<Subject<Notification<T>, Notification<T>>>() {
                 @Override
@@ -37,7 +34,7 @@ public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
 
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
 
-                    SpaceStation.INSTANCE.takeSubscription(key, factory.call(missionStatement)
+                    SpaceStation.INSTANCE.takeSubscription(key, satelliteFactory.call(missionStatement)
                         .materialize()
                         .subscribe(subject));
 

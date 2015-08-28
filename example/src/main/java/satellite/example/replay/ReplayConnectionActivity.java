@@ -9,6 +9,7 @@ import satellite.MissionControlCenter;
 import satellite.connections.ReplayConnectionFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
+import satellite.io.InputMap;
 import satellite.util.RxNotification;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
@@ -37,7 +38,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter = new MissionControlCenter(savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
+        controlCenter = new MissionControlCenter(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("center"));
     }
 
     @Override
@@ -72,6 +73,6 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle("center", controlCenter.saveInstanceState());
+        outState.putParcelable("center", controlCenter.saveInstanceState().toInput());
     }
 }

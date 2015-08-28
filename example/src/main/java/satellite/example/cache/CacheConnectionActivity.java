@@ -9,11 +9,11 @@ import satellite.EarthBase;
 import satellite.connections.CacheConnectionFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
+import satellite.io.InputMap;
 import satellite.util.RxNotification;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
-    public static final String EARTH_BASE_KEY = "base";
     public static final int SATELLITE_ID = 1;
 
     private EarthBase earthBase;
@@ -40,7 +40,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        earthBase = new EarthBase(savedInstanceState == null ? null : savedInstanceState.getBundle(EARTH_BASE_KEY), SATELLITE_ID);
+        earthBase = new EarthBase(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("base"), SATELLITE_ID);
     }
 
     @Override
@@ -75,6 +75,6 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle("base", earthBase.saveInstanceState());
+        outState.putParcelable("base", earthBase.saveInstanceState().toInput());
     }
 }

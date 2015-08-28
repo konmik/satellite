@@ -28,6 +28,10 @@ public enum SpaceStation {
         return subjects.get(key);
     }
 
+    public boolean contains(String key) {
+        return subjects.containsKey(key);
+    }
+
     void takeSubscription(String key, Subscription subscription) {
         dropSubscription(key);
         subscriptions.put(key, subscription);
