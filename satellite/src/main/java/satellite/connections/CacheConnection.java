@@ -11,13 +11,24 @@ import rx.subjects.BehaviorSubject;
 import satellite.MissionControlCenter;
 import satellite.SatelliteFactory;
 
-public class CacheResultConnectionOnSubscribe<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
+public class CacheConnection<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
+
+    private static final MissionControlCenter.SessionFactory<Object> SESSION_FACTORY = new MissionControlCenter.SessionFactory<Object>() {
+        @Override
+        public MissionControlCenter.SessionTypeOnSubscribe<Object> call(String key, SatelliteFactory<Object> satelliteFactory, Bundle bundle) {
+            return new CacheConnection<>(key, satelliteFactory, bundle);
+        }
+    };
+
+    public static <T> MissionControlCenter.SessionFactory<T> factory() {
+        return (MissionControlCenter.SessionFactory<T>)SESSION_FACTORY;
+    }
 
     private final String key;
     private final SatelliteFactory<T> factory;
     private final Bundle missionStatement;
 
-    public CacheResultConnectionOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+    public CacheConnection(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
         this.key = key;
         this.factory = factory;
         this.missionStatement = missionStatement;

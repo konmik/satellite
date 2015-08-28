@@ -6,10 +6,8 @@ import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func3;
 import rx.subjects.PublishSubject;
-import satellite.connections.CacheResultConnectionOnSubscribe;
-import satellite.connections.ReplayResultConnectionOnSubscribe;
-import satellite.connections.SingleResultConnectionOnSubscribe;
 
 /**
  * MissionControlCenter controls only one satellite.
@@ -20,27 +18,8 @@ public class MissionControlCenter {
         void recycle();
     }
 
-    public enum SessionType {
-        SINGLE {
-            @Override
-            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
-                return new SingleResultConnectionOnSubscribe<>(key, factory, missionStatement);
-            }
-        },
-        CACHE {
-            @Override
-            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
-                return new CacheResultConnectionOnSubscribe<>(key, factory, missionStatement);
-            }
-        },
-        REPLAY {
-            @Override
-            protected <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
-                return new ReplayResultConnectionOnSubscribe<>(key, factory, missionStatement);
-            }
-        };
+    public interface SessionFactory<T> extends Func3<String, SatelliteFactory<T>, Bundle, MissionControlCenter.SessionTypeOnSubscribe<T>> {
 
-        protected abstract <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement);
     }
 
     private final String key;
@@ -70,14 +49,14 @@ public class MissionControlCenter {
         return bundle;
     }
 
-    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory, final SessionType type) {
+    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory, final SessionFactory<T> type) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
                     if (onSubscribe != null)
                         onSubscribe.recycle();
-                    SessionTypeOnSubscribe<T> onSubscribe1 = type.createOnSubscribe(key, factory, statement);
+                    SessionTypeOnSubscribe<T> onSubscribe1 = type.call(key, factory, statement);
                     onSubscribe = onSubscribe1;
                     return Observable.create(onSubscribe1);
                 }

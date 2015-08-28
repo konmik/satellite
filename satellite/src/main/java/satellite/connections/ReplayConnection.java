@@ -7,17 +7,28 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func0;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.ReplaySubject;
 import satellite.MissionControlCenter;
 import satellite.SatelliteFactory;
 
-public class SingleResultConnectionOnSubscribe<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
+public class ReplayConnection<T> implements MissionControlCenter.SessionTypeOnSubscribe<T> {
+
+    private static final MissionControlCenter.SessionFactory<Object> SESSION_FACTORY = new MissionControlCenter.SessionFactory<Object>() {
+        @Override
+        public MissionControlCenter.SessionTypeOnSubscribe<Object> call(String key, SatelliteFactory<Object> satelliteFactory, Bundle bundle) {
+            return new ReplayConnection<>(key, satelliteFactory, bundle);
+        }
+    };
+
+    public static <T> MissionControlCenter.SessionFactory<T> factory() {
+        return (MissionControlCenter.SessionFactory<T>)SESSION_FACTORY;
+    }
 
     private final String key;
     private final SatelliteFactory<T> factory;
     private final Bundle missionStatement;
 
-    public SingleResultConnectionOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
+    public ReplayConnection(String key, SatelliteFactory<T> factory, Bundle missionStatement) {
         this.key = key;
         this.factory = factory;
         this.missionStatement = missionStatement;
@@ -31,10 +42,9 @@ public class SingleResultConnectionOnSubscribe<T> implements MissionControlCente
                 @Override
                 public Observable<Notification<T>> call() {
 
-                    BehaviorSubject<Notification<T>> subject = BehaviorSubject.create();
+                    ReplaySubject<Notification<T>> subject = ReplaySubject.create();
 
                     SpaceStation.INSTANCE.put(key + "/subscription", factory.call(missionStatement)
-                        .first()
                         .materialize()
                         .subscribe(subject));
 
@@ -45,6 +55,7 @@ public class SingleResultConnectionOnSubscribe<T> implements MissionControlCente
         subscriber.add(subject.subscribe(subscriber));
     }
 
+    @Override
     public void recycle() {
         SpaceStation.INSTANCE.remove(key + "/subject");
         Subscription subscription = SpaceStation.INSTANCE.get(key + "/subscription");
