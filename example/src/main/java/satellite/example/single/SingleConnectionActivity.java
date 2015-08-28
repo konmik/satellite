@@ -36,9 +36,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter = new MissionControlCenter(
-            MissionControlCenter.SessionType.SINGLE,
-            savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
+        controlCenter = new MissionControlCenter(savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
     }
 
     @Override
@@ -46,7 +44,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new ExampleSingleSatelliteFactory())
+            controlCenter.connection(new ExampleSingleSatelliteFactory(), MissionControlCenter.SessionType.SINGLE)
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override

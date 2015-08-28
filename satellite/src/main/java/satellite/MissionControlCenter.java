@@ -43,7 +43,6 @@ public class MissionControlCenter {
         protected abstract <T> SessionTypeOnSubscribe<T> createOnSubscribe(String key, SatelliteFactory<T> factory, Bundle missionStatement);
     }
 
-    private final SessionType type;
     private final String key;
 
     private PublishSubject<Bundle> launches = PublishSubject.create();
@@ -53,8 +52,7 @@ public class MissionControlCenter {
 
     private static long id;
 
-    public MissionControlCenter(SessionType type, Bundle state) {
-        this.type = type;
+    public MissionControlCenter(Bundle state) {
         if (state == null)
             key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         else {
@@ -72,7 +70,7 @@ public class MissionControlCenter {
         return bundle;
     }
 
-    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory) {
+    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory, final SessionType type) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override

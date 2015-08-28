@@ -36,9 +36,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter = new MissionControlCenter(
-            MissionControlCenter.SessionType.REPLAY,
-            savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
+        controlCenter = new MissionControlCenter(savedInstanceState == null ? null : savedInstanceState.getBundle("center"));
     }
 
     @Override
@@ -46,7 +44,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new ExampleReplaySatelliteFactory())
+            controlCenter.connection(new ExampleReplaySatelliteFactory(), MissionControlCenter.SessionType.REPLAY)
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override

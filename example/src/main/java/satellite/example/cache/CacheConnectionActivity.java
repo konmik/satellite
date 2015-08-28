@@ -39,9 +39,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        earthBase = new EarthBase.Builder(savedInstanceState == null ? null : savedInstanceState.getBundle("center"))
-            .controlCenter(SATELLITE_ID, MissionControlCenter.SessionType.CACHE)
-            .build();
+        earthBase = new EarthBase(savedInstanceState == null ? null : savedInstanceState.getBundle("center"), SATELLITE_ID);
     }
 
     @Override
@@ -49,7 +47,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            earthBase.connection(SATELLITE_ID, new ExampleCacheSatelliteFactory())
+            earthBase.connection(SATELLITE_ID, new ExampleCacheSatelliteFactory(), MissionControlCenter.SessionType.CACHE)
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override
