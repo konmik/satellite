@@ -5,24 +5,24 @@ import android.util.Printer;
 import java.util.HashMap;
 
 import rx.Notification;
-import rx.Observable;
 import rx.Subscription;
 import rx.functions.Func0;
+import rx.subjects.Subject;
 import satellite.MissionControlCenter;
 
 /**
  * SpaceStation represents... a space station! :D
  *
- * It connects started satellites with a land base {@link MissionControlCenter}.
+ * It keeps track of satellites and provides earth connections {@link MissionControlCenter}.
  */
 public enum SpaceStation {
 
     INSTANCE;
 
-    private HashMap<String, Observable> subjects = new HashMap<>();
+    private HashMap<String, Subject> subjects = new HashMap<>();
     private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
-    <T> Observable<Notification<T>> provideSubject(String key, Func0<Observable<Notification<T>>> factory) {
+    <T> Subject<Notification<T>, Notification<T>> provideSubject(String key, Func0<Subject<Notification<T>, Notification<T>>> factory) {
         if (!subjects.containsKey(key))
             subjects.put(key, factory.call());
         return subjects.get(key);
