@@ -1,22 +1,33 @@
 package satellite.connections;
 
+import android.os.Bundle;
+
 import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func0;
 import rx.subjects.Subject;
-import satellite.MissionControlCenter;
+import satellite.SatelliteFactory;
 
-public abstract class BaseConnection<T> implements MissionControlCenter.Connection<T> {
+public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
 
     private static final String SATELLITE_SUBSCRIPTION_POSTFIX = " /satellite_subscription";
     private static final String SUBJECT_POSTFIX = " /subject";
 
-    private final String key;
+    public interface SubjectFactory<T> extends Func0<Subject<Notification<T>, Notification<T>>> {
+    }
 
-    public BaseConnection(String key) {
+    private final String key;
+    private final SatelliteFactory<T> factory;
+    private final SubjectFactory<T> subjectFactory;
+    private final Bundle missionStatement;
+
+    public Connection(String key, SatelliteFactory<T> factory, SubjectFactory<T> subjectFactory, Bundle missionStatement) {
         this.key = key;
+        this.factory = factory;
+        this.subjectFactory = subjectFactory;
+        this.missionStatement = missionStatement;
     }
 
     @Override
@@ -26,9 +37,9 @@ public abstract class BaseConnection<T> implements MissionControlCenter.Connecti
                 @Override
                 public Observable<Notification<T>> call() {
 
-                    Subject<Notification<T>, Notification<T>> subject = createSubject();
+                    Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
 
-                    SpaceStation.INSTANCE.put(key + SATELLITE_SUBSCRIPTION_POSTFIX, createSatellite()
+                    SpaceStation.INSTANCE.put(key + SATELLITE_SUBSCRIPTION_POSTFIX, factory.call(missionStatement)
                         .materialize()
                         .subscribe(subject));
 
@@ -39,8 +50,7 @@ public abstract class BaseConnection<T> implements MissionControlCenter.Connecti
         subscriber.add(subject.subscribe(subscriber));
     }
 
-    @Override
-    public void recycle() {
+    public static void recycle(String key) {
         SpaceStation.INSTANCE.remove(key + SUBJECT_POSTFIX);
         Subscription subscription = SpaceStation.INSTANCE.get(key + SATELLITE_SUBSCRIPTION_POSTFIX);
         if (subscription != null) {
@@ -48,7 +58,4 @@ public abstract class BaseConnection<T> implements MissionControlCenter.Connecti
             SpaceStation.INSTANCE.remove(key + SATELLITE_SUBSCRIPTION_POSTFIX);
         }
     }
-
-    protected abstract Observable<T> createSatellite();
-    protected abstract Subject<Notification<T>, Notification<T>> createSubject();
 }

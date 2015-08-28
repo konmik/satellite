@@ -22,6 +22,7 @@ public class ExampleSingleSatelliteFactory implements SatelliteFactory<Integer> 
     @Override
     public Observable<Integer> call(final Bundle missionStatement) {
         return Observable.just(missionStatement.getInt(FROM_KEY))
-            .delay(1, TimeUnit.SECONDS, mainThread());
+            .delay(1, TimeUnit.SECONDS, mainThread())
+            .first();
     }
 }

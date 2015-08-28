@@ -2,6 +2,9 @@ package satellite.connections;
 
 import android.os.Bundle;
 
+import rx.Notification;
+import rx.subjects.BehaviorSubject;
+import rx.subjects.Subject;
 import satellite.MissionControlCenter;
 import satellite.SatelliteFactory;
 
@@ -14,7 +17,12 @@ public class SingleConnectionFactory<T> implements MissionControlCenter.Connecti
     }
 
     @Override
-    public MissionControlCenter.Connection<T> call(String key, Bundle bundle) {
-        return new SingleConnection<>(key, satelliteFactory, bundle);
+    public Connection<T> call(String key, Bundle bundle) {
+        return new Connection<>(key, satelliteFactory, new Connection.SubjectFactory<T>() {
+            @Override
+            public Subject<Notification<T>, Notification<T>> call() {
+                return BehaviorSubject.create();
+            }
+        }, bundle);
     }
 }

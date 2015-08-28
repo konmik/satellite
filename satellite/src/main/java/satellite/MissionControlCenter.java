@@ -7,20 +7,15 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.functions.Func3;
 import rx.subjects.PublishSubject;
+import satellite.connections.Connection;
 
 /**
  * MissionControlCenter controls only one satellite.
  */
 public class MissionControlCenter {
 
-    public interface Connection<T> extends Observable.OnSubscribe<Notification<T>> {
-        void recycle();
-    }
-
     public interface ConnectionFactory<T> extends Func2<String, Bundle, Connection<T>> {
-
     }
 
     private final String key;
@@ -56,7 +51,7 @@ public class MissionControlCenter {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
                     if (connection != null)
-                        connection.recycle();
+                        Connection.recycle(key);
                     Connection<T> onSubscribe1 = type.call(key, statement);
                     connection = onSubscribe1;
                     return Observable.create(onSubscribe1);
@@ -88,7 +83,7 @@ public class MissionControlCenter {
         restore = false;
         statement = null;
         if (connection != null) {
-            connection.recycle();
+            Connection.recycle(key);
             connection = null;
         }
     }

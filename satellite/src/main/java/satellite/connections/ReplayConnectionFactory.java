@@ -2,6 +2,9 @@ package satellite.connections;
 
 import android.os.Bundle;
 
+import rx.Notification;
+import rx.subjects.ReplaySubject;
+import rx.subjects.Subject;
 import satellite.MissionControlCenter;
 import satellite.SatelliteFactory;
 
@@ -14,7 +17,12 @@ public class ReplayConnectionFactory<T> implements MissionControlCenter.Connecti
     }
 
     @Override
-    public MissionControlCenter.Connection<T> call(String s, Bundle bundle) {
-        return new ReplayConnection<>(s, satelliteFactory, bundle);
+    public Connection<T> call(String s, Bundle bundle) {
+        return new Connection<>(s, satelliteFactory, new Connection.SubjectFactory<T>() {
+            @Override
+            public Subject<Notification<T>, Notification<T>> call() {
+                return ReplaySubject.create();
+            }
+        }, bundle);
     }
 }
