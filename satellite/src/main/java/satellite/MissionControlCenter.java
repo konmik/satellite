@@ -23,7 +23,6 @@ public class MissionControlCenter {
     private PublishSubject<Bundle> launches = PublishSubject.create();
     private boolean restore;
     private Bundle statement;
-    private Connection<?> connection;
 
     private static long id;
 
@@ -45,16 +44,12 @@ public class MissionControlCenter {
         return bundle;
     }
 
-    public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> type) {
+    public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> factory) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
-                    if (connection != null)
-                        Connection.recycle(key);
-                    Connection<T> onSubscribe1 = type.call(key, statement);
-                    connection = onSubscribe1;
-                    return Observable.create(onSubscribe1);
+                    return Observable.create(factory.call(key, statement));
                 }
             })
             .doOnNext(new Action1<Notification<T>>() {
@@ -67,7 +62,7 @@ public class MissionControlCenter {
     }
 
     public void launch(Bundle statement) {
-        dismiss();
+        Connection.recycle(key);
         this.restore = true;
         this.statement = statement;
         launches.onNext(statement);
@@ -76,9 +71,6 @@ public class MissionControlCenter {
     public void dismiss() {
         restore = false;
         statement = null;
-        if (connection != null) {
-            Connection.recycle(key);
-            connection = null;
-        }
+        Connection.recycle(key);
     }
 }
