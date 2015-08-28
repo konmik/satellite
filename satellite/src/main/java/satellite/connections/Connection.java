@@ -29,9 +29,9 @@ public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
     @Override
     public void call(Subscriber<? super Notification<T>> subscriber) {
         Observable<Notification<T>> subject = SpaceStation.INSTANCE
-            .provideSubject(key, new Func0<Observable<Notification<T>>>() {
+            .provideSubject(key, new Func0<Subject<Notification<T>, Notification<T>>>() {
                 @Override
-                public Observable<Notification<T>> call() {
+                public Subject<Notification<T>, Notification<T>> call() {
 
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
 
