@@ -6,13 +6,14 @@ import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.EarthBase;
-import satellite.connections.CacheConnection;
+import satellite.connections.CacheConnectionFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
+    public static final String EARTH_BASE_KEY = "base";
     public static final int SATELLITE_ID = 1;
 
     private EarthBase earthBase;
@@ -39,7 +40,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        earthBase = new EarthBase(savedInstanceState == null ? null : savedInstanceState.getBundle("base"), SATELLITE_ID);
+        earthBase = new EarthBase(savedInstanceState == null ? null : savedInstanceState.getBundle(EARTH_BASE_KEY), SATELLITE_ID);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            earthBase.connection(SATELLITE_ID, new ExampleCacheSatelliteFactory(), CacheConnection.<Integer>factory())
+            earthBase.connection(SATELLITE_ID, new CacheConnectionFactory<>(new ExampleCacheSatelliteFactory()))
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override

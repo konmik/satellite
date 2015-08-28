@@ -6,6 +6,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
@@ -14,11 +15,11 @@ import rx.subjects.PublishSubject;
  */
 public class MissionControlCenter {
 
-    public interface SessionTypeOnSubscribe<T> extends Observable.OnSubscribe<Notification<T>> {
+    public interface Connection<T> extends Observable.OnSubscribe<Notification<T>> {
         void recycle();
     }
 
-    public interface SessionFactory<T> extends Func3<String, SatelliteFactory<T>, Bundle, MissionControlCenter.SessionTypeOnSubscribe<T>> {
+    public interface ConnectionFactory<T> extends Func2<String, Bundle, Connection<T>> {
 
     }
 
@@ -27,7 +28,7 @@ public class MissionControlCenter {
     private PublishSubject<Bundle> launches = PublishSubject.create();
     private boolean restore;
     private Bundle statement;
-    private SessionTypeOnSubscribe<?> onSubscribe;
+    private Connection<?> connection;
 
     private static long id;
 
@@ -49,15 +50,15 @@ public class MissionControlCenter {
         return bundle;
     }
 
-    public <T> Observable<Notification<T>> connection(final SatelliteFactory<T> factory, final SessionFactory<T> type) {
+    public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> type) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<Bundle, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final Bundle bundle) {
-                    if (onSubscribe != null)
-                        onSubscribe.recycle();
-                    SessionTypeOnSubscribe<T> onSubscribe1 = type.call(key, factory, statement);
-                    onSubscribe = onSubscribe1;
+                    if (connection != null)
+                        connection.recycle();
+                    Connection<T> onSubscribe1 = type.call(key, statement);
+                    connection = onSubscribe1;
                     return Observable.create(onSubscribe1);
                 }
             })
@@ -86,9 +87,9 @@ public class MissionControlCenter {
     public void dismiss() {
         restore = false;
         statement = null;
-        if (onSubscribe != null) {
-            onSubscribe.recycle();
-            onSubscribe = null;
+        if (connection != null) {
+            connection.recycle();
+            connection = null;
         }
     }
 }

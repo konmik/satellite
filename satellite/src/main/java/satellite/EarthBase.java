@@ -18,8 +18,8 @@ public class EarthBase {
             centers.put(id, new MissionControlCenter(bundle == null ? null : bundle.getBundle(Integer.toString(id))));
     }
 
-    public <T> Observable<Notification<T>> connection(int id, SatelliteFactory<T> factory, MissionControlCenter.SessionFactory<T> type) {
-        return centers.get(id).connection(factory, type);
+    public <T> Observable<Notification<T>> connection(int id, MissionControlCenter.ConnectionFactory<T> type) {
+        return centers.get(id).connection(type);
     }
 
     public void launch(int id, Bundle missionStatement) {
