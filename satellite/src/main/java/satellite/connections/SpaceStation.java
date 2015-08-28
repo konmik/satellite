@@ -4,6 +4,9 @@ import android.util.Printer;
 
 import java.util.HashMap;
 
+import rx.Notification;
+import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func0;
 import satellite.MissionControlCenter;
 
@@ -16,29 +19,38 @@ public enum SpaceStation {
 
     INSTANCE;
 
-    private HashMap<String, Object> raw = new HashMap<>();
+    private HashMap<String, Observable> subjects = new HashMap<>();
+    private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
-    <T> T provide(String key, Func0<T> factory) {
-        if (!raw.containsKey(key))
-            raw.put(key, factory.call());
-        return (T)raw.get(key);
+    <T> Observable<Notification<T>> provideSubject(String key, Func0<Observable<Notification<T>>> factory) {
+        if (!subjects.containsKey(key))
+            subjects.put(key, factory.call());
+        return subjects.get(key);
     }
 
-    <T> T get(String key) {
-        return (T)raw.get(key);
+    void takeSubscription(String key, Subscription subscription) {
+        dropSubscription(key);
+        subscriptions.put(key, subscription);
     }
 
-    <T> void put(String key, T value) {
-        raw.put(key, value);
+    void dropSubject(String key) {
+        subjects.remove(key);
     }
 
-    void remove(String key) {
-        raw.remove(key);
+    void dropSubscription(String key) {
+        if (subscriptions.containsKey(key)) {
+            Subscription subscription = subscriptions.get(key);
+            subscription.unsubscribe();
+            subscriptions.remove(key);
+        }
     }
 
     public void print(Printer printer) {
-        printer.println("raw keys:");
-        for (String key : raw.keySet())
+        printer.println("subjects:");
+        for (String key : subjects.keySet())
+            printer.println(key);
+        printer.println("subscriptions:");
+        for (String key : subscriptions.keySet())
             printer.println(key);
     }
 }

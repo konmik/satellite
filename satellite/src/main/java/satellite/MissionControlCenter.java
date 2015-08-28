@@ -63,12 +63,6 @@ public class MissionControlCenter {
                     if (tNotification.isOnCompleted())
                         dismiss();
                 }
-            })
-            .filter(new Func1<Notification<T>, Boolean>() {
-                @Override
-                public Boolean call(Notification<T> notification) {
-                    return !notification.isOnCompleted();
-                }
             });
     }
 
