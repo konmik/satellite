@@ -12,6 +12,10 @@ android {
     }
 }
 
+configurations {
+    compileJavadoc
+}
+
 dependencies {
     compile 'io.reactivex:rxjava:1.0.13'
     testCompile 'junit:junit:4.12'
@@ -25,3 +29,16 @@ dependencies {
         exclude module: 'objenesis'
     }
 }
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    if (name.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
+        return; // Skip debug builds.
+    }
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives', task);
+}
+
+apply from: '../gradle/gradle-mvn-push.gradle'

@@ -73,6 +73,6 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("center", controlCenter.saveInstanceState().toInput());
+        outState.putParcelable("center", controlCenter.saveInstanceState());
     }
 }
