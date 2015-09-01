@@ -38,7 +38,9 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        controlCenter = new MissionControlCenter(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("center"));
+        controlCenter = savedInstanceState == null ?
+            new MissionControlCenter() :
+            new MissionControlCenter((InputMap)savedInstanceState.getParcelable("center"));
     }
 
     @Override

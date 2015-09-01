@@ -1,6 +1,5 @@
 package satellite;
 
-import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import rx.Notification;
@@ -13,11 +12,14 @@ import satellite.io.OutputMap;
  */
 public class EarthBase implements Launcher {
 
-    private final InputMap in;
     private final SparseArray<MissionControlCenter> centers = new SparseArray<>();
 
-    public EarthBase(@Nullable InputMap in) {
-        this.in = in == null ? InputMap.EMPTY : in;
+    public EarthBase() {
+    }
+
+    public EarthBase(InputMap in) {
+        for (String sId : in.keys())
+            centers.put(Integer.valueOf(sId), new MissionControlCenter((InputMap)in.get(sId)));
     }
 
     @Override
@@ -44,21 +46,12 @@ public class EarthBase implements Launcher {
         OutputMap out = new OutputMap();
         for (int i = 0; i < centers.size(); i++)
             out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).saveInstanceState());
-
-        // the case when saving the instance state if connections was not re-created
-        if (in != null) {
-            for (String sId : in.keys()) {
-                Integer id = Integer.valueOf(sId);
-                if (centers.indexOfKey(id) < 0)
-                    out.put(sId, in.get(sId));
-            }
-        }
         return out.toInput();
     }
 
     private MissionControlCenter getCenter(int id) {
         if (centers.get(id) == null)
-            centers.put(id, new MissionControlCenter(in == null ? null : (InputMap)in.get(Integer.toString(id))));
+            centers.put(id, new MissionControlCenter());
         return centers.get(id);
     }
 }

@@ -54,7 +54,10 @@ the application is still reliable.
 * The entire library has been built keeping [The Kiss Principle](https://people.apache.org/~fhanik/kiss.html) in mind.
 Anyone who is familiar with RxJava can read and understand it easily.
 
-### Architecture
+* The library utilizes as much of [Functional programming](https://en.wikipedia.org/wiki/Functional_programming)
+coding style as possible. Inspired by *Clojure*, making Functional Programming on Java easier.
+
+## Architecture
 
 Satellite is full of cosmic analogies. Why? Because this is fun and because this allows
 to construct an OOP model that is very close to what is going on. Reactive satellites are awesome. :)
@@ -85,9 +88,13 @@ If you want to try it - clone the repository and compile it yourself.
 * Go to `gradle.properties`.
 * Change `SNAPSHOT_REPOSITORY_URL` to your local repository.
 * Run `gradle clean build uploadArchives`.
+
+In your project:
+
+* `compile 'info.android15.satellite:satellite:0.1.0-SNAPSHOT'`
 * Don't forget to mention your `mavenLocal()` in the list of your project's repositories.
 
-### Feedback
+## Feedback
 
 Any feedback is welcome. :)
 

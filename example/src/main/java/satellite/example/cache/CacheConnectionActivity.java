@@ -40,7 +40,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        earthBase = new EarthBase(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("base"));
+        earthBase = savedInstanceState == null ? new EarthBase() : new EarthBase((InputMap)savedInstanceState.getParcelable("base"));
     }
 
     @Override
