@@ -1,5 +1,7 @@
 package satellite;
 
+import android.support.annotation.Nullable;
+
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
@@ -27,13 +29,13 @@ public class MissionControlCenter {
 
     private static long id;
 
-    public MissionControlCenter(InputMap inA) {
+    public MissionControlCenter(@Nullable InputMap inA) {
         InputMap in = inA != null ? inA :
             new InputMap("key", "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE));
 
         key = in.get("key");
         restore = in.get("restore", false);
-        statement = in.get("statement");
+        statement = in.get("statement", InputMap.EMPTY);
         out = in.toOutput();
     }
 

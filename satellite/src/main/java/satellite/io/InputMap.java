@@ -9,36 +9,25 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Input/OutputMap represent a "map" storage that can be used to remove more state off the view logic.
- *
- * InputMap is immutable and Parcelable, thus it can be safely used.
- *
- * OutputMap is write-only, so no troubles with state mutability can be created.
- *
- * An Activity has inputs:
- *
- * data (network, database, preferences)
- * user events (view callbacks, lifecycle events)
- * initial (input) state bundle
- * inter-component events
- *
- * And outputs:
- *
- * data,
- * view updates,
- * output state
- * inter-component events
- *
  * The typical state in Android applications is the state that is being kept inside of
  * Activity fields, prompting a programmer to reuse the state and get all the side-effects
  * of this act.
  *
+ * Input/OutputMap represent a "map" storage that can be used to remove more state off the view logic.
+ *
+ * InputMap is immutable and Parcelable, thus it can be safely used.
+ *
+ * OutputMap is write-only, so no troubles with the state mutability can be created.
+ *
  * Input/OutputMap allow to keep the instance state out of activity code, isolating it by strictly allowing to make write
  * or read operations only.
  *
- * Input/OutputMap automatically marshalls/unmarshalls all data to avoid modifications.
+ * Input/OutputMap automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
+ * immutable data immutable.
  */
 public class InputMap implements Parcelable {
+
+    public static final InputMap EMPTY = new InputMap();
 
     private final Map<String, byte[]> map;
 

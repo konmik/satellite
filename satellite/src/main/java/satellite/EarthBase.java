@@ -1,5 +1,6 @@
 package satellite;
 
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import rx.Notification;
@@ -15,8 +16,8 @@ public class EarthBase implements Launcher {
     private final InputMap in;
     private final SparseArray<MissionControlCenter> centers = new SparseArray<>();
 
-    public EarthBase(InputMap in) {
-        this.in = in;
+    public EarthBase(@Nullable InputMap in) {
+        this.in = in == null ? InputMap.EMPTY : in;
     }
 
     @Override

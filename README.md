@@ -82,5 +82,12 @@ from a given `Bundle` argument. [SatelliteFactory](https://github.com/konmik/sat
 This is a development version of the library.
 If you want to try it - clone the repository and compile it yourself.
 
-Any feedback is welcome.
+* Go to `gradle.properties`.
+* Change `SNAPSHOT_REPOSITORY_URL` to your local repository.
+* Run `gradle clean build uploadArchives`.
+* Don't forget to mention your `mavenLocal()` in the list of your project's repositories.
+
+### Feedback
+
+Any feedback is welcome. :)
 
