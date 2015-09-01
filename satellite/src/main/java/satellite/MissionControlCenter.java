@@ -31,7 +31,8 @@ public class MissionControlCenter {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
         statement = InputMap.EMPTY;
-        out = InputMap.EMPTY.toOutput();
+        out = InputMap.EMPTY.toOutput()
+            .put("key", key);
     }
 
     public MissionControlCenter(InputMap in) {
