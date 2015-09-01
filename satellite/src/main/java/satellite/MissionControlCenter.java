@@ -37,8 +37,8 @@ public class MissionControlCenter {
         out = in.toOutput();
     }
 
-    public OutputMap saveInstanceState() {
-        return out;
+    public InputMap saveInstanceState() {
+        return out.toInput();
     }
 
     public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> factory) {

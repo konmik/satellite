@@ -12,23 +12,23 @@ import satellite.io.OutputMap;
  */
 public class EarthBase {
 
+    private final InputMap in;
     private final SparseArray<MissionControlCenter> centers = new SparseArray<>();
 
-    public EarthBase(InputMap in, int... ids) {
-        for (int id : ids)
-            centers.put(id, new MissionControlCenter(in == null ? null : (InputMap)in.get(Integer.toString(id))));
+    public EarthBase(InputMap in) {
+        this.in = in;
     }
 
     public <T> Observable<Notification<T>> connection(int id, MissionControlCenter.ConnectionFactory<T> type) {
-        return centers.get(id).connection(type);
+        return getCenter(id).connection(type);
     }
 
     public void launch(int id, InputMap missionStatement) {
-        centers.get(id).launch(missionStatement);
+        getCenter(id).launch(missionStatement);
     }
 
     public void dismiss(int id) {
-        centers.get(id).dismiss();
+        getCenter(id).dismiss();
     }
 
     public void dismissAll() {
@@ -36,10 +36,25 @@ public class EarthBase {
             centers.valueAt(i).dismiss();
     }
 
-    public OutputMap saveInstanceState() {
+    public InputMap saveInstanceState() {
         OutputMap out = new OutputMap();
         for (int i = 0; i < centers.size(); i++)
-            out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).saveInstanceState().toInput());
-        return out;
+            out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).saveInstanceState());
+
+        // the case when saving the instance state if connections was not re-created
+        if (in != null) {
+            for (String sId : in.keys()) {
+                Integer id = Integer.valueOf(sId);
+                if (centers.indexOfKey(id) < 0)
+                    out.put(sId, in.get(sId));
+            }
+        }
+        return out.toInput();
+    }
+
+    private MissionControlCenter getCenter(int id) {
+        if (centers.get(id) == null)
+            centers.put(id, new MissionControlCenter(in == null ? null : (InputMap)in.get(Integer.toString(id))));
+        return centers.get(id);
     }
 }

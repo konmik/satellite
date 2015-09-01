@@ -3,8 +3,10 @@ package satellite.io;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Input/OutputMap represent a "map" storage that can be used to remove more state off the view logic.
@@ -57,6 +59,10 @@ public class InputMap implements Parcelable {
         }
 
         this.map = new HashMap<>(hashMap);
+    }
+
+    public Set<String> keys() {
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     public boolean contains(String key) {

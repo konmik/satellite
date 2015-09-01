@@ -40,7 +40,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
                 }
             });
 
-        earthBase = new EarthBase(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("base"), SATELLITE_ID);
+        earthBase = new EarthBase(savedInstanceState == null ? null : (InputMap)savedInstanceState.getParcelable("base"));
     }
 
     @Override
@@ -75,6 +75,6 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("base", earthBase.saveInstanceState().toInput());
+        outState.putParcelable("base", earthBase.saveInstanceState());
     }
 }
