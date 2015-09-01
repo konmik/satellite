@@ -10,7 +10,7 @@ import satellite.io.OutputMap;
 /**
  * EarthBase represents a set of {@link MissionControlCenter}.
  */
-public class EarthBase {
+public class EarthBase implements Launcher {
 
     private final InputMap in;
     private final SparseArray<MissionControlCenter> centers = new SparseArray<>();
@@ -19,14 +19,17 @@ public class EarthBase {
         this.in = in;
     }
 
+    @Override
     public <T> Observable<Notification<T>> connection(int id, MissionControlCenter.ConnectionFactory<T> type) {
         return getCenter(id).connection(type);
     }
 
+    @Override
     public void launch(int id, InputMap missionStatement) {
         getCenter(id).launch(missionStatement);
     }
 
+    @Override
     public void dismiss(int id) {
         getCenter(id).dismiss();
     }
