@@ -54,9 +54,6 @@ the application is still reliable.
 * The entire library has been built keeping [The Kiss Principle](https://people.apache.org/~fhanik/kiss.html) in mind.
 Anyone who is familiar with RxJava can read and understand it easily.
 
-* The library utilizes as much of [Functional programming](https://en.wikipedia.org/wiki/Functional_programming)
-coding style as possible. Inspired by *Clojure*, making Functional Programming on Java easier.
-
 ## Architecture
 
 Satellite is full of cosmic analogies. Why? Because this is fun and because this allows
@@ -68,17 +65,25 @@ It is out of reach of lifecycle events.
 `SpaceStation` is a singleton which keeps track of all launched
 satellites. It connects satellites with activities and fragments, providing an `Observable` connection.
 [SpaceStation](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SpaceStation.java)
+You don't normally need it, but it is nice to know about it.
+Sometimes you will want to get some debug information from its `print()` method.
 
 We also have `MissionControlCenter` - this is our land base inside of fragment/activity which manages all
 the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
-`MissionControlCenter` is the only thing that we need to persist within the activity state bundle.
-It implements `Parcelable` interface, so this is a trivial task. [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
+[MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
 
-For every launch we need to provide a "mission statement". This means that we supply a `Bundle`
-with arguments for the launch.
+`EarthBase` is a set of `MissionControlCenter` that allows to launch more than one satellite per fragment/activity.
+You will normally use `EarthBase` rather than `MissionControlCenter`.
 
-There is `SatelliteFactory` interface - we're extending it to instantiate our satellite code
-from a given `Bundle` argument. [SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
+`EarthBase` and `MissionControlCenter` are things that we need to persist within the activity state bundle.
+They both have `saveInstanceState` methods that return `Parcelable` that can be serialized to be used for restoration later.
+
+For every launch we need to provide a "mission statement". This means that we supply arguments for the launch.
+Arguments are stored in a special `Parcelable` immutable object `InputMap`. It is used here instead of `Bundle`
+to avoid a wide range of problems that are caused by using mutable data structures.
+
+There is `SatelliteFactory` interface - we're implementing it to instantiate our satellite code
+from a given `InputMap` argument. [SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
                                                              
 ## Installation
 
@@ -92,7 +97,7 @@ If you want to try it - clone the repository and compile it yourself.
 In your project:
 
 * `compile 'info.android15.satellite:satellite:0.1.0-SNAPSHOT'`
-* Don't forget to mention your `mavenLocal()` in the list of your project's repositories.
+* Don't forget to mention `mavenLocal()` in the list of your project's repositories.
 
 ## Feedback
 
