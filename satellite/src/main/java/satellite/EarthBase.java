@@ -23,8 +23,8 @@ public class EarthBase implements Launcher {
     }
 
     @Override
-    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<T> factory, SatelliteFactory<T> satelliteFactory) {
-        return getCenter(id).connection(factory, satelliteFactory);
+    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<T> subjectFactory, SatelliteFactory<T> satelliteFactory) {
+        return getCenter(id).connection(subjectFactory, satelliteFactory);
     }
 
     @Override

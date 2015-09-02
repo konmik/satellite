@@ -39,16 +39,12 @@ public class MissionControlCenter {
         out = in.toOutput();
     }
 
-    public InputMap saveInstanceState() {
-        return out.toInput();
-    }
-
-    public <T> Observable<Notification<T>> connection(final SubjectFactory<T> factory, final SatelliteFactory<T> satelliteFactory) {
+    public <T> Observable<Notification<T>> connection(final SubjectFactory<T> subjectFactory, final SatelliteFactory<T> satelliteFactory) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final InputMap statement) {
-                    return SpaceStation.INSTANCE.provide(key, factory, new Func0<Observable<T>>() {
+                    return SpaceStation.INSTANCE.provide(key, subjectFactory, new Func0<Observable<T>>() {
                         @Override
                         public Observable<T> call() {
                             return satelliteFactory.call(statement);
@@ -76,5 +72,9 @@ public class MissionControlCenter {
         SpaceStation.INSTANCE.recycle(key);
         out.remove("restore");
         out.remove("statement");
+    }
+
+    public InputMap saveInstanceState() {
+        return out.toInput();
     }
 }

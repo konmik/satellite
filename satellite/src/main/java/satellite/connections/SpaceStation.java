@@ -15,7 +15,7 @@ import satellite.MissionControlCenter;
 /**
  * SpaceStation represents... a space station! :D
  *
- * It keeps track of satellites and provides earth connections {@link MissionControlCenter}.
+ * It keeps track of satellites and provides connections for {@link MissionControlCenter}.
  */
 public enum SpaceStation {
 
@@ -29,9 +29,9 @@ public enum SpaceStation {
      * The satellite gets created if it is not launched.
      *
      * @param key              a unique id of the connection that should survive configuration changes
-     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link MissionControlCenter}.
+     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link MissionControlCenter}
      * @param satelliteFactory a satellite factory
-     * @param <T>              a type of satellite onNext values
+     * @param <T>              a type of satellite's onNext values
      * @return an observable that emits satellite notifications
      */
     public <T> Observable<Notification<T>> provide(
