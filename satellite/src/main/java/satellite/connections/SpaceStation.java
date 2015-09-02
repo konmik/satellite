@@ -5,6 +5,8 @@ import android.util.Printer;
 import java.util.HashMap;
 
 import rx.Notification;
+import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func0;
 import rx.subjects.Subject;
@@ -22,22 +24,38 @@ public enum SpaceStation {
     private HashMap<String, Subject> subjects = new HashMap<>();
     private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
-    <T> Subject<Notification<T>, Notification<T>> provideSubject(String key, Func0<Subject<Notification<T>, Notification<T>>> factory) {
-        if (!subjects.containsKey(key))
-            subjects.put(key, factory.call());
-        return subjects.get(key);
+    /**
+     * This is the core method that connects a satellite with {@link MissionControlCenter}.
+     * The satellite gets created if it is not launched.
+     *
+     * @param key              a unique id of the connection that should survive configuration changes
+     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link MissionControlCenter}.
+     * @param satelliteFactory a satellite factory
+     * @param <T>              a type of satellite onNext values
+     * @return an observable that emits satellite notifications
+     */
+    public <T> Observable<Notification<T>> provide(
+        final String key,
+        final Func0<Subject<Notification<T>, Notification<T>>> subjectFactory,
+        final Func0<Observable<T>> satelliteFactory) {
+
+        return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
+            @Override
+            public void call(Subscriber<? super Notification<T>> subscriber) {
+                if (!subjects.containsKey(key)) {
+                    Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
+                    subscriptions.put(key, satelliteFactory.call()
+                        .materialize()
+                        .subscribe(subject));
+                    subjects.put(key, subject);
+                }
+                subscriber.add(subjects.get(key).subscribe(subscriber));
+            }
+        });
     }
 
-    void takeSubscription(String key, Subscription subscription) {
-        dropSubscription(key);
-        subscriptions.put(key, subscription);
-    }
-
-    void dropSubject(String key) {
+    public void recycle(String key) {
         subjects.remove(key);
-    }
-
-    void dropSubscription(String key) {
         if (subscriptions.containsKey(key)) {
             Subscription subscription = subscriptions.get(key);
             subscription.unsubscribe();
