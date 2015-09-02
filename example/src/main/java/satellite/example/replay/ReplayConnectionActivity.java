@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.MissionControlCenter;
-import satellite.connections.ReplayConnectionFactory;
+import satellite.connections.ReplaySubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.io.InputMap;
@@ -48,7 +48,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new ReplayConnectionFactory<>(new ExampleReplaySatelliteFactory()))
+            controlCenter.connection(new ReplaySubjectFactory<Integer>(), new ExampleReplaySatelliteFactory())
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override

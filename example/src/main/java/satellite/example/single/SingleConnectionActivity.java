@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.MissionControlCenter;
-import satellite.connections.SingleConnectionFactory;
+import satellite.connections.CacheSubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.io.InputMap;
@@ -48,7 +48,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new SingleConnectionFactory<>(new ExampleSingleSatelliteFactory()))
+            controlCenter.connection(new CacheSubjectFactory<Integer>(), new ExampleSingleSatelliteFactory())
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override

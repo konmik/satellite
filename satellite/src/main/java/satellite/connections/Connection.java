@@ -8,41 +8,27 @@ import rx.subjects.Subject;
 import satellite.SatelliteFactory;
 import satellite.io.InputMap;
 
-public class Connection<T> implements Observable.OnSubscribe<Notification<T>> {
+public class Connection {
 
-    public interface SubjectFactory<T> extends Func0<Subject<Notification<T>, Notification<T>>> {
-    }
-
-    private final String key;
-    private final SatelliteFactory<T> satelliteFactory;
-    private final SubjectFactory<T> subjectFactory;
-    private final InputMap missionStatement;
-
-    public Connection(String key, SatelliteFactory<T> satelliteFactory, SubjectFactory<T> subjectFactory, InputMap missionStatement) {
-        this.key = key;
-        this.satelliteFactory = satelliteFactory;
-        this.subjectFactory = subjectFactory;
-        this.missionStatement = missionStatement;
-    }
-
-    @Override
-    public void call(Subscriber<? super Notification<T>> subscriber) {
-        Observable<Notification<T>> subject = SpaceStation.INSTANCE
-            .provideSubject(key, new Func0<Subject<Notification<T>, Notification<T>>>() {
-                @Override
-                public Subject<Notification<T>, Notification<T>> call() {
-
-                    Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
-
-                    SpaceStation.INSTANCE.takeSubscription(key, satelliteFactory.call(missionStatement)
-                        .materialize()
-                        .subscribe(subject));
-
-                    return subject;
-                }
-            });
-
-        subscriber.add(subject.subscribe(subscriber));
+    public static <T> Observable.OnSubscribe<Notification<T>> factory(final String key, final Func0<Subject<Notification<T>, Notification<T>>> subjectFactory, final SatelliteFactory<T> satelliteFactory, final InputMap missionStatement) {
+        return new Observable.OnSubscribe<Notification<T>>() {
+            @Override
+            public void call(Subscriber<? super Notification<T>> subscriber) {
+                subscriber.add(
+                    SpaceStation.INSTANCE
+                        .provideSubject(key, new Func0<Subject<Notification<T>, Notification<T>>>() {
+                            @Override
+                            public Subject<Notification<T>, Notification<T>> call() {
+                                Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
+                                SpaceStation.INSTANCE.takeSubscription(key, satelliteFactory.call(missionStatement)
+                                    .materialize()
+                                    .subscribe(subject));
+                                return subject;
+                            }
+                        })
+                        .subscribe(subscriber));
+            }
+        };
     }
 
     public static void recycle(String key) {

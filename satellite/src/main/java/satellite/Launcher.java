@@ -9,7 +9,7 @@ import satellite.io.InputMap;
  * are able to launch satellites.
  */
 public interface Launcher {
-    <T> Observable<Notification<T>> connection(int id, MissionControlCenter.ConnectionFactory<T> type);
+    <T> Observable<Notification<T>> connection(int id, SubjectFactory<T> factory, SatelliteFactory<T> satelliteFactory);
     void launch(int id, InputMap missionStatement);
     void dismiss(int id);
 }

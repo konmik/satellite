@@ -4,7 +4,6 @@ import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import satellite.connections.Connection;
 import satellite.io.InputMap;
@@ -14,9 +13,6 @@ import satellite.io.OutputMap;
  * MissionControlCenter controls only one satellite.
  */
 public class MissionControlCenter {
-
-    public interface ConnectionFactory<T> extends Func2<String, InputMap, Connection<T>> {
-    }
 
     private final String key;
     private final boolean restore;
@@ -46,12 +42,12 @@ public class MissionControlCenter {
         return out.toInput();
     }
 
-    public <T> Observable<Notification<T>> connection(final ConnectionFactory<T> factory) {
+    public <T> Observable<Notification<T>> connection(final SubjectFactory<T> factory, final SatelliteFactory<T> satelliteFactory) {
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(InputMap input) {
-                    return Observable.create(factory.call(key, input));
+                    return Observable.create(Connection.factory(key, factory, satelliteFactory, input));
                 }
             })
             .doOnNext(new Action1<Notification<T>>() {

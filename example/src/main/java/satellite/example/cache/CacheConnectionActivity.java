@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import rx.functions.Action1;
 import satellite.EarthBase;
-import satellite.connections.CacheConnectionFactory;
+import satellite.connections.CacheSubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.io.InputMap;
@@ -48,7 +48,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            earthBase.connection(SATELLITE_ID, new CacheConnectionFactory<>(new ExampleCacheSatelliteFactory()))
+            earthBase.connection(SATELLITE_ID, new CacheSubjectFactory<Integer>(), new ExampleCacheSatelliteFactory())
                 .subscribe(RxNotification.split(
                     new Action1<Integer>() {
                         @Override
