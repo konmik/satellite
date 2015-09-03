@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import satellite.MissionControlCenter;
-import satellite.subjects.CacheSubjectFactory;
+import satellite.subjects.BehaviorSubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
@@ -35,7 +35,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(CacheSubjectFactory.instance(), new ExampleSingleSatelliteFactory())
+            controlCenter.connection(BehaviorSubjectFactory.instance(), new ExampleSingleSatelliteFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

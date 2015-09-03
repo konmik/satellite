@@ -2,7 +2,7 @@ package satellite.subjects;
 
 import rx.subjects.BehaviorSubject;
 
-public class CacheSubjectFactory {
+public class BehaviorSubjectFactory {
 
     private static final SubjectFactory INSTANCE = new SubjectFactory() {
         @Override
