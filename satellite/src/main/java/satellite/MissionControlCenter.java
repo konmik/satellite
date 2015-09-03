@@ -6,9 +6,9 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
-import satellite.connections.SpaceStation;
 import satellite.io.InputMap;
 import satellite.io.OutputMap;
+import satellite.subjects.SubjectFactory;
 
 /**
  * MissionControlCenter controls only one satellite.

@@ -3,9 +3,10 @@ package satellite;
 import rx.Notification;
 import rx.Observable;
 import satellite.io.InputMap;
+import satellite.subjects.SubjectFactory;
 
 /**
- * This is the abstraction for the easier implementation of base Android view classes that
+ * This is an abstraction for the easier implementation of base Android view classes that
  * are able to launch satellites.
  */
 public interface Launcher {

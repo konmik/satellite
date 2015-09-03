@@ -1,4 +1,4 @@
-package satellite.connections;
+package satellite;
 
 import android.util.Pair;
 import android.util.Printer;

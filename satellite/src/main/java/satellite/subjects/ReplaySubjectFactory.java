@@ -1,9 +1,8 @@
-package satellite.connections;
+package satellite.subjects;
 
 import rx.Notification;
 import rx.subjects.ReplaySubject;
 import rx.subjects.Subject;
-import satellite.SubjectFactory;
 
 public class ReplaySubjectFactory<T> implements SubjectFactory<T> {
 

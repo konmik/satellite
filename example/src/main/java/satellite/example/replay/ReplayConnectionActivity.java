@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import satellite.MissionControlCenter;
-import satellite.connections.ReplaySubjectFactory;
+import satellite.subjects.ReplaySubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;

@@ -6,6 +6,7 @@ import rx.Notification;
 import rx.Observable;
 import satellite.io.InputMap;
 import satellite.io.OutputMap;
+import satellite.subjects.SubjectFactory;
 
 /**
  * EarthBase represents a set of {@link MissionControlCenter}.

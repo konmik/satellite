@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.StringBuilderPrinter;
-import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -13,9 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.internal.util.SubscriptionList;
-import satellite.connections.SpaceStation;
+import satellite.SpaceStation;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 

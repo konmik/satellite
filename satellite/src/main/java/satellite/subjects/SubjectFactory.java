@@ -1,4 +1,4 @@
-package satellite;
+package satellite.subjects;
 
 import rx.Notification;
 import rx.functions.Func0;
