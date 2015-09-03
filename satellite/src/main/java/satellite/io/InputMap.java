@@ -27,13 +27,11 @@ import java.util.Set;
  */
 public class InputMap implements Parcelable {
 
-    public static final InputMap EMPTY = new InputMap();
+    public static InputMap empty() {
+        return EMPTY;
+    }
 
     private final Map<String, byte[]> map;
-
-    InputMap(Map<String, byte[]> map) {
-        this.map = new HashMap<>(map);
-    }
 
     public InputMap(Object... map) {
         if (map.length / 2 * 2 != map.length)
@@ -72,6 +70,10 @@ public class InputMap implements Parcelable {
         return new OutputMap(map);
     }
 
+    InputMap(Map<String, byte[]> map) {
+        this.map = new HashMap<>(map);
+    }
+
     private static <T> T unmarshall(byte[] array) {
         Parcel parcel = Parcel.obtain();
         parcel.unmarshall(array, 0, array.length);
@@ -80,6 +82,8 @@ public class InputMap implements Parcelable {
         parcel.recycle();
         return (T)value;
     }
+
+    private static final InputMap EMPTY = new InputMap();
 
     private static final ClassLoader CLASS_LOADER = InputMap.class.getClassLoader();
 

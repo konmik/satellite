@@ -27,7 +27,7 @@ public class MissionControlCenter {
     public MissionControlCenter() {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
-        statement = InputMap.EMPTY;
+        statement = InputMap.empty();
         out = new OutputMap()
             .put("key", key);
     }
@@ -35,7 +35,7 @@ public class MissionControlCenter {
     public MissionControlCenter(InputMap in) {
         key = in.get("key");
         restore = in.get("restore", false);
-        statement = in.get("statement", InputMap.EMPTY);
+        statement = in.get("statement", InputMap.empty());
         out = in.toOutput();
     }
 
@@ -74,7 +74,7 @@ public class MissionControlCenter {
         out.remove("statement");
     }
 
-    public InputMap saveInstanceState() {
+    public InputMap instanceState() {
         return out.toInput();
     }
 }

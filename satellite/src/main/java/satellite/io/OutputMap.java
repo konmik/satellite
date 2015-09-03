@@ -13,10 +13,6 @@ public class OutputMap {
         this.map = new HashMap<>();
     }
 
-    OutputMap(Map<String, byte[]> map) {
-        this.map = new HashMap<>(map);
-    }
-
     public OutputMap put(String key, Object value) {
         Parcel parcel = Parcel.obtain();
         parcel.writeValue(value);
@@ -32,5 +28,9 @@ public class OutputMap {
 
     public InputMap toInput() {
         return new InputMap(map);
+    }
+
+    OutputMap(Map<String, byte[]> map) {
+        this.map = new HashMap<>(map);
     }
 }

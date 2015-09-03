@@ -1,19 +1,17 @@
 package satellite.subjects;
 
-import rx.Notification;
 import rx.subjects.BehaviorSubject;
-import rx.subjects.Subject;
 
-public class CacheSubjectFactory<T> implements SubjectFactory<T> {
+public class CacheSubjectFactory {
 
-    private static final CacheSubjectFactory INSTANCE = new CacheSubjectFactory();
+    private static final SubjectFactory INSTANCE = new SubjectFactory() {
+        @Override
+        public Object call() {
+            return BehaviorSubject.create();
+        }
+    };
 
-    public static <T> CacheSubjectFactory<T> instance() {
+    public static <T> SubjectFactory<T> instance() {
         return INSTANCE;
-    }
-
-    @Override
-    public Subject<Notification<T>, Notification<T>> call() {
-        return BehaviorSubject.create();
     }
 }

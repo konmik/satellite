@@ -43,10 +43,10 @@ public class EarthBase implements Launcher {
             centers.valueAt(i).dismiss();
     }
 
-    public InputMap saveInstanceState() {
+    public InputMap instanceState() {
         OutputMap out = new OutputMap();
         for (int i = 0; i < centers.size(); i++)
-            out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).saveInstanceState());
+            out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).instanceState());
         return out.toInput();
     }
 

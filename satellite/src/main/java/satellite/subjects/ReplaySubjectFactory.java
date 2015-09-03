@@ -1,19 +1,17 @@
 package satellite.subjects;
 
-import rx.Notification;
 import rx.subjects.ReplaySubject;
-import rx.subjects.Subject;
 
-public class ReplaySubjectFactory<T> implements SubjectFactory<T> {
+public class ReplaySubjectFactory {
 
-    private static final ReplaySubjectFactory INSTANCE = new ReplaySubjectFactory();
+    private static final SubjectFactory INSTANCE = new SubjectFactory() {
+        @Override
+        public Object call() {
+            return ReplaySubject.create();
+        }
+    };
 
-    public static <T> ReplaySubjectFactory<T> instance() {
+    public static <T> SubjectFactory<T> instance() {
         return INSTANCE;
-    }
-
-    @Override
-    public Subject<Notification<T>, Notification<T>> call() {
-        return ReplaySubject.create();
     }
 }

@@ -52,6 +52,6 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("base", earthBase.saveInstanceState());
+        outState.putParcelable("base", earthBase.instanceState());
     }
 }

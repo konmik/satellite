@@ -54,6 +54,6 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("center", controlCenter.saveInstanceState());
+        outState.putParcelable("center", controlCenter.instanceState());
     }
 }
