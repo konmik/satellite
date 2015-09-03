@@ -29,12 +29,7 @@ public abstract class BaseLaunchActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        findViewById(R.id.button_back).setOnClickListener(v -> onBackPressed());
     }
 
     @Override
@@ -63,14 +58,11 @@ public abstract class BaseLaunchActivity extends AppCompatActivity {
 
     protected void onCreateConnections() {
         unsubscribeOnDestroy(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
-            .subscribe(new Action1<Long>() {
-                @Override
-                public void call(Long ignored) {
-                    StringBuilder builder = new StringBuilder();
-                    SpaceStation.INSTANCE.print(new StringBuilderPrinter(builder));
-                    TextView report = (TextView)findViewById(R.id.stationReport);
-                    report.setText(builder.toString());
-                }
+            .subscribe(ignored -> {
+                StringBuilder builder = new StringBuilder();
+                SpaceStation.INSTANCE.print(new StringBuilderPrinter(builder));
+                TextView report = (TextView)findViewById(R.id.stationReport);
+                report.setText(builder.toString());
             }));
     }
 
@@ -85,12 +77,7 @@ public abstract class BaseLaunchActivity extends AppCompatActivity {
         String text = textView.getText().toString();
         textView.setText(text + (text.length() == 0 ? "" : "\n") + message);
         final ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
-        scrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
+        scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
     }
 
     protected void onNext(Integer value) {

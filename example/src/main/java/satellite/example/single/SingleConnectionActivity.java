@@ -1,15 +1,12 @@
 package satellite.example.single;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 
-import rx.functions.Action1;
 import satellite.MissionControlCenter;
 import satellite.connections.CacheSubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.io.InputMap;
 import satellite.util.RxNotification;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
@@ -24,23 +21,13 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
         findViewById(R.id.launch)
-            .setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    controlCenter.launch(ExampleSingleSatelliteFactory.missionStatement(10));
-                }
-            });
+            .setOnClickListener(v -> controlCenter.launch(ExampleSingleSatelliteFactory.missionStatement(10)));
         findViewById(R.id.drop)
-            .setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    controlCenter.dismiss();
-                }
-            });
+            .setOnClickListener(v -> controlCenter.dismiss());
 
         controlCenter = savedInstanceState == null ?
             new MissionControlCenter() :
-            new MissionControlCenter((InputMap)savedInstanceState.getParcelable("center"));
+            new MissionControlCenter(savedInstanceState.getParcelable("center"));
     }
 
     @Override
@@ -48,21 +35,13 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(new CacheSubjectFactory<Integer>(), new ExampleSingleSatelliteFactory())
+            controlCenter.connection(CacheSubjectFactory.instance(), new ExampleSingleSatelliteFactory())
                 .subscribe(RxNotification.split(
-                    new Action1<Integer>() {
-                        @Override
-                        public void call(Integer value) {
-                            log("SINGLE: onNext " + value);
-                            onNext(value);
-                        }
+                    value -> {
+                        log("SINGLE: onNext " + value);
+                        onNext(value);
                     },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            log("SINGLE: onError " + throwable);
-                        }
-                    })));
+                    throwable -> log("SINGLE: onError " + throwable))));
     }
 
     @Override

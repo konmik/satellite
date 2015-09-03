@@ -19,13 +19,7 @@ public class ExampleCacheSatelliteFactory implements SatelliteFactory<Integer> {
 
     @Override
     public Observable<Integer> call(InputMap missionStatement) {
-        final int from = missionStatement.get(FROM_KEY);
         return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
-            .map(new Func1<Long, Integer>() {
-                @Override
-                public Integer call(Long time) {
-                    return (int)(time + from);
-                }
-            });
+            .map(time -> (int)(time + (int)missionStatement.get(FROM_KEY)));
     }
 }
