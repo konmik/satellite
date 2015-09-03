@@ -6,7 +6,7 @@ import rx.Notification;
 import rx.Observable;
 import satellite.io.InputMap;
 import satellite.io.OutputMap;
-import satellite.subjects.SubjectFactory;
+import satellite.util.SubjectFactory;
 
 /**
  * EarthBase represents a set of {@link MissionControlCenter}.
@@ -24,7 +24,7 @@ public class EarthBase implements Launcher {
     }
 
     @Override
-    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<T> subjectFactory, SatelliteFactory<T> satelliteFactory) {
+    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<T> satelliteFactory) {
         return getCenter(id).connection(subjectFactory, satelliteFactory);
     }
 

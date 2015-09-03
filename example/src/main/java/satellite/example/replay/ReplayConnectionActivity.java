@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import satellite.MissionControlCenter;
-import satellite.subjects.ReplaySubjectFactory;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.util.RxNotification;
+import satellite.util.SubjectFactory;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
@@ -35,7 +35,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(ReplaySubjectFactory.instance(), new ExampleReplaySatelliteFactory())
+            controlCenter.connection(SubjectFactory.replaySubject(), new ExampleReplaySatelliteFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

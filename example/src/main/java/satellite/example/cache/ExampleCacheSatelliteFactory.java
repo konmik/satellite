@@ -3,7 +3,6 @@ package satellite.example.cache;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.functions.Func1;
 import satellite.SatelliteFactory;
 import satellite.io.InputMap;
 

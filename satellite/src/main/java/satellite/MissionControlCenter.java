@@ -8,7 +8,7 @@ import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 import satellite.io.InputMap;
 import satellite.io.OutputMap;
-import satellite.subjects.SubjectFactory;
+import satellite.util.SubjectFactory;
 
 /**
  * MissionControlCenter controls only one satellite.
@@ -39,7 +39,10 @@ public class MissionControlCenter {
         out = in.toOutput();
     }
 
-    public <T> Observable<Notification<T>> connection(final SubjectFactory<T> subjectFactory, final SatelliteFactory<T> satelliteFactory) {
+    public <T> Observable<Notification<T>> connection(
+        final SubjectFactory<Notification<T>> subjectFactory,
+        final SatelliteFactory<T> satelliteFactory) {
+
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
                 @Override

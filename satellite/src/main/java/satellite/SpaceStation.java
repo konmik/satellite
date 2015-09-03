@@ -11,7 +11,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func0;
 import rx.subjects.Subject;
-import satellite.MissionControlCenter;
+import satellite.util.SubjectFactory;
 
 /**
  * SpaceStation represents... a space station! :D
@@ -36,7 +36,7 @@ public enum SpaceStation {
      */
     public <T> Observable<Notification<T>> provide(
         final String key,
-        final Func0<Subject<Notification<T>, Notification<T>>> subjectFactory,
+        final SubjectFactory<Notification<T>> subjectFactory,
         final Func0<Observable<T>> satelliteFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
