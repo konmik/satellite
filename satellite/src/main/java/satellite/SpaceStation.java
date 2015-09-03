@@ -34,7 +34,7 @@ public enum SpaceStation {
      * @param <T>              a type of satellite's onNext values
      * @return an observable that emits satellite notifications
      */
-    public <T> Observable<Notification<T>> provide(
+    public <T> Observable<Notification<T>> connection(
         final String key,
         final SubjectFactory<Notification<T>> subjectFactory,
         final Func0<Observable<T>> satelliteFactory) {

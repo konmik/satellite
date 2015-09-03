@@ -27,11 +27,11 @@ import java.util.Set;
  */
 public class InputMap implements Parcelable {
 
+    private final Map<String, byte[]> map;
+
     public static InputMap empty() {
         return EMPTY;
     }
-
-    private final Map<String, byte[]> map;
 
     public InputMap(Object... map) {
         if (map.length / 2 * 2 != map.length)

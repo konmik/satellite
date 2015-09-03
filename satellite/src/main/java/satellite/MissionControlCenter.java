@@ -47,7 +47,7 @@ public class MissionControlCenter {
             .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final InputMap statement) {
-                    return SpaceStation.INSTANCE.provide(key, subjectFactory, new Func0<Observable<T>>() {
+                    return SpaceStation.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
                         @Override
                         public Observable<T> call() {
                             return satelliteFactory.call(statement);
