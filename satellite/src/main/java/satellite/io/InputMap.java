@@ -65,17 +65,20 @@ public class InputMap implements Parcelable {
     public <T> T get(String key, T defaultValue) {
         if (!map.containsKey(key))
             return defaultValue;
+        return unmarshall(map.get(key));
+    }
+
+    public OutputMap toOutput() {
+        return new OutputMap(map);
+    }
+
+    private static <T> T unmarshall(byte[] array) {
         Parcel parcel = Parcel.obtain();
-        byte[] array = map.get(key);
         parcel.unmarshall(array, 0, array.length);
         parcel.setDataPosition(0);
         Object value = parcel.readValue(CLASS_LOADER);
         parcel.recycle();
         return (T)value;
-    }
-
-    public OutputMap toOutput() {
-        return new OutputMap(map);
     }
 
     private static final ClassLoader CLASS_LOADER = InputMap.class.getClassLoader();

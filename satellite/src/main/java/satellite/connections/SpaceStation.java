@@ -1,5 +1,6 @@
 package satellite.connections;
 
+import android.util.Pair;
 import android.util.Printer;
 
 import java.util.HashMap;
@@ -21,8 +22,7 @@ public enum SpaceStation {
 
     INSTANCE;
 
-    private HashMap<String, Subject> subjects = new HashMap<>();
-    private HashMap<String, Subscription> subscriptions = new HashMap<>();
+    private HashMap<String, Pair<Subscription, Subject>> connections = new HashMap<>();
 
     /**
      * This is the core method that connects a satellite with {@link MissionControlCenter}.
@@ -42,33 +42,30 @@ public enum SpaceStation {
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
             public void call(Subscriber<? super Notification<T>> subscriber) {
-                if (!subjects.containsKey(key)) {
+                if (!connections.containsKey(key)) {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
-                    subscriptions.put(key, satelliteFactory.call()
-                        .materialize()
-                        .subscribe(subject));
-                    subjects.put(key, subject);
+                    connections.put(key,
+                        new Pair<Subscription, Subject>(
+                            satelliteFactory.call()
+                                .materialize()
+                                .subscribe(subject),
+                            subject));
                 }
-                subscriber.add(subjects.get(key).subscribe(subscriber));
+                subscriber.add(connections.get(key).second.subscribe(subscriber));
             }
         });
     }
 
     public void recycle(String key) {
-        subjects.remove(key);
-        if (subscriptions.containsKey(key)) {
-            Subscription subscription = subscriptions.get(key);
-            subscription.unsubscribe();
-            subscriptions.remove(key);
+        if (connections.containsKey(key)) {
+            connections.get(key).first.unsubscribe();
+            connections.remove(key);
         }
     }
 
     public void print(Printer printer) {
-        printer.println("subjects:");
-        for (String key : subjects.keySet())
-            printer.println(key);
-        printer.println("subscriptions:");
-        for (String key : subscriptions.keySet())
+        printer.println("connections:");
+        for (String key : connections.keySet())
             printer.println(key);
     }
 }
