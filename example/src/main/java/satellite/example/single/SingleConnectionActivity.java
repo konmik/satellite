@@ -21,14 +21,10 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch)
-            .setOnClickListener(v -> controlCenter.launch(ExampleSingleSatelliteFactory.missionStatement(10)));
-        findViewById(R.id.drop)
-            .setOnClickListener(v -> controlCenter.dismiss());
+        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleSatelliteFactory.missionStatement(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> controlCenter.dismiss());
 
-        controlCenter = savedInstanceState == null ?
-            new MissionControlCenter<>() :
-            new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
+        controlCenter = savedInstanceState == null ? new MissionControlCenter<>() : new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
     }
 
     @Override

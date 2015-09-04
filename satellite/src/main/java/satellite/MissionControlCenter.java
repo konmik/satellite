@@ -60,7 +60,7 @@ public class MissionControlCenter<A extends Parcelable, T> {
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
                 public void call(Notification<T> notification) {
-                    if (notification.isOnCompleted())
+                    if (notification.isOnCompleted() || notification.isOnError())
                         dismiss();
                 }
             });
