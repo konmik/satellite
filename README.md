@@ -57,6 +57,8 @@ waiting for a long running background task completion, the application is still 
 * The entire library has been built keeping [The Kiss Principle](https://people.apache.org/~fhanik/kiss.html) in mind.
 Anyone who is familiar with RxJava can read and understand it easily.
 
+* The library is extremely tiny: it has only 17Kb jar.
+
 ## Architecture
 
 Satellite is full of cosmic analogies. Why? Because this is fun and because this allows
@@ -67,32 +69,36 @@ to construct an OOP model that is very close to what is going on. Reactive satel
 `Satellite` is any RxJava `Observable` which resides in the background.
 It is out of reach of lifecycle events.
 
-There is `SatelliteFactory` interface - we're implementing it to instantiate our satellite code
-from a given argument. [SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
-It is a good idea to declare the factory outside of `Activity` to prevent memory leaks.
+There is
+[SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
+interface - we're implementing it to instantiate our satellite code
+from a given argument. It is a good idea to declare the factory outside of `Activity` to
+prevent memory leaks during long requests and time consuming operations.
 
-`SpaceStation` is a singleton which keeps track of all launched
+[SpaceStation](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SpaceStation.java)
+is a singleton which keeps track of all launched
 satellites. It connects satellites with activities and fragments, providing an `Observable` connection.
 You don't normally need it, but it is nice to know about it.
 Sometimes you will want to get some debug information from its `print()` method.
-[SpaceStation](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SpaceStation.java)
 
-We also have `MissionControlCenter` - this is our land base inside of Fragment/Activity which manages all
-the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
+We also have
 [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
+- this is our land base inside of Fragment/Activity which manages all
+the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
 
-`EarthBase` is a set of `MissionControlCenter`s that allows to launch more than one satellite.
-You may use `EarthBase` or `MissionControlCenter` directly, depending on your preferences.
 [EarthBase](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/EarthBase.java)
+is a set of `MissionControlCenter`s that allows to launch more than one satellite.
+You may use `EarthBase` or `MissionControlCenter` directly, depending on your preferences.
 
 `EarthBase` and `MissionControlCenter` are things that we need to persist within the activity state bundle.
 They both have `instanceState()` methods which return `Parcelable` that can be serialized to be used for restoration later.
 
 For every launch we need to provide a "mission statement". This means that we supply arguments for the launch.
-It is recommended to supply arguments in a special `Parcelable` immutable object `InputMap` instead of `Bundle`.
+It is recommended to supply arguments in a special `Parcelable` immutable object
+[InputMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/io/InputMap.java)
+instead of `Bundle`.
 Immutable objects allow to avoid a wide range of problems that can be caused by using mutable
 data structures and provide reliable support for multithreading.
-[InputMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/io/InputMap.java)
 
 ## The code
 
@@ -152,7 +158,9 @@ public class AnActivity extends Activity {
 ```
 
 This looks a little bit bloated now, but when you use `EarthBase` and implement `Launcher` interface on your
-base activity this can become as simple as this:
+base activity
+[BaseActivity](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/BaseActivity.java)
+this can become as simple as this:
 
 ```java
 public class AnActivity extends BaseActivity {
