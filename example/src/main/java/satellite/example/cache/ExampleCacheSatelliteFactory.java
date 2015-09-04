@@ -8,17 +8,15 @@ import satellite.io.InputMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleCacheSatelliteFactory implements SatelliteFactory<Integer> {
-
-    public static final String FROM_KEY = "from";
+public class ExampleCacheSatelliteFactory implements SatelliteFactory<InputMap, Integer> {
 
     public static InputMap missionStatement(int from) {
-        return new InputMap(FROM_KEY, from);
+        return new InputMap("from", from);
     }
 
     @Override
     public Observable<Integer> call(InputMap missionStatement) {
         return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
-            .map(time -> (int)(time + (int)missionStatement.get(FROM_KEY)));
+            .map(time -> (int)(time + (int)missionStatement.get("from")));
     }
 }

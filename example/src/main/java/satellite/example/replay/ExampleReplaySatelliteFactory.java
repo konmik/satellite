@@ -8,7 +8,7 @@ import satellite.io.InputMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleReplaySatelliteFactory implements SatelliteFactory<Integer> {
+public class ExampleReplaySatelliteFactory implements SatelliteFactory<InputMap, Integer> {
 
     public static InputMap missionStatement(int from) {
         return new InputMap("from", from);

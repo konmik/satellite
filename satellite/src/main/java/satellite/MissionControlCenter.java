@@ -1,5 +1,7 @@
 package satellite;
 
+import android.os.Parcelable;
+
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
@@ -13,21 +15,21 @@ import satellite.util.SubjectFactory;
 /**
  * MissionControlCenter controls only one satellite.
  */
-public class MissionControlCenter {
+public class MissionControlCenter<A extends Parcelable, T> {
 
     private final String key;
     private final boolean restore;
-    private final InputMap statement;
+    private final A statement;
     private final OutputMap out;
 
-    private final PublishSubject<InputMap> launches = PublishSubject.create();
+    private final PublishSubject<A> launches = PublishSubject.create();
 
     private static long id;
 
     public MissionControlCenter() {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
-        statement = InputMap.empty();
+        statement = (A)InputMap.empty();
         out = new OutputMap()
             .put("key", key);
     }
@@ -35,18 +37,18 @@ public class MissionControlCenter {
     public MissionControlCenter(InputMap in) {
         key = in.get("key");
         restore = in.get("restore", false);
-        statement = in.get("statement", InputMap.empty());
+        statement = (A)in.get("statement", InputMap.empty());
         out = in.toOutput();
     }
 
-    public <T> Observable<Notification<T>> connection(
+    public Observable<Notification<T>> connection(
         final SubjectFactory<Notification<T>> subjectFactory,
-        final SatelliteFactory<T> satelliteFactory) {
+        final SatelliteFactory<A, T> satelliteFactory) {
 
         return (restore ? launches.startWith(statement) : launches)
-            .switchMap(new Func1<InputMap, Observable<Notification<T>>>() {
+            .switchMap(new Func1<A, Observable<Notification<T>>>() {
                 @Override
-                public Observable<Notification<T>> call(final InputMap statement) {
+                public Observable<Notification<T>> call(final A statement) {
                     return SpaceStation.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
                         @Override
                         public Observable<T> call() {
@@ -64,7 +66,7 @@ public class MissionControlCenter {
             });
     }
 
-    public void launch(InputMap statement) {
+    public void launch(A statement) {
         SpaceStation.INSTANCE.recycle(key);
         out.put("restore", true);
         out.put("statement", statement);

@@ -1,8 +1,9 @@
 package satellite;
 
+import android.os.Parcelable;
+
 import rx.Observable;
 import rx.functions.Func1;
-import satellite.io.InputMap;
 
-public interface SatelliteFactory<T> extends Func1<InputMap, Observable<T>> {
+public interface SatelliteFactory<A extends Parcelable, T> extends Func1<A, Observable<T>> {
 }

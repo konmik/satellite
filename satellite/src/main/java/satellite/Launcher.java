@@ -1,8 +1,9 @@
 package satellite;
 
+import android.os.Parcelable;
+
 import rx.Notification;
 import rx.Observable;
-import satellite.io.InputMap;
 import satellite.util.SubjectFactory;
 
 /**
@@ -10,7 +11,8 @@ import satellite.util.SubjectFactory;
  * are able to launch satellites.
  */
 public interface Launcher {
-    <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<T> satelliteFactory);
-    void launch(int id, InputMap missionStatement);
+    <A extends Parcelable, T> Observable<Notification<T>> connection(
+        int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory);
+    void launch(int id, Parcelable missionStatement);
     void dismiss(int id);
 }
