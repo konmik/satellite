@@ -83,7 +83,7 @@ Sometimes you will want to get some debug information from its `print()` method.
 
 We also have
 [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
-- this is our land base inside of Fragment/Activity which manages all
+ - this is our land base inside of Fragment/Activity which manages all
 the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
 
 [EarthBase](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/EarthBase.java)
@@ -103,7 +103,7 @@ data structures and provide reliable support for multithreading.
 ## The code
 
 Here is the typical code that is used to launch satellites. Some parts can be extracted into a base activity class
-to eliminate the code duplication.
+to eliminate code duplication.
 
 ```java
 public class SignIn implements SatelliteFactory<InputMap, Boolean> {
@@ -115,11 +115,11 @@ public class SignIn implements SatelliteFactory<InputMap, Boolean> {
     @Override
     public Observable<Integer> call(InputMap in) {
         return serverApi.signIn(in.get("username"), in.get("password"))
-            .observerOn(mainThread());
+            .observeOn(mainThread());
     }
 }
 
-public class AnActivity extends Activity {
+public class SignInActivity extends Activity {
 
     private MissionControlCenter<InputMap, Integer> controlCenter;
     private Subscription subscription;
@@ -128,7 +128,7 @@ public class AnActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        findViewById(R.id.launch).setOnClickListener(v ->
+        findViewById(R.id.button_sign_in).setOnClickListener(v ->
             controlCenter.launch(SignIn.missionStatement("user", "password")));
 
         controlCenter = savedInstanceState == null ?
@@ -136,7 +136,7 @@ public class AnActivity extends Activity {
             new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
 
         subscription = controlCenter.connection(SubjectFactory.behaviorSubject(), new SignIn())
-            .subscribe(RxNotification.split(
+            .subscribe(split(
                 value -> log("onNext " + value),
                 throwable -> log("onError " + throwable))));
     }
@@ -157,13 +157,31 @@ public class AnActivity extends Activity {
 }
 ```
 
-This looks a little bit bloated now, but when you use `EarthBase` and implement `Launcher` interface on your
+##### split
+
+I may noticed the [split](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/util/RxNotification.java)
+magic method. What it does?
+
+All events come from satellites in the materialized state
+[materialize-dematerialize](http://reactivex.io/documentation/operators/materialize-dematerialize.html).
+This is done to be able to reuse the existing connection, without creating it each time. `split` dematerializes
+events and returns them into `onNext`, `onError`, `onComplete` lambdas.
+
+##### SubjectFactory
+
+There is also `SubjectFactory`. What *it* does? Basically, we need to be able to reconnect to background task
+and receive the `onNext` value that has been emitted while the activity was destroyed. So, we need a subject
+that will keep the value and re-emit it on connection. We use `BehaviorSubject` to replay the latest value,
+we use `ReplaySubject` to replay all received values. Replaying of all received values makes it easy to
+page data.
+
+The example looks a little bit bloated now, but when you use `EarthBase` and implement `Launcher` interface on your
 base activity
 [BaseActivity](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/BaseActivity.java)
-this can become as simple as this:
+it can become as simple as this:
 
 ```java
-public class AnActivity extends BaseActivity {
+public class SignInActivity extends BaseActivity {
 
     private static final int SIGN_IN = 1;
 
@@ -171,14 +189,14 @@ public class AnActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        findViewById(R.id.launch).setOnClickListener(v ->
+        findViewById(R.id.button_sign_in).setOnClickListener(v ->
             launch(SIGN_IN, SignIn.missionStatement("user", "password")));
     }
 
     @Override
     protected Subscription onConnect() {
         return connection(SIGN_IN, SubjectFactory.behaviorSubject(), new SignIn())
-            .subscribe(RxNotification.split(
+            .subscribe(split(
                 value -> log("onNext " + value),
                 throwable -> log("onError " + throwable))));
     }
