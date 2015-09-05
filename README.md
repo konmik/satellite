@@ -82,8 +82,8 @@ You don't normally need it, but it is nice to know about it.
 Sometimes you will want to get some debug information from its `print()` method.
 
 We also have
-[MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java)
- - this is our land base inside of Fragment/Activity which manages all
+[MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java) -
+this is our land base inside of Fragment/Activity which manages all
 the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
 
 [EarthBase](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/EarthBase.java)
