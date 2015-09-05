@@ -55,8 +55,14 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
+    public <A extends Parcelable, T> Observable<Notification<T>> connection(int id, SatelliteFactory<A, T> satelliteFactory) {
+        return earthBase.connection(id, SubjectFactory.behaviorSubject(), satelliteFactory);
+    }
+
     @Override
-    public <A extends Parcelable, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
+    public <A extends Parcelable, T> Observable<Notification<T>> connection(
+        int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
+
         return earthBase.connection(id, subjectFactory, satelliteFactory);
     }
 

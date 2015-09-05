@@ -25,10 +25,8 @@ public class EarthBase implements Launcher {
     }
 
     @Override
-    public <A extends Parcelable, T> Observable<Notification<T>> connection(
-        int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
-
-        return getCenter(id).connection(subjectFactory, satelliteFactory);
+    public <A extends Parcelable, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
+        return this.<A, T>getCenter(id).connection(subjectFactory, satelliteFactory);
     }
 
     @Override
@@ -53,7 +51,7 @@ public class EarthBase implements Launcher {
         return out.toInput();
     }
 
-    private MissionControlCenter getCenter(int id) {
+    private <A extends Parcelable, T> MissionControlCenter<A, T> getCenter(int id) {
         if (centers.get(id) == null)
             centers.put(id, new MissionControlCenter());
         return centers.get(id);

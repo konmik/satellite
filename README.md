@@ -113,7 +113,7 @@ public class SignIn implements SatelliteFactory<InputMap, Boolean> {
     }
 
     @Override
-    public Observable<Integer> call(InputMap in) {
+    public Observable<Boolean> call(InputMap in) {
         return serverApi.signIn(in.get("username"), in.get("password"))
             .observeOn(mainThread());
     }
@@ -121,7 +121,7 @@ public class SignIn implements SatelliteFactory<InputMap, Boolean> {
 
 public class SignInActivity extends Activity {
 
-    private MissionControlCenter<InputMap, Integer> controlCenter;
+    private MissionControlCenter<InputMap, Boolean> controlCenter;
     private Subscription subscription;
 
     @Override
@@ -137,8 +137,8 @@ public class SignInActivity extends Activity {
 
         subscription = controlCenter.connection(SubjectFactory.behaviorSubject(), new SignIn())
             .subscribe(split(
-                value -> log("onNext " + value),
-                throwable -> log("onError " + throwable))));
+                value -> Log.v("SignIn", "onNext " + value),
+                throwable -> Log.v("SignIn", "onError " + throwable)));
     }
 
     @Override
@@ -159,13 +159,12 @@ public class SignInActivity extends Activity {
 
 ##### split
 
-I may noticed the [split](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/util/RxNotification.java)
+You may noticed the [split](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/util/RxNotification.java)
 magic method. What it does?
 
-All events come from satellites in the materialized state
+All events come from `MissionControlCenter` in the materialized state
 [materialize-dematerialize](http://reactivex.io/documentation/operators/materialize-dematerialize.html).
-This is done to be able to reuse the existing connection, without creating it each time. `split` dematerializes
-events and returns them into `onNext`, `onError`, `onComplete` lambdas.
+`split` dematerializes events and returns them into `onNext`, `onError`, `onComplete` lambdas.
 
 ##### SubjectFactory
 
@@ -173,7 +172,7 @@ There is also `SubjectFactory`. What *it* does? Basically, we need to be able to
 and receive the `onNext` value that has been emitted while the activity was destroyed. So, we need a subject
 that will keep the value and re-emit it on connection. We use `BehaviorSubject` to replay the latest value,
 we use `ReplaySubject` to replay all received values. Replaying of all received values makes it easy to
-page data.
+organize data paging and one-by-one streaming.
 
 The example looks a little bit bloated now, but when you use `EarthBase` and implement `Launcher` interface on your
 base activity
@@ -195,10 +194,10 @@ public class SignInActivity extends BaseActivity {
 
     @Override
     protected Subscription onConnect() {
-        return connection(SIGN_IN, SubjectFactory.behaviorSubject(), new SignIn())
+        return connection(SIGN_IN, new SignIn())
             .subscribe(split(
-                value -> log("onNext " + value),
-                throwable -> log("onError " + throwable))));
+                value -> Log.v("SignIn", "onNext " + value),
+                throwable -> Log.v("SignIn", "onError " + throwable)));
     }
 }
 ```
