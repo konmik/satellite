@@ -4,6 +4,8 @@ Satellite
 Satellite is a simple (for those who are familiar with RxJava) Android library, which allows
 to properly connect background tasks with visual parts of an application.
 
+![](https://github.com/konmik/satellite/blob/images/images/satellite_logo_small.png)
+
 ## Introduction
 
 If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
@@ -64,7 +66,7 @@ Anyone who is familiar with RxJava can read and understand it easily.
 Satellite is full of cosmic analogies. Why? Because this is fun and because this allows
 to construct an OOP model that is very close to what is going on. Reactive satellites are awesome. :)
 
-![](https://github.com/konmik/satellite/blob/images2/images/satellite.png)
+![](https://github.com/konmik/satellite/blob/images/images/satellite.png)
 
 `Satellite` is any RxJava `Observable` which resides in the background.
 It is out of reach of lifecycle events.
