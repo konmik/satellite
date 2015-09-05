@@ -11,7 +11,7 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 public class ExampleReplaySatelliteFactory implements SatelliteFactory<InputMap, Integer> {
 
     public static InputMap missionStatement(int from) {
-        return new InputMap("from", from);
+        return InputMap.sequence("from", from);
     }
 
     @Override

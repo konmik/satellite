@@ -33,19 +33,20 @@ public class InputMap implements Parcelable {
         return EMPTY;
     }
 
-    public InputMap(Object... map) {
+    /**
+     * Constructs InputMap using a sequence of key-value arguments.
+     * Keys should be String, values should fit {@link Parcel#writeValue(Object)} argument
+     * requirements.
+     */
+    public static InputMap sequence(Object... map) {
         if (map.length / 2 * 2 != map.length)
             throw new IllegalArgumentException("should provide <String> key - <?> value pairs");
 
         HashMap<String, byte[]> hashMap = new HashMap<>(map.length / 2);
-        for (int i = 0; i < map.length; i += 2) {
-            Parcel parcel = Parcel.obtain();
-            parcel.writeValue(map[i + 1]);
-            hashMap.put((String)map[i], parcel.marshall());
-            parcel.recycle();
-        }
+        for (int i = 0; i < map.length; i += 2)
+            hashMap.put((String)map[i], marshall(map[i + 1]));
 
-        this.map = new HashMap<>(hashMap);
+        return new InputMap(hashMap);
     }
 
     public Set<String> keys() {
@@ -83,7 +84,15 @@ public class InputMap implements Parcelable {
         return (T)value;
     }
 
-    private static final InputMap EMPTY = new InputMap();
+    private static byte[] marshall(Object o) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeValue(o);
+        byte[] result = parcel.marshall();
+        parcel.recycle();
+        return result;
+    }
+
+    private static final InputMap EMPTY = new InputMap(Collections.<String, byte[]>emptyMap());
 
     private static final ClassLoader CLASS_LOADER = InputMap.class.getClassLoader();
 

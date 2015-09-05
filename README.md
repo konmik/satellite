@@ -78,7 +78,7 @@ prevent memory leaks during long requests and time consuming operations.
 [SpaceStation](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SpaceStation.java)
 is a singleton which keeps track of all launched
 satellites. It connects satellites with activities and fragments, providing an `Observable` connection.
-You don't normally need it, but it is nice to know about it.
+You don't normally need to use `SpaceStation` directly, but it is nice to know about it.
 Sometimes you will want to get some debug information from its `print()` method.
 
 We also have
@@ -98,7 +98,12 @@ It is recommended to supply arguments in a special `Parcelable` immutable object
 [InputMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/io/InputMap.java)
 instead of `Bundle`.
 Immutable objects allow to avoid a wide range of problems that can be caused by using mutable
-data structures and provide reliable support for multithreading.
+data structures. Immutable objects also provide reliable support for multithreading. If you want to
+go deeper with immutability and functional juice on Android, take a look at
+[Solid](https://github.com/konmik/solid) libraries.
+and
+[AutoParcel](https://github.com/frankiesardo/auto-parcel)
+libraries.
 
 ## The code
 
