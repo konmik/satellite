@@ -10,7 +10,7 @@ If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
 Satellite is basically the same but is much simpler because it does NOT utilize MVP pattern
 to do the same job.
 
-**WARNING!** This is an early proof-of-concept, please do not use it on production! :)
+**WARNING!** The project is in Alpha stage, the API is a subject to change. Tests coverage is 0%! :D
 
 ### Problem
 
