@@ -30,6 +30,12 @@ public class BaseActivity extends Activity implements Launcher {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("earthBase", earthBase.instanceState());
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (connect) {
