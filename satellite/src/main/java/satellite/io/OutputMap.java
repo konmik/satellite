@@ -1,9 +1,9 @@
 package satellite.io;
 
-import android.os.Parcel;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import satellite.util.ParcelFn;
 
 public class OutputMap {
 
@@ -14,10 +14,7 @@ public class OutputMap {
     }
 
     public OutputMap put(String key, Object value) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeValue(value);
-        map.put(key, parcel.marshall());
-        parcel.recycle();
+        map.put(key, ParcelFn.marshall(value));
         return this;
     }
 
@@ -32,5 +29,15 @@ public class OutputMap {
 
     OutputMap(Map<String, byte[]> map) {
         this.map = new HashMap<>(map);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return MarshallMapFn.equalsMap(map, ((OutputMap)o).map);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
     }
 }

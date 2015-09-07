@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import satellite.util.ParcelFn;
+
 /**
  * The typical state in Android applications is the state that is being kept inside of
  * Activity fields, prompting a programmer to reuse the state and get all the side-effects
@@ -44,7 +46,7 @@ public class InputMap implements Parcelable {
 
         HashMap<String, byte[]> hashMap = new HashMap<>(map.length / 2);
         for (int i = 0; i < map.length; i += 2)
-            hashMap.put((String)map[i], marshall(map[i + 1]));
+            hashMap.put((String)map[i], ParcelFn.marshall(map[i + 1]));
 
         return new InputMap(hashMap);
     }
@@ -64,7 +66,7 @@ public class InputMap implements Parcelable {
     public <T> T get(String key, T defaultValue) {
         if (!map.containsKey(key))
             return defaultValue;
-        return unmarshall(map.get(key));
+        return ParcelFn.unmarshall(map.get(key));
     }
 
     public OutputMap toOutput() {
@@ -73,23 +75,6 @@ public class InputMap implements Parcelable {
 
     InputMap(Map<String, byte[]> map) {
         this.map = new HashMap<>(map);
-    }
-
-    private static <T> T unmarshall(byte[] array) {
-        Parcel parcel = Parcel.obtain();
-        parcel.unmarshall(array, 0, array.length);
-        parcel.setDataPosition(0);
-        Object value = parcel.readValue(CLASS_LOADER);
-        parcel.recycle();
-        return (T)value;
-    }
-
-    private static byte[] marshall(Object o) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeValue(o);
-        byte[] result = parcel.marshall();
-        parcel.recycle();
-        return result;
     }
 
     private static final InputMap EMPTY = new InputMap(Collections.<String, byte[]>emptyMap());
@@ -121,4 +106,14 @@ public class InputMap implements Parcelable {
             return new InputMap[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        return MarshallMapFn.equalsMap(map, ((InputMap)o).map);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
+    }
 }
