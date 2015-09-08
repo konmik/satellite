@@ -12,7 +12,7 @@ class MarshallMapFn {
             return false;
 
         for (Map.Entry<String, byte[]> entry : map.entrySet()) {
-            Object key = entry.getKey();
+            String key = entry.getKey();
             byte[] value = entry.getValue();
             byte[] value2 = other.get(key);
             if (value == null) {

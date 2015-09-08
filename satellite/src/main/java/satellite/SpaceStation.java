@@ -1,9 +1,10 @@
 package satellite;
 
 import android.util.Pair;
-import android.util.Printer;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 import rx.Notification;
 import rx.Observable;
@@ -63,9 +64,7 @@ public enum SpaceStation {
         }
     }
 
-    public void print(Printer printer) {
-        printer.println("connections:");
-        for (String key : connections.keySet())
-            printer.println(key);
+    public Set<String> keys() {
+        return Collections.unmodifiableSet(connections.keySet());
     }
 }

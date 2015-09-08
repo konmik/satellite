@@ -81,7 +81,7 @@ prevent memory leaks during long requests and time consuming operations.
 is a singleton which keeps track of all launched
 satellites. It connects satellites with activities and fragments, providing an `Observable` connection.
 You don't normally need to use `SpaceStation` directly, but it is nice to know about it.
-Sometimes you will want to get some debug information from its `print()` method.
+Sometimes you will want to get some debug information from its `keys()` method.
 
 We also have
 [MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java) -

@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.StringBuilderPrinter;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -58,7 +57,9 @@ public abstract class BaseLaunchActivity extends AppCompatActivity {
         unsubscribeOnDestroy(Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
             .subscribe(ignored -> {
                 StringBuilder builder = new StringBuilder();
-                SpaceStation.INSTANCE.print(new StringBuilderPrinter(builder));
+                builder.append("connections:\n");
+                for (String key : SpaceStation.INSTANCE.keys())
+                    builder.append(key).append("\n");
                 TextView report = (TextView)findViewById(R.id.stationReport);
                 report.setText(builder.toString());
             }));
