@@ -1,7 +1,5 @@
 package satellite;
 
-import android.util.Pair;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,7 +21,7 @@ public enum SpaceStation {
 
     INSTANCE;
 
-    private HashMap<String, Pair<Subscription, Subject>> connections = new HashMap<>();
+    private HashMap<String, Object[]> connections = new HashMap<>();
 
     /**
      * This is the core method that connects a satellite with {@link MissionControlCenter}.
@@ -45,21 +43,20 @@ public enum SpaceStation {
             public void call(Subscriber<? super Notification<T>> subscriber) {
                 if (!connections.containsKey(key)) {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
-                    connections.put(key,
-                        new Pair<Subscription, Subject>(
-                            satelliteFactory.call()
-                                .materialize()
-                                .subscribe(subject),
-                            subject));
+                    connections.put(key, new Object[]{
+                        satelliteFactory.call()
+                            .materialize()
+                            .subscribe(subject),
+                        subject});
                 }
-                subscriber.add(connections.get(key).second.subscribe(subscriber));
+                subscriber.add(((Subject)connections.get(key)[1]).subscribe(subscriber));
             }
         });
     }
 
     public void recycle(String key) {
         if (connections.containsKey(key)) {
-            connections.get(key).first.unsubscribe();
+            ((Subscription)connections.get(key)[0]).unsubscribe();
             connections.remove(key);
         }
     }
