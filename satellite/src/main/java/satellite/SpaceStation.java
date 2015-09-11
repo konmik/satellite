@@ -41,15 +41,17 @@ public enum SpaceStation {
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
             public void call(Subscriber<? super Notification<T>> subscriber) {
-                if (!connections.containsKey(key)) {
+                if (connections.containsKey(key))
+                    subscriber.add(((Subject)connections.get(key)[1]).subscribe(subscriber));
+                else {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
+                    subscriber.add(subject.subscribe(subscriber));
                     connections.put(key, new Object[]{
                         satelliteFactory.call()
                             .materialize()
                             .subscribe(subject),
                         subject});
                 }
-                subscriber.add(((Subject)connections.get(key)[1]).subscribe(subscriber));
             }
         });
     }

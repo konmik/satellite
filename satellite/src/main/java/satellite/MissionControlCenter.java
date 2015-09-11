@@ -1,7 +1,5 @@
 package satellite;
 
-import android.os.Parcelable;
-
 import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
@@ -15,7 +13,7 @@ import satellite.util.SubjectFactory;
 /**
  * MissionControlCenter controls only one satellite.
  */
-public class MissionControlCenter<A extends Parcelable, T> {
+public class MissionControlCenter<A, T> {
 
     private final String key;
     private final boolean restore;

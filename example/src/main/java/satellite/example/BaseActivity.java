@@ -2,7 +2,6 @@ package satellite.example;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import rx.Notification;
 import rx.Observable;
@@ -61,19 +60,19 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
-    public <A extends Parcelable, T> Observable<Notification<T>> connection(int id, SatelliteFactory<A, T> satelliteFactory) {
+    public <A, T> Observable<Notification<T>> connection(int id, SatelliteFactory<A, T> satelliteFactory) {
         return earthBase.connection(id, SubjectFactory.behaviorSubject(), satelliteFactory);
     }
 
     @Override
-    public <A extends Parcelable, T> Observable<Notification<T>> connection(
+    public <A, T> Observable<Notification<T>> connection(
         int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
 
         return earthBase.connection(id, subjectFactory, satelliteFactory);
     }
 
     @Override
-    public void launch(int id, Parcelable missionStatement) {
+    public <A> void launch(int id, A missionStatement) {
         earthBase.launch(id, missionStatement);
     }
 

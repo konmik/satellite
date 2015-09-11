@@ -1,6 +1,5 @@
 package satellite;
 
-import android.os.Parcelable;
 import android.util.SparseArray;
 
 import rx.Notification;
@@ -25,12 +24,12 @@ public class EarthBase implements Launcher {
     }
 
     @Override
-    public <A extends Parcelable, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
+    public <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
         return this.<A, T>center(id).connection(subjectFactory, satelliteFactory);
     }
 
     @Override
-    public void launch(int id, Parcelable missionStatement) {
+    public <A> void launch(int id, A missionStatement) {
         center(id).launch(missionStatement);
     }
 
@@ -51,7 +50,7 @@ public class EarthBase implements Launcher {
         return out.toInput();
     }
 
-    private <A extends Parcelable, T> MissionControlCenter<A, T> center(int id) {
+    private <A, T> MissionControlCenter<A, T> center(int id) {
         if (centers.get(id) == null)
             centers.put(id, new MissionControlCenter());
         return centers.get(id);
