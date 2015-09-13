@@ -5,22 +5,15 @@ import rx.Observable;
 import satellite.util.SubjectFactory;
 
 /**
- * This is an abstraction for the easier implementation of base Android view classes that
- * are able to launch satellites.
+ * This is an abstraction for the easier implementation of classes that
+ * are able to launch restartables.
+ *
+ * See {@link RestartableConnectionSet} for JavaDoc.
  */
 public interface Launcher {
-    /**
-     * Creates a connection given connection id, subject factory and satellite factory.
-     */
+    <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory);
     <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory);
-
-    /**
-     * Launches a satellite on a given connection id given a mission statement.
-     */
-    <A> void launch(int id, A missionStatement);
-
-    /**
-     * Dismisses a satellite on a given connection id.
-     */
+    void launch(int id);
+    void launch(int id, Object missionStatement);
     void dismiss(int id);
 }

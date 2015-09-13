@@ -15,11 +15,10 @@ import java.util.Set;
  * of this act.
  *
  * {@link StateMap} represents a "map" storage that can be used to remove more state off the view logic.
- * It is immutable and Parcelable, thus it can be safely used without creation of
- * side effects.
+ * It is immutable and Parcelable, thus it can be safely used without side effects.
  *
- * If you need to save data that is collected during activity, it is a good idea to create a
- * {@link satellite.state.StateMap.Builder} and use it to push data for the next activity instance.
+ * If you need to save Activity instance state, it is a good idea to create a
+ * {@link satellite.state.StateMap.Builder} and use it to push data out for the next activity instance.
  * {@link satellite.state.StateMap.Builder} is write-only, so no troubles with the state mutability can be created
  * this way.
  *
@@ -27,8 +26,10 @@ import java.util.Set;
  * to make write ({@link satellite.state.StateMap.Builder}) or read ({@link StateMap}) operations only.
  *
  * {@link StateMap} automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
- * immutable data immutable. Thus, it is not recommended to use {@link StateMap} on performance critical
- * application parts.
+ * immutable data completely immutable. Every time set/get is called a corresponding
+ * {@link Parcel#marshall()}/{@link Parcel#unmarshall(byte[], int, int)} is called,
+ * providing you with a fresh instance of the stored value.
+ * Thus, it is not recommended to use {@link StateMap} on performance critical application parts.
  */
 public class StateMap implements Parcelable {
 

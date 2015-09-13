@@ -14,7 +14,7 @@ import rx.functions.Action1;
 public class RxNotification {
 
     /**
-     * Returns an {@link Action1} that will be used to split {@link Notification} to appropriate
+     * Returns an {@link Action1} that can be used to split {@link Notification} to appropriate
      * dematerialized onNext calls.
      *
      * @param onNext a method that will be called in case of onNext notification, or null.
@@ -30,7 +30,7 @@ public class RxNotification {
 
     /**
      * Returns an {@link Action1} that can be used to split {@link Notification} to appropriate
-     * dematerialized onNext, onError calls.
+     * dematerialized onNext and onError calls.
      *
      * @param onNext  a method that will be called in case of onNext notification, or null.
      * @param onError a method that will be called in case of onError notification, or null.
@@ -47,7 +47,7 @@ public class RxNotification {
 
     /**
      * Returns an {@link Action1} that can be used to split {@link Notification} to appropriate
-     * dematerialized onNext, onError, onComplete calls.
+     * dematerialized onNext, onError and onComplete calls.
      *
      * @param onNext      a method that will be called in case of onNext notification, or null.
      * @param onError     a method that will be called in case of onError notification, or null.

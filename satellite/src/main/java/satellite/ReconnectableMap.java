@@ -13,7 +13,11 @@ import rx.subjects.Subject;
 import satellite.util.SubjectFactory;
 
 /**
- * ReconnectableMap keeps track of restartable observables and provides observables for {@link RestartableConnection}.
+ * ReconnectableMap keeps track of reconnectable observables (reconnectable observable is an
+ * {@link Observable} that emits materialized values into a {@link Subject}). The
+ * subject is used to (re)connect to the observable.
+ *
+ * Reconnectable observables are used by {@link RestartableConnection}.
  */
 public enum ReconnectableMap {
 
@@ -22,14 +26,14 @@ public enum ReconnectableMap {
     private HashMap<String, Object[]> connections = new HashMap<>();
 
     /**
-     * This is the core method that connects a satellite with {@link RestartableConnection}.
-     * The satellite gets created if it is not launched yet.
+     * This is the core method that connects an observable with {@link RestartableConnection}.
+     * The observable gets created if it does not exist yet.
      *
-     * @param key              a unique key of the connection that should survive configuration changes
-     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link RestartableConnection}
-     * @param satelliteFactory a satellite factory
-     * @param <T>              a type of satellite's onNext values
-     * @return an observable that emits satellite notifications
+     * @param key              a unique key of the connection.
+     * @param subjectFactory   a factory for creating a subject that lies between the observable and {@link RestartableConnection}.
+     * @param satelliteFactory an observable factory.
+     * @param <T>              a type of observable`s onNext values
+     * @return an observable that emits materialized notifications
      */
     public <T> Observable<Notification<T>> connection(
         final String key,
@@ -51,11 +55,11 @@ public enum ReconnectableMap {
     }
 
     /**
-     * Unsubscribes a given satellite from connection and removes the connection subject.
+     * Unsubscribes a given observable and removes its subject.
      *
      * @param key a unique key of the connection.
      */
-    public void recycle(String key) {
+    public void dismiss(String key) {
         if (connections.containsKey(key)) {
             ((Subscription)connections.get(key)[0]).unsubscribe();
             connections.remove(key);

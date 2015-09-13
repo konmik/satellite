@@ -45,7 +45,7 @@ public class RestartableConnectionTest {
 
     private static class MccLauncher implements InstanceLauncher {
 
-        private final RestartableConnection<String, Integer> center = new RestartableConnection<>();
+        private final RestartableConnection center = new RestartableConnection();
 
         @Override
         public Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory) {
@@ -132,7 +132,7 @@ public class RestartableConnectionTest {
     public void testSaveRestoreRestart() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection<String, Integer> center = new RestartableConnection<>();
+        RestartableConnection center = new RestartableConnection();
         Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         center.launch("1");
 
@@ -143,7 +143,7 @@ public class RestartableConnectionTest {
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection<String, Integer> center2 = new RestartableConnection<>(state);
+        RestartableConnection center2 = new RestartableConnection(state);
         Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
@@ -153,7 +153,7 @@ public class RestartableConnectionTest {
     public void testSaveRestoreCompleted() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection<String, Integer> center = new RestartableConnection<>();
+        RestartableConnection center = new RestartableConnection();
         Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
         center.launch("1");
 
@@ -164,7 +164,7 @@ public class RestartableConnectionTest {
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection<String, Integer> center2 = new RestartableConnection<>(state);
+        RestartableConnection center2 = new RestartableConnection(state);
         Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
@@ -172,6 +172,6 @@ public class RestartableConnectionTest {
 
     private void resetStation() {
         for (String key : new HashSet<>(ReconnectableMap.INSTANCE.keys()))
-            ReconnectableMap.INSTANCE.recycle(key);
+            ReconnectableMap.INSTANCE.dismiss(key);
     }
 }

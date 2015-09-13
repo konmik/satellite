@@ -22,7 +22,7 @@ public class ReconnectableMapTest {
     @After
     public void tearDown() throws Exception {
         for (String key : new HashSet<>(ReconnectableMap.INSTANCE.keys()))
-            ReconnectableMap.INSTANCE.recycle(key);
+            ReconnectableMap.INSTANCE.dismiss(key);
     }
 
     @Test
