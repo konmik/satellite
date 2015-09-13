@@ -68,40 +68,42 @@ to construct an OOP model that is very close to what is going on. Reactive satel
 
 ![](https://github.com/konmik/satellite/blob/images/images/satellite.png)
 
-`Satellite` is any RxJava `Observable` which resides in the background.
-It is out of reach of lifecycle events.
+`Reconnectable` is any RxJava `Observable` which resides in the background.
+It is out of reach of lifecycle events. All emissions go through a `Subject`
+of your choice to fit any possible usage pattern. In example, you could use `BehaviorSubject`
+to re-emit the latest value on configuration change or `ReplaySubject` to re-emit
+all values which can be useful if you want to implement paging.
+
+[ReconnectableMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/ReconnectableMap.java)
+is a singleton which keeps track of all launched
+reconnectables. It connects them with activities and fragments, providing an `Observable` connection.
+You don't normally need to use `ReconnectableMap` directly, but it is good to know about it.
+Sometimes you will want to get some debug information from its `keys()` method.
 
 There is
-[SatelliteFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SatelliteFactory.java)
+[RestartableConnection](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/RestartableConnection.java) -
+this is our land base inside of `Activity` which manages all
+the restartable stuff and guarantees that the observable will be completed despite of any lifecycle events.
+
+We also have
+[RestartableFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/RestartableFactory.java)
 interface - we're implementing it to instantiate our satellite code
 from a given argument. It is a good idea to declare the factory outside of `Activity` to
 prevent memory leaks during long requests and time consuming operations.
 
-[SpaceStation](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/SpaceStation.java)
-is a singleton which keeps track of all launched
-satellites. It connects satellites with activities and fragments, providing an `Observable` connection.
-You don't normally need to use `SpaceStation` directly, but it is nice to know about it.
-Sometimes you will want to get some debug information from its `keys()` method.
+[RestartableConnectionSet](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/RestartableConnectionSet.java)
+is a set of `RestartableConnection` that allows to launch more than one restartable.
 
-We also have
-[MissionControlCenter](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/MissionControlCenter.java) -
-this is our land base inside of Fragment/Activity which manages all
-the cosmic stuff and guarantees that the mission will be completed despite of any lifecycle events.
+`RestartableConnection` and `RestartableConnectionSet` are things that we need to persist within the activity state bundle.
+They both have `instanceState()` methods which return `Parcelable` that can be used for restoration later.
 
-[EarthBase](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/EarthBase.java)
-is a set of `MissionControlCenter`s that allows to launch more than one satellite.
-You may use `EarthBase` or `MissionControlCenter` directly, depending on your preferences.
-
-`EarthBase` and `MissionControlCenter` are things that we need to persist within the activity state bundle.
-They both have `instanceState()` methods which return `Parcelable` that can be serialized to be used for restoration later.
-
-For every launch we need to provide a "mission statement". This means that we supply arguments for the launch.
+There can be two launch cases: with and without argument.
 It is recommended to supply arguments in a special `Parcelable` immutable object
-[InputMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/io/InputMap.java)
+[StateMap](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/state/StateMap.java)
 instead of `Bundle`.
 Immutable objects allow to avoid a wide range of problems that can be caused by using mutable
-data structures. Immutable objects also provide reliable support for multithreading. If you want to
-go deeper with immutability and functional juice on Android, take a look at
+data structures. Immutable objects are also reliable enough for multithreading without additional techniques.
+If you want to go deeper with immutability and functional juice on Android, take a look at
 [Solid](https://github.com/konmik/solid) libraries.
 and
 [AutoParcel](https://github.com/frankiesardo/auto-parcel)
@@ -109,18 +111,18 @@ libraries.
 
 ## The code
 
-Here is the typical code that is used to launch satellites. Some parts can be extracted into a base activity class
-to eliminate code duplication.
+Here is a typical code that is used to launch restartable requests.
+Some parts can be extracted into a base class to eliminate code duplication.
 
 ```java
-public class SignIn implements SatelliteFactory<InputMap, Boolean> {
+public class SignIn implements RestartableFactory<StateMap, Boolean> {
 
-    public static InputMap missionStatement(String username, String password) {
-        return new InputMap("username", username, "password", password);
+    public static StateMap argument(String username, String password) {
+        return StateMap.sequence("username", username, "password", password);
     }
 
     @Override
-    public Observable<Boolean> call(InputMap in) {
+    public Observable<Boolean> call(StateMap in) {
         return serverApi.signIn(in.get("username"), in.get("password"))
             .observeOn(mainThread());
     }
@@ -128,7 +130,7 @@ public class SignIn implements SatelliteFactory<InputMap, Boolean> {
 
 public class SignInActivity extends Activity {
 
-    private MissionControlCenter<InputMap, Boolean> controlCenter;
+    private RestartableConnection connection;
     private Subscription subscription;
 
     @Override
@@ -136,13 +138,13 @@ public class SignInActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         findViewById(R.id.button_sign_in).setOnClickListener(v ->
-            controlCenter.launch(SignIn.missionStatement("user", "password")));
+            connection.launch(SignIn.argument("user", "password")));
 
-        controlCenter = savedInstanceState == null ?
-            new MissionControlCenter<>() :
-            new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
+        connection = savedInstanceState == null ?
+            new RestartableConnection<>() :
+            new RestartableConnection<>(savedInstanceState.getParcelable("connection"));
 
-        subscription = controlCenter.connection(SubjectFactory.behaviorSubject(), new SignIn())
+        subscription = connection.connection(SubjectFactory.behaviorSubject(), new SignIn())
             .subscribe(split(
                 value -> Log.v("SignIn", "onNext " + value),
                 throwable -> Log.v("SignIn", "onError " + throwable)));
@@ -153,13 +155,13 @@ public class SignInActivity extends Activity {
         super.onDestroy();
         subscription.unsubscribe();
         if (isFinishing())
-            controlCenter.dismiss();
+            connection.dismiss();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("center", controlCenter.instanceState());
+        outState.putParcelable("connection", connection.instanceState());
     }
 }
 ```
@@ -169,21 +171,19 @@ public class SignInActivity extends Activity {
 You may noticed the [split](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/util/RxNotification.java)
 magic method. What it does?
 
-All events come from `MissionControlCenter` in the materialized state
+All events come from `RestartableConnection` in the materialized state
 [materialize-dematerialize](http://reactivex.io/documentation/operators/materialize-dematerialize.html).
 `split` dematerializes events and returns them into `onNext`, `onError`, `onComplete` lambdas.
 
 ##### SubjectFactory
 
-There is also `SubjectFactory`. What *it* does? Basically, we need to be able to reconnect to background task
+There is also `SubjectFactory`. We need to be able to reconnect to background task
 and receive the `onNext` value that has been emitted while the activity was destroyed. So, we need a subject
-that will keep the value and re-emit it on connection. We use `BehaviorSubject` to replay the latest value,
-we use `ReplaySubject` to replay all received values. Replaying of all received values makes it easy to
-organize data paging and one-by-one streaming.
+that will keep the value and re-emit it on connection.
 
-The example looks a little bit bloated now, but when you use `EarthBase` and implement `Launcher` interface on your
-base activity
-[BaseActivity](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/BaseActivity.java)
+The example looks a little bit bloated now, but when you use `RestartableConnectionSet` and implement `Launcher` interface on your
+base activity (example:
+[BaseActivity](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/BaseActivity.java))
 it can become as simple as this:
 
 ```java
@@ -196,7 +196,7 @@ public class SignInActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         findViewById(R.id.button_sign_in).setOnClickListener(v ->
-            launch(SIGN_IN, SignIn.missionStatement("user", "password")));
+            launch(SIGN_IN, SignIn.argument("user", "password")));
     }
 
     @Override
