@@ -23,12 +23,12 @@ import static java.util.Arrays.asList;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class RestartableConnectionSetTest {
 
-    private static class EarthBaseLauncher implements RestartableConnectionTest.InstanceLauncher {
+    private static class RestartableConnectionSetLauncher implements RestartableConnectionTest.InstanceLauncher {
 
         final RestartableConnectionSet restartableConnectionSet;
         final int mccId;
 
-        public EarthBaseLauncher(RestartableConnectionSet restartableConnectionSet, int mccId) {
+        public RestartableConnectionSetLauncher(RestartableConnectionSet restartableConnectionSet, int mccId) {
             this.restartableConnectionSet = restartableConnectionSet;
             this.mccId = mccId;
         }
@@ -57,24 +57,24 @@ public class RestartableConnectionSetTest {
     @Test
     public void testConnectionImmediate() throws Exception {
         final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
-        new RestartableConnectionTest().testConnectionImmediateStrategy(new EarthBaseLauncher(restartableConnectionSet, 1));
-        new RestartableConnectionTest().testConnectionImmediateStrategy(new EarthBaseLauncher(restartableConnectionSet, 2));
+        new RestartableConnectionTest().testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
+        new RestartableConnectionTest().testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
     }
 
     @Test
     public void testConnectionDelayed() throws Exception {
         final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
-        new RestartableConnectionTest().testConnectionDelayedStrategy(new EarthBaseLauncher(restartableConnectionSet, 1));
-        new RestartableConnectionTest().testConnectionDelayedStrategy(new EarthBaseLauncher(restartableConnectionSet, 2));
+        new RestartableConnectionTest().testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
+        new RestartableConnectionTest().testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
     }
 
     @Test
     public void testDismiss() throws Exception {
         final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
-        new RestartableConnectionTest().testDismissStrategy(new EarthBaseLauncher(restartableConnectionSet, 1));
-        new RestartableConnectionTest().testDismissStrategy(new EarthBaseLauncher(restartableConnectionSet, 2));
-        new RestartableConnectionTest().testDismissStrategy(new EarthBaseLauncher(restartableConnectionSet, 1));
-        new RestartableConnectionTest().testDismissStrategy(new EarthBaseLauncher(restartableConnectionSet, 1));
+        new RestartableConnectionTest().testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
+        new RestartableConnectionTest().testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
+        new RestartableConnectionTest().testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
+        new RestartableConnectionTest().testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
     }
 
     @Test

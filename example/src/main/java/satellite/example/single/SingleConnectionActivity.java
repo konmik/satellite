@@ -11,7 +11,7 @@ import satellite.util.SubjectFactory;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private RestartableConnection controlCenter;
+    private RestartableConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,10 +20,10 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleRestartableFactory.argument(10)));
-        findViewById(R.id.drop).setOnClickListener(v -> controlCenter.dismiss());
+        findViewById(R.id.launch).setOnClickListener(v -> connection.launch(ExampleSingleRestartableFactory.argument(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> connection.dismiss());
 
-        controlCenter = savedInstanceState == null ? new RestartableConnection() : new RestartableConnection(savedInstanceState.getParcelable("center"));
+        connection = savedInstanceState == null ? new RestartableConnection() : new RestartableConnection(savedInstanceState.getParcelable("connection"));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
+            connection.connection(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);
@@ -44,12 +44,12 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing())
-            controlCenter.dismiss();
+            connection.dismiss();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("center", controlCenter.instanceState());
+        outState.putParcelable("connection", connection.instanceState());
     }
 }

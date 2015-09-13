@@ -45,21 +45,21 @@ public class RestartableConnectionTest {
 
     private static class MccLauncher implements InstanceLauncher {
 
-        private final RestartableConnection center = new RestartableConnection();
+        private final RestartableConnection connection = new RestartableConnection();
 
         @Override
         public Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory) {
-            return center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
+            return connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
         }
 
         @Override
         public void launch(String arg) {
-            center.launch(arg);
+            connection.launch(arg);
         }
 
         @Override
         public void dismiss() {
-            center.dismiss();
+            connection.dismiss();
         }
     }
 
@@ -132,19 +132,19 @@ public class RestartableConnectionTest {
     public void testSaveRestoreRestart() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection center = new RestartableConnection();
-        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
-        center.launch("1");
+        RestartableConnection connection = new RestartableConnection();
+        Subscription subscription = connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
+        connection.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
 
-        StateMap state = center.instanceState();
+        StateMap state = connection.instanceState();
 
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection center2 = new RestartableConnection(state);
-        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
+        RestartableConnection connection2 = new RestartableConnection(state);
+        Subscription subscription2 = connection2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
     }
@@ -153,19 +153,19 @@ public class RestartableConnectionTest {
     public void testSaveRestoreCompleted() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection center = new RestartableConnection();
-        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
-        center.launch("1");
+        RestartableConnection connection = new RestartableConnection();
+        Subscription subscription = connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
+        connection.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
 
-        StateMap state = center.instanceState();
+        StateMap state = connection.instanceState();
 
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection center2 = new RestartableConnection(state);
-        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
+        RestartableConnection connection2 = new RestartableConnection(state);
+        Subscription subscription2 = connection2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
     }

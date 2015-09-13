@@ -11,7 +11,7 @@ import satellite.util.SubjectFactory;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
-    private RestartableConnection controlCenter;
+    private RestartableConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,13 +21,13 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
         findViewById(R.id.launch)
-            .setOnClickListener(v -> controlCenter.launch(ExampleReplayRestartableFactory.argument(10)));
+            .setOnClickListener(v -> connection.launch(ExampleReplayRestartableFactory.argument(10)));
         findViewById(R.id.drop)
-            .setOnClickListener(v -> controlCenter.dismiss());
+            .setOnClickListener(v -> connection.dismiss());
 
-        controlCenter = savedInstanceState == null ?
+        connection = savedInstanceState == null ?
             new RestartableConnection() :
-            new RestartableConnection(savedInstanceState.getParcelable("center"));
+            new RestartableConnection(savedInstanceState.getParcelable("connection"));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(SubjectFactory.replaySubject(), new ExampleReplayRestartableFactory())
+            connection.connection(SubjectFactory.replaySubject(), new ExampleReplayRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);
@@ -48,12 +48,12 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing())
-            controlCenter.dismiss();
+            connection.dismiss();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("center", controlCenter.instanceState());
+        outState.putParcelable("connection", connection.instanceState());
     }
 }
