@@ -6,13 +6,13 @@ import android.widget.TextView;
 import satellite.MissionControlCenter;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.io.InputMap;
+import satellite.io.StateMap;
 import satellite.util.RxNotification;
 import satellite.util.SubjectFactory;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
-    private MissionControlCenter<InputMap, Integer> controlCenter;
+    private MissionControlCenter<StateMap, Integer> controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

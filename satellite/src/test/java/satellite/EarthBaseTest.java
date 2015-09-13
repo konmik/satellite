@@ -14,7 +14,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.observers.TestObserver;
-import satellite.io.InputMap;
+import satellite.io.StateMap;
 import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
@@ -90,7 +90,7 @@ public class EarthBaseTest {
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
 
-        InputMap state = base.instanceState();
+        StateMap state = base.instanceState();
 
         resetStation();
 
@@ -118,7 +118,7 @@ public class EarthBaseTest {
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
 
-        InputMap state = base.instanceState();
+        StateMap state = base.instanceState();
 
         resetStation();
 

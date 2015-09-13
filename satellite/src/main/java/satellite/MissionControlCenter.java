@@ -6,8 +6,7 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
-import satellite.io.InputMap;
-import satellite.io.OutputMap;
+import satellite.io.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
@@ -20,7 +19,7 @@ public class MissionControlCenter<A, T> {
     private final String key;
     private final boolean restore;
     private final A statement;
-    private final OutputMap out;
+    private final StateMap.Builder out;
 
     private final PublishSubject<A> launches = PublishSubject.create();
 
@@ -32,19 +31,19 @@ public class MissionControlCenter<A, T> {
     public MissionControlCenter() {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
-        statement = (A)InputMap.empty();
-        out = new OutputMap().put("key", key);
+        statement = (A)StateMap.empty();
+        out = new StateMap.Builder().put("key", key);
     }
 
     /**
      * Creates a new MissionControlCenter form a given state that has been received
      * from {@link #instanceState()}.
      */
-    public MissionControlCenter(InputMap in) {
+    public MissionControlCenter(StateMap in) {
         key = in.get("key");
         restore = in.get("restore", false);
-        statement = (A)in.get("statement", InputMap.empty());
-        out = in.toOutput();
+        statement = (A)in.get("statement", StateMap.empty());
+        out = in.toBuilder();
     }
 
     /**
@@ -108,7 +107,7 @@ public class MissionControlCenter<A, T> {
      * Returns the instance state that can be used to create a new
      * MissionControlCenter later.
      */
-    public InputMap instanceState() {
-        return out.toInput();
+    public StateMap instanceState() {
+        return out.build();
     }
 }

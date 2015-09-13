@@ -17,7 +17,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
-import satellite.io.InputMap;
+import satellite.io.StateMap;
 import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
@@ -138,7 +138,7 @@ public class MissionControlCenterTest {
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
 
-        InputMap state = center.instanceState();
+        StateMap state = center.instanceState();
 
         resetStation();
 
@@ -159,7 +159,7 @@ public class MissionControlCenterTest {
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
 
-        InputMap state = center.instanceState();
+        StateMap state = center.instanceState();
 
         resetStation();
 

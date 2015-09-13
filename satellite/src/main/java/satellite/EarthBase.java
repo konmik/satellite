@@ -4,8 +4,7 @@ import android.util.SparseArray;
 
 import rx.Notification;
 import rx.Observable;
-import satellite.io.InputMap;
-import satellite.io.OutputMap;
+import satellite.io.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
@@ -27,9 +26,9 @@ public class EarthBase implements Launcher {
      * Creates an EarthBase instance from a given state. All instances of
      * {@link MissionControlCenter} will be restored as well.
      */
-    public EarthBase(InputMap in) {
+    public EarthBase(StateMap in) {
         for (String sId : in.keys())
-            centers.put(Integer.valueOf(sId), new MissionControlCenter((InputMap)in.get(sId)));
+            centers.put(Integer.valueOf(sId), new MissionControlCenter((StateMap)in.get(sId)));
     }
 
     /**
@@ -77,13 +76,13 @@ public class EarthBase implements Launcher {
 
     /**
      * Returns the instance state that can be used to create a restored instance of
-     * EarthBase later, see {@link #EarthBase(InputMap)}.
+     * EarthBase later, see {@link #EarthBase(StateMap)}.
      */
-    public InputMap instanceState() {
-        OutputMap out = new OutputMap();
+    public StateMap instanceState() {
+        StateMap.Builder out = new StateMap.Builder();
         for (int i = 0; i < centers.size(); i++)
             out.put(Integer.toString(centers.keyAt(i)), centers.valueAt(i).instanceState());
-        return out.toInput();
+        return out.build();
     }
 
     private <A, T> MissionControlCenter<A, T> center(int id) {
