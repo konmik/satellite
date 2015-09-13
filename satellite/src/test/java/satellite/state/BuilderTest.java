@@ -1,4 +1,4 @@
-package satellite.io;
+package satellite.state;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

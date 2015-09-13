@@ -14,7 +14,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.observers.TestObserver;
-import satellite.io.StateMap;
+import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;

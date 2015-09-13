@@ -17,7 +17,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
-import satellite.io.StateMap;
+import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;

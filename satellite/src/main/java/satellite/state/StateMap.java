@@ -1,4 +1,4 @@
-package satellite.io;
+package satellite.state;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,12 +19,12 @@ import java.util.Set;
  * side effects.
  *
  * If you need to save data that is collected during activity, it is a good idea to create a
- * {@link satellite.io.StateMap.Builder} and use it to push data for the next activity instance.
- * {@link satellite.io.StateMap.Builder} is write-only, so no troubles with the state mutability can be created
+ * {@link satellite.state.StateMap.Builder} and use it to push data for the next activity instance.
+ * {@link satellite.state.StateMap.Builder} is write-only, so no troubles with the state mutability can be created
  * this way.
  *
  * {@link StateMap} allows to keep the instance state out of activity code, isolating it by strictly allowing
- * to make write ({@link satellite.io.StateMap.Builder}) or read ({@link StateMap}) operations only.
+ * to make write ({@link satellite.state.StateMap.Builder}) or read ({@link StateMap}) operations only.
  *
  * {@link StateMap} automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
  * immutable data immutable. Thus, it is not recommended to use {@link StateMap} on performance critical

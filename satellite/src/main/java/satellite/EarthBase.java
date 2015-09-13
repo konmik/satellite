@@ -4,7 +4,7 @@ import android.util.SparseArray;
 
 import rx.Notification;
 import rx.Observable;
-import satellite.io.StateMap;
+import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 /**

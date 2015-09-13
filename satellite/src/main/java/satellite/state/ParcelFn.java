@@ -1,4 +1,4 @@
-package satellite.io;
+package satellite.state;
 
 import android.os.Parcel;
 

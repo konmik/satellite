@@ -6,7 +6,7 @@ import android.widget.TextView;
 import satellite.MissionControlCenter;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.io.StateMap;
+import satellite.state.StateMap;
 import satellite.util.RxNotification;
 import satellite.util.SubjectFactory;
 
