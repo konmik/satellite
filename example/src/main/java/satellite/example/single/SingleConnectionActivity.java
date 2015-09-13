@@ -6,13 +6,12 @@ import android.widget.TextView;
 import satellite.RestartableConnection;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.state.StateMap;
 import satellite.util.RxNotification;
 import satellite.util.SubjectFactory;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private RestartableConnection<StateMap, Integer> controlCenter;
+    private RestartableConnection controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +23,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleRestartableFactory.missionStatement(10)));
         findViewById(R.id.drop).setOnClickListener(v -> controlCenter.dismiss());
 
-        controlCenter = savedInstanceState == null ? new RestartableConnection<>() : new RestartableConnection<>(savedInstanceState.getParcelable("center"));
+        controlCenter = savedInstanceState == null ? new RestartableConnection() : new RestartableConnection(savedInstanceState.getParcelable("center"));
     }
 
     @Override

@@ -12,7 +12,7 @@ If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
 Satellite is basically the same but is much simpler because it does NOT utilize MVP pattern
 to do the same job.
 
-**WARNING!** The project is in Alpha stage, the API is a subject to change. Tests coverage is 0%! :D
+**WARNING!** The project is in Alpha stage, the API is a subject to change.
 
 ### Problem
 
@@ -34,7 +34,7 @@ and waits for a user who pressed "Login" button while being in a subway and swit
 because his network connection was too slow. Bugs that almost any application produce in such cases
 are numerous.
 
-Android docs are covering such problems very briefly, take a look at:
+Android docs are covering these problems very briefly, take a look at:
 [Processes and Threads - 4. Background process](http://developer.android.com/guide/components/processes-and-threads.html#Lifecycle)
 *"If an activity implements its lifecycle methods correctly, and saves
 its current state, killing its process will not have a visible effect on
@@ -48,8 +48,8 @@ a user will see the usual "progress bar forever" bug.
 
 ### Satellite
 
-* In case of configuration change Satellite automatically re-attaches
-all running background tasks to the new View instance.
+* In case of a configuration change Satellite automatically re-connects
+all running background tasks to the new Activity/Fragment/View instance.
 The application will not forget what it is doing.
 
 * In case of a process restart Satellite automatically restarts background tasks that
@@ -59,7 +59,7 @@ waiting for a long running background task completion, the application is still 
 * The entire library has been built keeping [The Kiss Principle](https://people.apache.org/~fhanik/kiss.html) in mind.
 Anyone who is familiar with RxJava can read and understand it easily.
 
-* The library is extremely tiny: it has only 17Kb jar.
+* The library is extremely tiny: it consists of only 20Kb jar.
 
 ## Architecture
 
