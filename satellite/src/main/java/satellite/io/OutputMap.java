@@ -3,8 +3,6 @@ package satellite.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import satellite.util.ParcelFn;
-
 public class OutputMap {
 
     private final Map<String, byte[]> map;
@@ -13,6 +11,14 @@ public class OutputMap {
         this.map = new HashMap<>();
     }
 
+    /**
+     * Puts a value into the map.
+     *
+     * @param key   the value key.
+     * @param value the value. It must satisfy {@link android.os.Parcel#writeValue(Object)}
+     *              method requirements.
+     * @return
+     */
     public OutputMap put(String key, Object value) {
         map.put(key, ParcelFn.marshall(value));
         return this;
@@ -29,15 +35,5 @@ public class OutputMap {
 
     OutputMap(Map<String, byte[]> map) {
         this.map = new HashMap<>(map);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return MarshallMapFn.equalsMap(map, ((OutputMap)o).map);
-    }
-
-    @Override
-    public int hashCode() {
-        return map.hashCode();
     }
 }

@@ -25,9 +25,9 @@ public enum SpaceStation {
 
     /**
      * This is the core method that connects a satellite with {@link MissionControlCenter}.
-     * The satellite gets created if it is not launched.
+     * The satellite gets created if it is not launched yet.
      *
-     * @param key              a unique id of the connection that should survive configuration changes
+     * @param key              a unique key of the connection that should survive configuration changes
      * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link MissionControlCenter}
      * @param satelliteFactory a satellite factory
      * @param <T>              a type of satellite's onNext values
@@ -46,16 +46,17 @@ public enum SpaceStation {
                 else {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
                     subscriber.add(subject.subscribe(subscriber));
-                    connections.put(key, new Object[]{
-                        satelliteFactory.call()
-                            .materialize()
-                            .subscribe(subject),
-                        subject});
+                    connections.put(key, new Object[]{satelliteFactory.call().materialize().subscribe(subject), subject});
                 }
             }
         });
     }
 
+    /**
+     * Unsubscribes a given satellite from connection and removes the connection subject.
+     *
+     * @param key a unique key of the connection.
+     */
     public void recycle(String key) {
         if (connections.containsKey(key)) {
             ((Subscription)connections.get(key)[0]).unsubscribe();
@@ -63,6 +64,9 @@ public enum SpaceStation {
         }
     }
 
+    /**
+     * Return a current list of connection keys.
+     */
     public Set<String> keys() {
         return Collections.unmodifiableSet(connections.keySet());
     }

@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import satellite.util.ParcelFn;
-
 /**
  * The typical state in Android applications is the state that is being kept inside of
  * Activity fields, prompting a programmer to reuse the state and get all the side-effects
@@ -25,7 +23,8 @@ import satellite.util.ParcelFn;
  * or read operations only.
  *
  * Input/OutputMap automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
- * immutable data immutable.
+ * immutable data immutable. Thus, it is not recommended to use Input/OutputMap on performance critical
+ * application parts.
  */
 public class InputMap implements Parcelable {
 
@@ -51,24 +50,39 @@ public class InputMap implements Parcelable {
         return new InputMap(hashMap);
     }
 
+    /**
+     * Returns an immutable set of the keys contained in this {@link InputMap}.
+     */
     public Set<String> keys() {
         return Collections.unmodifiableSet(map.keySet());
     }
 
-    public boolean contains(String key) {
+    /**
+     * Returns whether this {@link InputMap} contains the specified key.
+     */
+    public boolean containsKey(String key) {
         return map.containsKey(key);
     }
 
+    /**
+     * Returns the value of the mapping with the specified key, or null.
+     */
     public <T> T get(String key) {
         return (T)get(key, null);
     }
 
+    /**
+     * Returns the value of the mapping with the specified key, or the given default value.
+     */
     public <T> T get(String key, T defaultValue) {
         if (!map.containsKey(key))
             return defaultValue;
         return ParcelFn.unmarshall(map.get(key));
     }
 
+    /**
+     * Returns the output map which contains the current {@link InputMap} values.
+     */
     public OutputMap toOutput() {
         return new OutputMap(map);
     }
@@ -109,7 +123,7 @@ public class InputMap implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return MarshallMapFn.equalsMap(map, ((InputMap)o).map);
+        return o instanceof InputMap && MarshallMapFn.equalsMap(map, ((InputMap)o).map);
     }
 
     @Override

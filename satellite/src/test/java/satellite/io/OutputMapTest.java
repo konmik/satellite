@@ -37,7 +37,7 @@ public class OutputMapTest {
         OutputMap out = new OutputMap();
         out.put("1", 1);
         out.remove("1");
-        assertFalse(out.toInput().contains("1"));
+        assertFalse(out.toInput().containsKey("1"));
     }
 
     @Test

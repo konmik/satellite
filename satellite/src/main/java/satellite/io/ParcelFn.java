@@ -1,16 +1,16 @@
-package satellite.util;
+package satellite.io;
 
 import android.os.Parcel;
 
-public class ParcelFn {
+class ParcelFn {
 
     private static final ClassLoader CLASS_LOADER = ParcelFn.class.getClassLoader();
 
-    public static <T> T clone(Object o) {
+    static <T> T clone(Object o) {
         return unmarshall(marshall(o));
     }
 
-    public static <T> T unmarshall(byte[] array) {
+    static <T> T unmarshall(byte[] array) {
         Parcel parcel = Parcel.obtain();
         parcel.unmarshall(array, 0, array.length);
         parcel.setDataPosition(0);
@@ -19,7 +19,7 @@ public class ParcelFn {
         return (T)value;
     }
 
-    public static byte[] marshall(Object o) {
+    static byte[] marshall(Object o) {
         Parcel parcel = Parcel.obtain();
         parcel.setDataPosition(0);
         parcel.writeValue(o);

@@ -49,8 +49,8 @@ public class InputMapTest {
 
     @Test
     public void testContains() throws Exception {
-        assertTrue(getSequence123().contains("1"));
-        assertFalse(getSequence123().contains("-1"));
+        assertTrue(getSequence123().containsKey("1"));
+        assertFalse(getSequence123().containsKey("-1"));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class InputMapTest {
         out.put("1", 1);
         out.put("2", 2);
         out.put("3", 3);
-        assertTrue(out.equals(getSequence123().toOutput()));
+        assertTrue(out.toInput().equals(getSequence123()));
     }
 
     private HashSet getSetString123() {
