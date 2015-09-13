@@ -18,11 +18,11 @@ import satellite.util.SubjectFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SpaceStationTest {
+public class ReconnectableMapTest {
     @After
     public void tearDown() throws Exception {
-        for (String key : new HashSet<>(SpaceStation.INSTANCE.keys()))
-            SpaceStation.INSTANCE.recycle(key);
+        for (String key : new HashSet<>(ReconnectableMap.INSTANCE.keys()))
+            ReconnectableMap.INSTANCE.recycle(key);
     }
 
     @Test
@@ -42,22 +42,22 @@ public class SpaceStationTest {
                 return satellite;
             }
         };
-        Observable connection = SpaceStation.INSTANCE.connection("1", subjectFactory, satelliteFactory);
+        Observable connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory);
 
         assertNotNull(connection);
-        assertEquals(0, SpaceStation.INSTANCE.keys().size());
+        assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
 
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
         connection.subscribe(testObserver);
 
-        assertEquals(1, SpaceStation.INSTANCE.keys().size());
+        assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with the same key does not create a new connection
-        SpaceStation.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe();
-        assertEquals(1, SpaceStation.INSTANCE.keys().size());
+        ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe();
+        assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with a different key creates a new connection
-        SpaceStation.INSTANCE.connection("2", new SubjectFactory<Notification<Integer>>() {
+        ReconnectableMap.INSTANCE.connection("2", new SubjectFactory<Notification<Integer>>() {
             @Override
             public Subject<Notification<Integer>, Notification<Integer>> call() {
                 return PublishSubject.create();
@@ -68,7 +68,7 @@ public class SpaceStationTest {
                 return Observable.just(1);
             }
         }).subscribe();
-        assertEquals(2, SpaceStation.INSTANCE.keys().size());
+        assertEquals(2, ReconnectableMap.INSTANCE.keys().size());
 
         // onNext values are passing up
         satellite.onNext(1);
@@ -76,7 +76,7 @@ public class SpaceStationTest {
 
         // secondary subscription works
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        SpaceStation.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe(testObserver2);
+        ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe(testObserver2);
         testObserver2.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
     }
 }

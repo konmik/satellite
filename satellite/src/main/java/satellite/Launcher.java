@@ -12,7 +12,7 @@ public interface Launcher {
     /**
      * Creates a connection given connection id, subject factory and satellite factory.
      */
-    <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory);
+    <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory);
 
     /**
      * Launches a satellite on a given connection id given a mission statement.

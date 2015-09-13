@@ -7,31 +7,32 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
-import satellite.EarthBase;
+import satellite.RestartableConnectionGroup;
 import satellite.Launcher;
-import satellite.SatelliteFactory;
+import satellite.RestartableConnection;
+import satellite.RestartableFactory;
 import satellite.util.SubjectFactory;
 
 /**
  * This is an example activity that eliminates code duplications when dealing with
- * {@link satellite.MissionControlCenter}.
+ * {@link RestartableConnection}.
  */
 public class BaseActivity extends Activity implements Launcher {
 
-    private EarthBase earthBase;
+    private RestartableConnectionGroup restartableConnectionGroup;
     private Subscription subscription;
     private boolean connect = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        earthBase = savedInstanceState == null ? new EarthBase() : new EarthBase(savedInstanceState.getParcelable("earthBase"));
+        restartableConnectionGroup = savedInstanceState == null ? new RestartableConnectionGroup() : new RestartableConnectionGroup(savedInstanceState.getParcelable("restartableConnectionGroup"));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("earthBase", earthBase.instanceState());
+        outState.putParcelable("restartableConnectionGroup", restartableConnectionGroup.instanceState());
     }
 
     @Override
@@ -48,7 +49,7 @@ public class BaseActivity extends Activity implements Launcher {
         super.onDestroy();
         subscription.unsubscribe();
         if (isFinishing())
-            earthBase.dismissAll();
+            restartableConnectionGroup.dismissAll();
     }
 
     /**
@@ -60,24 +61,24 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
-    public <A, T> Observable<Notification<T>> connection(int id, SatelliteFactory<A, T> satelliteFactory) {
-        return earthBase.connection(id, SubjectFactory.behaviorSubject(), satelliteFactory);
+    public <A, T> Observable<Notification<T>> connection(int id, RestartableFactory<A, T> restartableFactory) {
+        return restartableConnectionGroup.connection(id, SubjectFactory.behaviorSubject(), restartableFactory);
     }
 
     @Override
     public <A, T> Observable<Notification<T>> connection(
-        int id, SubjectFactory<Notification<T>> subjectFactory, SatelliteFactory<A, T> satelliteFactory) {
+        int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
 
-        return earthBase.connection(id, subjectFactory, satelliteFactory);
+        return restartableConnectionGroup.connection(id, subjectFactory, restartableFactory);
     }
 
     @Override
     public <A> void launch(int id, A missionStatement) {
-        earthBase.launch(id, missionStatement);
+        restartableConnectionGroup.launch(id, missionStatement);
     }
 
     @Override
     public void dismiss(int id) {
-        earthBase.dismiss(id);
+        restartableConnectionGroup.dismiss(id);
     }
 }

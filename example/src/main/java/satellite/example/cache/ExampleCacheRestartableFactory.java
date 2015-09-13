@@ -1,14 +1,14 @@
-package satellite.example.replay;
+package satellite.example.cache;
 
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import satellite.SatelliteFactory;
+import satellite.RestartableFactory;
 import satellite.state.StateMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleReplaySatelliteFactory implements SatelliteFactory<StateMap, Integer> {
+public class ExampleCacheRestartableFactory implements RestartableFactory<StateMap, Integer> {
 
     public static StateMap missionStatement(int from) {
         return StateMap.sequence("from", from);
@@ -16,7 +16,7 @@ public class ExampleReplaySatelliteFactory implements SatelliteFactory<StateMap,
 
     @Override
     public Observable<Integer> call(StateMap missionStatement) {
-        return Observable.interval(0, 1, TimeUnit.SECONDS, mainThread())
-            .map(tick -> (int)(long)(tick) + (int)missionStatement.get("from"));
+        return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
+            .map(time -> (int)(time + (int)missionStatement.get("from")));
     }
 }

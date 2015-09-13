@@ -24,13 +24,13 @@ import static java.util.Arrays.asList;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class MissionControlCenterTest {
+public class RestartableConnectionTest {
     @After
     public void tearDown() throws Exception {
         resetStation();
     }
 
-    public static final SatelliteFactory<String, Integer> satelliteFactory = new SatelliteFactory<String, Integer>() {
+    public static final RestartableFactory<String, Integer> RESTARTABLE_FACTORY = new RestartableFactory<String, Integer>() {
         @Override
         public Observable<Integer> call(String in) {
             return Observable.just(Integer.valueOf(in));
@@ -38,18 +38,18 @@ public class MissionControlCenterTest {
     };
 
     public interface InstanceLauncher {
-        Observable<Notification<Integer>> connection(SatelliteFactory<String, Integer> satelliteFactory);
+        Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory);
         void launch(String statement);
         void dismiss();
     }
 
     private static class MccLauncher implements InstanceLauncher {
 
-        private final MissionControlCenter<String, Integer> center = new MissionControlCenter<>();
+        private final RestartableConnection<String, Integer> center = new RestartableConnection<>();
 
         @Override
-        public Observable<Notification<Integer>> connection(SatelliteFactory<String, Integer> satelliteFactory) {
-            return center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), satelliteFactory);
+        public Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory) {
+            return center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
         }
 
         @Override
@@ -70,13 +70,13 @@ public class MissionControlCenterTest {
 
     public void testConnectionImmediateStrategy(InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
-        Subscription subscription = launcher.connection(satelliteFactory).subscribe(testObserver);
+        Subscription subscription = launcher.connection(RESTARTABLE_FACTORY).subscribe(testObserver);
         launcher.launch("1");
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
     }
 
     final TestScheduler testScheduler = new TestScheduler();
-    SatelliteFactory<String, Integer> scheduledSatelliteFactory = new SatelliteFactory<String, Integer>() {
+    RestartableFactory<String, Integer> scheduledRestartableFactory = new RestartableFactory<String, Integer>() {
         @Override
         public Observable<Integer> call(String in) {
             return Observable.just(Integer.valueOf(in)).delay(5, TimeUnit.SECONDS, testScheduler);
@@ -90,7 +90,7 @@ public class MissionControlCenterTest {
 
     public void testConnectionDelayedStrategy(InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
-        Subscription subscription = launcher.connection(scheduledSatelliteFactory).subscribe(testObserver);
+        Subscription subscription = launcher.connection(scheduledRestartableFactory).subscribe(testObserver);
         launcher.launch("1");
         testObserver.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
         testScheduler.advanceTimeBy(6, TimeUnit.SECONDS);
@@ -105,7 +105,7 @@ public class MissionControlCenterTest {
     public void testDismissStrategy(InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        Subscription subscription = launcher.connection(scheduledSatelliteFactory).subscribe(testObserver);
+        Subscription subscription = launcher.connection(scheduledRestartableFactory).subscribe(testObserver);
 
         launcher.launch("1");
         testObserver.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
@@ -116,7 +116,7 @@ public class MissionControlCenterTest {
         testObserver.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
     }
 
-    public static final SatelliteFactory<String, Integer> infiniteSatelliteFactory = new SatelliteFactory<String, Integer>() {
+    public static final RestartableFactory<String, Integer> INFINITE_RESTARTABLE_FACTORY = new RestartableFactory<String, Integer>() {
         @Override
         public Observable<Integer> call(final String in) {
             return Observable.create(new Observable.OnSubscribe<Integer>() {
@@ -132,8 +132,8 @@ public class MissionControlCenterTest {
     public void testSaveRestoreRestart() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        MissionControlCenter<String, Integer> center = new MissionControlCenter<>();
-        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), infiniteSatelliteFactory).subscribe(testObserver);
+        RestartableConnection<String, Integer> center = new RestartableConnection<>();
+        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         center.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
@@ -143,8 +143,8 @@ public class MissionControlCenterTest {
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        MissionControlCenter<String, Integer> center2 = new MissionControlCenter<>(state);
-        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), infiniteSatelliteFactory).subscribe(testObserver2);
+        RestartableConnection<String, Integer> center2 = new RestartableConnection<>(state);
+        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
     }
@@ -153,8 +153,8 @@ public class MissionControlCenterTest {
     public void testSaveRestoreCompleted() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        MissionControlCenter<String, Integer> center = new MissionControlCenter<>();
-        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), satelliteFactory).subscribe(testObserver);
+        RestartableConnection<String, Integer> center = new RestartableConnection<>();
+        Subscription subscription = center.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
         center.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
@@ -164,14 +164,14 @@ public class MissionControlCenterTest {
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        MissionControlCenter<String, Integer> center2 = new MissionControlCenter<>(state);
-        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), satelliteFactory).subscribe(testObserver2);
+        RestartableConnection<String, Integer> center2 = new RestartableConnection<>(state);
+        Subscription subscription2 = center2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
     }
 
     private void resetStation() {
-        for (String key : new HashSet<>(SpaceStation.INSTANCE.keys()))
-            SpaceStation.INSTANCE.recycle(key);
+        for (String key : new HashSet<>(ReconnectableMap.INSTANCE.keys()))
+            ReconnectableMap.INSTANCE.recycle(key);
     }
 }

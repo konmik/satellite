@@ -10,11 +10,11 @@ import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
- * MissionControlCenter controls only one satellite.
+ * RestartableConnection controls only one restartable.
  * It saves satellite arguments and restarts the satellite in
  * case of the process restart if the launched satellite is not completed.
  */
-public class MissionControlCenter<A, T> {
+public class RestartableConnection<A, T> {
 
     private final String key;
     private final boolean restore;
@@ -26,9 +26,9 @@ public class MissionControlCenter<A, T> {
     private static long id;
 
     /**
-     * Creates a new MissionControlCenter.
+     * Creates a new RestartableConnection.
      */
-    public MissionControlCenter() {
+    public RestartableConnection() {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
         statement = (A)StateMap.empty();
@@ -36,10 +36,10 @@ public class MissionControlCenter<A, T> {
     }
 
     /**
-     * Creates a new MissionControlCenter form a given state that has been received
+     * Creates a new RestartableConnection form a given state that has been received
      * from {@link #instanceState()}.
      */
-    public MissionControlCenter(StateMap in) {
+    public RestartableConnection(StateMap in) {
         key = in.get("key");
         restore = in.get("restore", false);
         statement = (A)in.get("statement", StateMap.empty());
@@ -49,23 +49,23 @@ public class MissionControlCenter<A, T> {
     /**
      * Provides a connection to the given satellite through a given subject.
      *
-     * @param subjectFactory   a subject factory which creates a subject to
-     *                         transmit satellite emissions to views.
-     * @param satelliteFactory a satellite factory which will be used on launch.
+     * @param subjectFactory     a subject factory which creates a subject to
+     *                           transmit satellite emissions to views.
+     * @param restartableFactory a satellite factory which will be used on launch.
      * @return an observable which emits {@link rx.Notification} of satellite emissions.
      */
     public Observable<Notification<T>> connection(
         final SubjectFactory<Notification<T>> subjectFactory,
-        final SatelliteFactory<A, T> satelliteFactory) {
+        final RestartableFactory<A, T> restartableFactory) {
 
         return (restore ? launches.startWith(statement) : launches)
             .switchMap(new Func1<A, Observable<Notification<T>>>() {
                 @Override
                 public Observable<Notification<T>> call(final A statement) {
-                    return SpaceStation.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
+                    return ReconnectableMap.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
                         @Override
                         public Observable<T> call() {
-                            return satelliteFactory.call(statement);
+                            return restartableFactory.call(statement);
                         }
                     });
                 }
@@ -88,24 +88,28 @@ public class MissionControlCenter<A, T> {
      *                         method requirements.
      */
     public void launch(A missionStatement) {
-        SpaceStation.INSTANCE.recycle(key);
+        ReconnectableMap.INSTANCE.recycle(key);
         out.put("restore", true);
         out.put("statement", missionStatement);
         launches.onNext(missionStatement);
+    }
+
+    public void launch() {
+        launch(null);
     }
 
     /**
      * Dismisses the current satellite.
      */
     public void dismiss() {
-        SpaceStation.INSTANCE.recycle(key);
+        ReconnectableMap.INSTANCE.recycle(key);
         out.remove("restore");
         out.remove("statement");
     }
 
     /**
      * Returns the instance state that can be used to create a new
-     * MissionControlCenter later.
+     * RestartableConnection later.
      */
     public StateMap instanceState() {
         return out.build();

@@ -13,22 +13,20 @@ import rx.subjects.Subject;
 import satellite.util.SubjectFactory;
 
 /**
- * SpaceStation represents... a space station! :D
- *
- * It keeps track of satellites and provides connections for {@link MissionControlCenter}.
+ * ReconnectableMap keeps track of restartable observables and provides observables for {@link RestartableConnection}.
  */
-public enum SpaceStation {
+public enum ReconnectableMap {
 
     INSTANCE;
 
     private HashMap<String, Object[]> connections = new HashMap<>();
 
     /**
-     * This is the core method that connects a satellite with {@link MissionControlCenter}.
+     * This is the core method that connects a satellite with {@link RestartableConnection}.
      * The satellite gets created if it is not launched yet.
      *
      * @param key              a unique key of the connection that should survive configuration changes
-     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link MissionControlCenter}
+     * @param subjectFactory   a factory for creating the subject that lies between the satellite and {@link RestartableConnection}
      * @param satelliteFactory a satellite factory
      * @param <T>              a type of satellite's onNext values
      * @return an observable that emits satellite notifications

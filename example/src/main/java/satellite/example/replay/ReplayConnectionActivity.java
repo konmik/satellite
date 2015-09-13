@@ -3,7 +3,7 @@ package satellite.example.replay;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import satellite.MissionControlCenter;
+import satellite.RestartableConnection;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.state.StateMap;
@@ -12,7 +12,7 @@ import satellite.util.SubjectFactory;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
-    private MissionControlCenter<StateMap, Integer> controlCenter;
+    private RestartableConnection<StateMap, Integer> controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +22,13 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
         findViewById(R.id.launch)
-            .setOnClickListener(v -> controlCenter.launch(ExampleReplaySatelliteFactory.missionStatement(10)));
+            .setOnClickListener(v -> controlCenter.launch(ExampleReplayRestartableFactory.missionStatement(10)));
         findViewById(R.id.drop)
             .setOnClickListener(v -> controlCenter.dismiss());
 
         controlCenter = savedInstanceState == null ?
-            new MissionControlCenter<>() :
-            new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
+            new RestartableConnection<>() :
+            new RestartableConnection<>(savedInstanceState.getParcelable("center"));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(SubjectFactory.replaySubject(), new ExampleReplaySatelliteFactory())
+            controlCenter.connection(SubjectFactory.replaySubject(), new ExampleReplayRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

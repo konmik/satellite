@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscription;
 import rx.internal.util.SubscriptionList;
-import satellite.SpaceStation;
+import satellite.ReconnectableMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -58,7 +58,7 @@ public abstract class BaseLaunchActivity extends AppCompatActivity {
             .subscribe(ignored -> {
                 StringBuilder builder = new StringBuilder();
                 builder.append("connections:\n");
-                for (String key : SpaceStation.INSTANCE.keys())
+                for (String key : ReconnectableMap.INSTANCE.keys())
                     builder.append(key).append("\n");
                 TextView report = (TextView)findViewById(R.id.stationReport);
                 report.setText(builder.toString());

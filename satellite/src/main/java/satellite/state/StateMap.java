@@ -59,7 +59,7 @@ public class StateMap implements Parcelable {
     }
 
     /**
-     * Returns an immutable set of the keys contained in this {@link StateMap}.
+     * Returns an immutable set of keys contained in this {@link StateMap}.
      */
     public Set<String> keys() {
         return Collections.unmodifiableSet(map.keySet());

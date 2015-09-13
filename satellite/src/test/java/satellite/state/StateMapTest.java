@@ -11,6 +11,7 @@ import info.android15.satellite.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -85,6 +86,11 @@ public class StateMapTest {
         assertFalse(map1.equals(map4));
         assertTrue(StateMap.empty().equals(StateMap.empty()));
         assertTrue(StateMap.sequence(null, null).equals(StateMap.sequence(null, null)));
+    }
+
+    @Test
+    public void testBuilder() throws Exception {
+        assertNotNull(StateMap.builder());
     }
 
     private HashSet getSetString123() {

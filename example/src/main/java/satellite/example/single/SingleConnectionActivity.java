@@ -3,7 +3,7 @@ package satellite.example.single;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import satellite.MissionControlCenter;
+import satellite.RestartableConnection;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.state.StateMap;
@@ -12,7 +12,7 @@ import satellite.util.SubjectFactory;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private MissionControlCenter<StateMap, Integer> controlCenter;
+    private RestartableConnection<StateMap, Integer> controlCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,10 +21,10 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleSatelliteFactory.missionStatement(10)));
+        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleRestartableFactory.missionStatement(10)));
         findViewById(R.id.drop).setOnClickListener(v -> controlCenter.dismiss());
 
-        controlCenter = savedInstanceState == null ? new MissionControlCenter<>() : new MissionControlCenter<>(savedInstanceState.getParcelable("center"));
+        controlCenter = savedInstanceState == null ? new RestartableConnection<>() : new RestartableConnection<>(savedInstanceState.getParcelable("center"));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            controlCenter.connection(SubjectFactory.behaviorSubject(), new ExampleSingleSatelliteFactory())
+            controlCenter.connection(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);
