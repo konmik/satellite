@@ -28,7 +28,7 @@ public class ReconnectableMapTest {
     @Test
     public void testConnection() throws Exception {
         final BehaviorSubject subject = BehaviorSubject.create();
-        final PublishSubject satellite = PublishSubject.create();
+        final PublishSubject observable = PublishSubject.create();
 
         SubjectFactory<Notification<Integer>> subjectFactory = new SubjectFactory<Notification<Integer>>() {
             @Override
@@ -36,13 +36,13 @@ public class ReconnectableMapTest {
                 return subject;
             }
         };
-        Func0<Observable<Integer>> satelliteFactory = new Func0<Observable<Integer>>() {
+        Func0<Observable<Integer>> observableFactory = new Func0<Observable<Integer>>() {
             @Override
             public Observable<Integer> call() {
-                return satellite;
+                return observable;
             }
         };
-        Observable connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory);
+        Observable connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory);
 
         assertNotNull(connection);
         assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
@@ -53,7 +53,7 @@ public class ReconnectableMapTest {
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with the same key does not create a new connection
-        ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe();
+        ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory).subscribe();
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with a different key creates a new connection
@@ -71,12 +71,12 @@ public class ReconnectableMapTest {
         assertEquals(2, ReconnectableMap.INSTANCE.keys().size());
 
         // onNext values are passing up
-        satellite.onNext(1);
+        observable.onNext(1);
         testObserver.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
 
         // secondary subscription works
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        ReconnectableMap.INSTANCE.connection("1", subjectFactory, satelliteFactory).subscribe(testObserver2);
+        ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory).subscribe(testObserver2);
         testObserver2.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
     }
 }

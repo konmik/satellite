@@ -20,7 +20,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleRestartableFactory.missionStatement(10)));
+        findViewById(R.id.launch).setOnClickListener(v -> controlCenter.launch(ExampleSingleRestartableFactory.argument(10)));
         findViewById(R.id.drop).setOnClickListener(v -> controlCenter.dismiss());
 
         controlCenter = savedInstanceState == null ? new RestartableConnection() : new RestartableConnection(savedInstanceState.getParcelable("center"));

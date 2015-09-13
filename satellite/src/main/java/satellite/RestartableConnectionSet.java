@@ -38,8 +38,8 @@ public class RestartableConnectionSet implements Launcher {
      * @param id                 a {@link RestartableConnection} id.
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create a satellite per launch.
-     * @return an observable which emits {@link rx.Notification} of satellite emissions.
+     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
      */
     @Override
     public <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
@@ -59,8 +59,8 @@ public class RestartableConnectionSet implements Launcher {
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create a satellite per launch.
-     * @return an observable which emits {@link rx.Notification} of satellite emissions.
+     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @return an observable which emits {@link rx.Notification} of the observable emissions.
      */
     @Override
     public <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {

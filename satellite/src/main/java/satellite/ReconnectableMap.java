@@ -29,16 +29,16 @@ public enum ReconnectableMap {
      * This is the core method that connects an observable with {@link RestartableConnection}.
      * The observable gets created if it does not exist yet.
      *
-     * @param key              a unique key of the connection.
-     * @param subjectFactory   a factory for creating a subject that lies between the observable and {@link RestartableConnection}.
-     * @param satelliteFactory an observable factory.
-     * @param <T>              a type of observable`s onNext values
+     * @param key               a unique key of the connection.
+     * @param subjectFactory    a factory for creating a subject that lies between the observable and {@link RestartableConnection}.
+     * @param observableFactory an observable factory.
+     * @param <T>               a type of observable`s onNext values
      * @return an observable that emits materialized notifications
      */
     public <T> Observable<Notification<T>> connection(
         final String key,
         final SubjectFactory<Notification<T>> subjectFactory,
-        final Func0<Observable<T>> satelliteFactory) {
+        final Func0<Observable<T>> observableFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
@@ -48,7 +48,7 @@ public enum ReconnectableMap {
                 else {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
                     subscriber.add(subject.subscribe(subscriber));
-                    connections.put(key, new Object[]{satelliteFactory.call().materialize().subscribe(subject), subject});
+                    connections.put(key, new Object[]{observableFactory.call().materialize().subscribe(subject), subject});
                 }
             }
         });

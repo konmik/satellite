@@ -39,8 +39,8 @@ public class RestartableConnectionSetTest {
         }
 
         @Override
-        public void launch(String statement) {
-            restartableConnectionSet.launch(mccId, statement);
+        public void launch(String arg) {
+            restartableConnectionSet.launch(mccId, arg);
         }
 
         @Override

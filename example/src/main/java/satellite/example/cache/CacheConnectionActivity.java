@@ -11,7 +11,7 @@ import satellite.util.SubjectFactory;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
-    public static final int SATELLITE_ID = 1;
+    public static final int CONNECTION_ID = 1;
 
     private RestartableConnectionSet restartableConnectionSet;
 
@@ -22,8 +22,8 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> restartableConnectionSet.launch(SATELLITE_ID, ExampleCacheRestartableFactory.missionStatement(10)));
-        findViewById(R.id.drop).setOnClickListener(v -> restartableConnectionSet.dismiss(SATELLITE_ID));
+        findViewById(R.id.launch).setOnClickListener(v -> restartableConnectionSet.launch(CONNECTION_ID, ExampleCacheRestartableFactory.argument(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> restartableConnectionSet.dismiss(CONNECTION_ID));
 
         restartableConnectionSet = savedInstanceState == null ? new RestartableConnectionSet() : new RestartableConnectionSet(savedInstanceState.getParcelable("base"));
     }
@@ -33,7 +33,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            restartableConnectionSet.connection(SATELLITE_ID, SubjectFactory.behaviorSubject(), new ExampleCacheRestartableFactory())
+            restartableConnectionSet.connection(CONNECTION_ID, SubjectFactory.behaviorSubject(), new ExampleCacheRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

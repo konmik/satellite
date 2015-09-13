@@ -39,7 +39,7 @@ public class RestartableConnectionTest {
 
     public interface InstanceLauncher {
         Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory);
-        void launch(String statement);
+        void launch(String arg);
         void dismiss();
     }
 
@@ -53,8 +53,8 @@ public class RestartableConnectionTest {
         }
 
         @Override
-        public void launch(String statement) {
-            center.launch(statement);
+        public void launch(String arg) {
+            center.launch(arg);
         }
 
         @Override

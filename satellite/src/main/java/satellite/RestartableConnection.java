@@ -20,7 +20,7 @@ public class RestartableConnection {
 
     private final String key;
     private final boolean restore;
-    private final Object statement;
+    private final Object arg;
     private final StateMap.Builder out;
 
     private final PublishSubject<Object> launches = PublishSubject.create();
@@ -33,7 +33,7 @@ public class RestartableConnection {
     public RestartableConnection() {
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
-        statement = StateMap.empty();
+        arg = StateMap.empty();
         out = StateMap.builder().put("key", key);
     }
 
@@ -44,7 +44,7 @@ public class RestartableConnection {
     public RestartableConnection(StateMap in) {
         key = in.get("key");
         restore = in.get("restore", false);
-        statement = in.get("statement", StateMap.empty());
+        arg = in.get("arg", StateMap.empty());
         out = in.toBuilder();
     }
 
@@ -53,8 +53,8 @@ public class RestartableConnection {
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create a satellite per launch.
-     * @return an observable which emits {@link rx.Notification} of satellite emissions.
+     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <T> Observable<Notification<T>> connection(
         final SubjectFactory<Notification<T>> subjectFactory,
@@ -80,8 +80,8 @@ public class RestartableConnection {
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create a satellite per launch.
-     * @return an observable which emits {@link rx.Notification} of satellite emissions.
+     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <A, T> Observable<Notification<T>> connection(
         final SubjectFactory<Notification<T>> subjectFactory,
@@ -89,11 +89,11 @@ public class RestartableConnection {
 
         return connection(new Func1<Object, Observable<Notification<T>>>() {
             @Override
-            public Observable<Notification<T>> call(final Object statement) {
+            public Observable<Notification<T>> call(final Object arg) {
                 return ReconnectableMap.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
                     @Override
                     public Observable<T> call() {
-                        return restartableFactory.call((A)statement);
+                        return restartableFactory.call((A)arg);
                     }
                 });
             }
@@ -123,7 +123,7 @@ public class RestartableConnection {
     public void launch(Object arg) {
         ReconnectableMap.INSTANCE.dismiss(key);
         out.put("restore", true);
-        out.put("statement", arg);
+        out.put("arg", arg);
         launches.onNext(arg);
     }
 
@@ -133,7 +133,7 @@ public class RestartableConnection {
     public void dismiss() {
         ReconnectableMap.INSTANCE.dismiss(key);
         out.remove("restore");
-        out.remove("statement");
+        out.remove("arg");
     }
 
     /**
@@ -145,7 +145,7 @@ public class RestartableConnection {
     }
 
     private <T> Observable<Notification<T>> connection(Func1<Object, Observable<Notification<T>>> instantiate) {
-        return (restore ? launches.startWith(statement) : launches)
+        return (restore ? launches.startWith(arg) : launches)
             .switchMap(instantiate)
             .doOnNext(new Action1<Notification<T>>() {
                 @Override

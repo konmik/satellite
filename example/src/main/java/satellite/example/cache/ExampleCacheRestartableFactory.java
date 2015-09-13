@@ -10,13 +10,13 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class ExampleCacheRestartableFactory implements RestartableFactory<StateMap, Integer> {
 
-    public static StateMap missionStatement(int from) {
+    public static StateMap argument(int from) {
         return StateMap.sequence("from", from);
     }
 
     @Override
-    public Observable<Integer> call(StateMap missionStatement) {
+    public Observable<Integer> call(StateMap arg) {
         return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
-            .map(time -> (int)(time + (int)missionStatement.get("from")));
+            .map(time -> (int)(time + (int)arg.get("from")));
     }
 }

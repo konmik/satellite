@@ -21,7 +21,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
         findViewById(R.id.launch)
-            .setOnClickListener(v -> controlCenter.launch(ExampleReplayRestartableFactory.missionStatement(10)));
+            .setOnClickListener(v -> controlCenter.launch(ExampleReplayRestartableFactory.argument(10)));
         findViewById(R.id.drop)
             .setOnClickListener(v -> controlCenter.dismiss());
 

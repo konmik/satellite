@@ -82,8 +82,8 @@ public class BaseActivity extends Activity implements Launcher {
     }
 
     @Override
-    public void launch(int id, Object missionStatement) {
-        connections.launch(id, missionStatement);
+    public void launch(int id, Object arg) {
+        connections.launch(id, arg);
     }
 
     @Override

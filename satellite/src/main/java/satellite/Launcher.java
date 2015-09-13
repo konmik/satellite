@@ -14,6 +14,6 @@ public interface Launcher {
     <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory);
     <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory);
     void launch(int id);
-    void launch(int id, Object missionStatement);
+    void launch(int id, Object arg);
     void dismiss(int id);
 }

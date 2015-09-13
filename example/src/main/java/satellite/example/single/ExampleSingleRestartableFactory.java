@@ -10,13 +10,13 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class ExampleSingleRestartableFactory implements RestartableFactory<StateMap, Integer> {
 
-    public static StateMap missionStatement(int from) {
+    public static StateMap argument(int from) {
         return StateMap.sequence("from", from);
     }
 
     @Override
-    public Observable<Integer> call(StateMap missionStatement) {
-        return Observable.just((int)missionStatement.get("from"))
+    public Observable<Integer> call(StateMap arg) {
+        return Observable.just((int)arg.get("from"))
             .delay(1, TimeUnit.SECONDS, mainThread())
             .first();
     }
