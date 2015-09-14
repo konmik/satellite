@@ -68,6 +68,11 @@ public class RxNotificationTest {
         Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
         split.call(Notification.createOnNext(1));
         split.call(Notification.<Integer>createOnCompleted());
+    }
+
+    @Test(expected = OnErrorNotImplementedException.class)
+    public void testOnErrorNotImplemented() throws Exception {
+        Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
         split.call(Notification.<Integer>createOnError(null));
     }
 }
