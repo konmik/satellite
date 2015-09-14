@@ -113,7 +113,7 @@ public class RestartableConnectionSet implements Launcher {
      *
      * See {@link RestartableConnection#dismiss()}.
      */
-    public void unsubscribe() {
+    public void dismiss() {
         for (int i = 0; i < connections.size(); i++)
             connections.valueAt(i).dismiss();
     }

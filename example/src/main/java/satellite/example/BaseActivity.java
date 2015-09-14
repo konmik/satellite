@@ -50,7 +50,7 @@ public class BaseActivity extends Activity implements Launcher {
         super.onDestroy();
         subscription.unsubscribe();
         if (isFinishing())
-            connections.unsubscribe();
+            connections.dismiss();
     }
 
     /**

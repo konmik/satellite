@@ -46,7 +46,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing())
-            restartableConnectionSet.unsubscribe();
+            restartableConnectionSet.dismiss();
     }
 
     @Override
