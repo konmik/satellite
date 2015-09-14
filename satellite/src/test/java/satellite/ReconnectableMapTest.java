@@ -16,6 +16,7 @@ import rx.subjects.Subject;
 import satellite.util.SubjectFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class ReconnectableMapTest {
@@ -27,8 +28,8 @@ public class ReconnectableMapTest {
 
     @Test
     public void testConnection() throws Exception {
-        final BehaviorSubject subject = BehaviorSubject.create();
-        final PublishSubject observable = PublishSubject.create();
+        final BehaviorSubject<Notification<Integer>> subject = BehaviorSubject.create();
+        final PublishSubject<Integer> observable = PublishSubject.create();
 
         SubjectFactory<Notification<Integer>> subjectFactory = new SubjectFactory<Notification<Integer>>() {
             @Override
@@ -42,7 +43,7 @@ public class ReconnectableMapTest {
                 return observable;
             }
         };
-        Observable connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory);
+        Observable<Notification<Integer>> connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory);
 
         assertNotNull(connection);
         assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
@@ -74,9 +75,13 @@ public class ReconnectableMapTest {
         observable.onNext(1);
         testObserver.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
 
-        // secondary subscription works
+        // secondary subscription to the same connection works
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
         ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory).subscribe(testObserver2);
         testObserver2.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
+
+        // dismiss works
+        ReconnectableMap.INSTANCE.dismiss("1");
+        assertFalse(ReconnectableMap.INSTANCE.keys().contains("1"));
     }
 }

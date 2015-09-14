@@ -62,4 +62,12 @@ public class RxNotificationTest {
         verify(onCompleted, times(1)).call();
         verifyNoMoreInteractions(onNext, onError, onCompleted);
     }
+
+    @Test
+    public void testNull() throws Exception {
+        Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
+        split.call(Notification.createOnNext(1));
+        split.call(Notification.<Integer>createOnCompleted());
+        split.call(Notification.<Integer>createOnError(null));
+    }
 }
