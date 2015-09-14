@@ -14,8 +14,8 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-        findViewById(R.id.button_single).setOnClickListener(v -> startActivity(new Intent(LauncherActivity.this, SingleConnectionActivity.class)));
-        findViewById(R.id.button_cache).setOnClickListener(v -> startActivity(new Intent(LauncherActivity.this, CacheConnectionActivity.class)));
-        findViewById(R.id.button_replay).setOnClickListener(v -> startActivity(new Intent(LauncherActivity.this, ReplayConnectionActivity.class)));
+        findViewById(R.id.button_single).setOnClickListener(v -> startActivity(new Intent(this, SingleConnectionActivity.class)));
+        findViewById(R.id.button_cache).setOnClickListener(v -> startActivity(new Intent(this, CacheConnectionActivity.class)));
+        findViewById(R.id.button_replay).setOnClickListener(v -> startActivity(new Intent(this, ReplayConnectionActivity.class)));
     }
 }

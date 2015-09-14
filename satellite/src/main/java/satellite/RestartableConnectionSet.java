@@ -32,7 +32,7 @@ public class RestartableConnectionSet implements Launcher {
     }
 
     /**
-     * Provides a connection to an observable through a given observable factory and a given subject factory,
+     * Provides a connection to an observable through a given observable factory and a given intermediate subject factory,
      * see {@link RestartableConnection#connection(SubjectFactory, RestartableFactoryNoArg)}.
      *
      * @param id                 a {@link RestartableConnection} id.
@@ -47,7 +47,7 @@ public class RestartableConnectionSet implements Launcher {
     }
 
     /**
-     * Provides a connection to the given observable through a given observable factory and a given subject factory,
+     * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory,
      * see {@link RestartableConnection#connection(SubjectFactory, RestartableFactory)}.
      *
      * This {@link #connection(int, SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that

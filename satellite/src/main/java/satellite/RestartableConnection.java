@@ -49,7 +49,7 @@ public class RestartableConnection {
     }
 
     /**
-     * Provides a connection to an observable through a given observable factory and a given subject factory.
+     * Provides a connection to an observable through a given observable factory and a given intermediate subject factory.
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
@@ -69,7 +69,7 @@ public class RestartableConnection {
     }
 
     /**
-     * Provides a connection to the given observable through a given observable factory and a given subject factory.
+     * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory.
      *
      * This {@link #connection(SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.

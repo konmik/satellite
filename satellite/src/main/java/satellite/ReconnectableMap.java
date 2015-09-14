@@ -23,14 +23,15 @@ public enum ReconnectableMap {
 
     INSTANCE;
 
-    private HashMap<String, Object[]> connections = new HashMap<>();
+    private HashMap<String, Subject> subjects = new HashMap<>();
+    private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
     /**
      * This is the core method that connects an observable with {@link RestartableConnection}.
      * The observable gets created if it does not exist yet.
      *
      * @param key               a unique key of the connection.
-     * @param subjectFactory    a factory for creating a subject that lies between the observable and {@link RestartableConnection}.
+     * @param subjectFactory    a factory for creating an intermediate subject that lies between the observable and {@link RestartableConnection}.
      * @param observableFactory an observable factory.
      * @param <T>               a type of observable`s onNext values
      * @return an observable that emits materialized notifications
@@ -43,12 +44,13 @@ public enum ReconnectableMap {
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
             public void call(Subscriber<? super Notification<T>> subscriber) {
-                if (connections.containsKey(key))
-                    subscriber.add(((Subject)connections.get(key)[1]).subscribe(subscriber));
+                if (subscriptions.containsKey(key))
+                    subscriber.add(subjects.get(key).subscribe(subscriber));
                 else {
                     Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
                     subscriber.add(subject.subscribe(subscriber));
-                    connections.put(key, new Object[]{observableFactory.call().materialize().subscribe(subject), subject});
+                    subscriptions.put(key, observableFactory.call().materialize().subscribe(subject));
+                    subjects.put(key, subject);
                 }
             }
         });
@@ -60,9 +62,10 @@ public enum ReconnectableMap {
      * @param key a unique key of the connection.
      */
     public void dismiss(String key) {
-        if (connections.containsKey(key)) {
-            ((Subscription)connections.get(key)[0]).unsubscribe();
-            connections.remove(key);
+        if (subscriptions.containsKey(key)) {
+            subscriptions.get(key).unsubscribe();
+            subscriptions.remove(key);
+            subjects.remove(key);
         }
     }
 
@@ -70,6 +73,6 @@ public enum ReconnectableMap {
      * Return a current list of connection keys.
      */
     public Set<String> keys() {
-        return Collections.unmodifiableSet(connections.keySet());
+        return Collections.unmodifiableSet(subscriptions.keySet());
     }
 }
