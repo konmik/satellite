@@ -73,6 +73,6 @@ public class RxNotificationTest {
     @Test(expected = OnErrorNotImplementedException.class)
     public void testOnErrorNotImplemented() throws Exception {
         Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
-        split.call(Notification.<Integer>createOnError(null));
+        split.call(Notification.<Integer>createOnError(new Exception()));
     }
 }
