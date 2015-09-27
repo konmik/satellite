@@ -40,7 +40,7 @@ public class RestartableConnection {
 
     /**
      * Creates a new RestartableConnection form a given state that has been received
-     * from {@link #instanceState()}.
+     * from previous instance out.
      */
     public RestartableConnection(StateMap in, StateMap.Builder out) {
         this.out = out;

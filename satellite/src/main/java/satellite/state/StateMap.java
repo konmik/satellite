@@ -50,7 +50,7 @@ public class StateMap implements Parcelable {
      */
     public static StateMap sequence(Object... map) {
         if (map.length / 2 * 2 != map.length)
-            throw new IllegalArgumentException("should provide <String> key - <?> value pairs");
+            throw new IllegalArgumentException("Arguments should be <String> key - <?> value pairs");
 
         HashMap<String, byte[]> hashMap = new HashMap<>(map.length / 2);
         for (int i = 0; i < map.length; i += 2)
@@ -135,12 +135,13 @@ public class StateMap implements Parcelable {
         }
 
         /**
-         * Returns a child builder.
+         * Returns a child builder. The child builder will be marshalled into a {@link StateMap}
+         * instance with the key during the {@link #build()} call.
          *
          * @param key a child builder key.
-         * @return
+         * @return a new builder instance or an existing one.
          */
-        public Builder sub(String key) {
+        public Builder child(String key) {
             if (sub.containsKey(key)) {
                 return sub.get(key);
             }

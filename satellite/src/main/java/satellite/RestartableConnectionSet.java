@@ -25,13 +25,13 @@ public class RestartableConnectionSet implements Launcher {
 
     /**
      * Creates an RestartableConnectionSet instance form a given state that has been received
-     * from {@link #instanceState()}.
+     * from previous instance out.
      * All instances of {@link RestartableConnection} will be restored as well.
      */
     public RestartableConnectionSet(StateMap in, StateMap.Builder out) {
         this.out = out;
         for (String sId : in.keys())
-            connections.put(Integer.valueOf(sId), new RestartableConnection((StateMap)in.get(sId), out.sub(sId)));
+            connections.put(Integer.valueOf(sId), new RestartableConnection((StateMap)in.get(sId), out.child(sId)));
     }
 
     /**
@@ -123,7 +123,7 @@ public class RestartableConnectionSet implements Launcher {
 
     private RestartableConnection connection(int id) {
         if (connections.get(id) == null)
-            connections.put(id, new RestartableConnection(out.sub(Integer.toString(id))));
+            connections.put(id, new RestartableConnection(out.child(Integer.toString(id))));
         return connections.get(id);
     }
 }
