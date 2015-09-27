@@ -6,6 +6,7 @@ import android.widget.TextView;
 import satellite.RestartableConnectionSet;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
+import satellite.state.StateMap;
 import satellite.util.RxNotification;
 import satellite.util.SubjectFactory;
 
@@ -13,7 +14,8 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
 
     public static final int CONNECTION_ID = 1;
 
-    private RestartableConnectionSet restartableConnectionSet;
+    private RestartableConnectionSet connections;
+    private StateMap.Builder out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,10 +24,21 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> restartableConnectionSet.launch(CONNECTION_ID, ExampleCacheRestartableFactory.argument(10)));
-        findViewById(R.id.drop).setOnClickListener(v -> restartableConnectionSet.dismiss(CONNECTION_ID));
+        findViewById(R.id.launch).setOnClickListener(v -> connections.launch(CONNECTION_ID, ExampleCacheRestartableFactory.argument(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> connections.dismiss(CONNECTION_ID));
 
-        restartableConnectionSet = savedInstanceState == null ? new RestartableConnectionSet() : new RestartableConnectionSet(savedInstanceState.getParcelable("base"));
+        if (savedInstanceState == null)
+            this.connections = new RestartableConnectionSet(out = new StateMap.Builder());
+        else {
+            StateMap map = savedInstanceState.getParcelable("connections");
+            this.connections = new RestartableConnectionSet(map, out = map.toBuilder());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("connections", out.build());
     }
 
     @Override
@@ -33,7 +46,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            restartableConnectionSet.connection(CONNECTION_ID, SubjectFactory.behaviorSubject(), new ExampleCacheRestartableFactory())
+            connections.connection(CONNECTION_ID, SubjectFactory.behaviorSubject(), new ExampleCacheRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);
@@ -46,12 +59,6 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (isFinishing())
-            restartableConnectionSet.dismiss();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("base", restartableConnectionSet.instanceState());
+            connections.dismiss();
     }
 }

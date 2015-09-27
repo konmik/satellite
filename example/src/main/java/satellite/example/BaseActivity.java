@@ -12,6 +12,7 @@ import satellite.RestartableConnection;
 import satellite.RestartableConnectionSet;
 import satellite.RestartableFactory;
 import satellite.RestartableFactoryNoArg;
+import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
@@ -23,17 +24,23 @@ public class BaseActivity extends Activity implements Launcher {
     private RestartableConnectionSet connections;
     private Subscription subscription;
     private boolean connect = true;
+    private StateMap.Builder out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        connections = savedInstanceState == null ? new RestartableConnectionSet() : new RestartableConnectionSet(savedInstanceState.getParcelable("connections"));
+        if (savedInstanceState == null)
+            this.connections = new RestartableConnectionSet(out = new StateMap.Builder());
+        else {
+            StateMap map = savedInstanceState.getParcelable("connections");
+            this.connections = new RestartableConnectionSet(map, out = map.toBuilder());
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("connections", connections.instanceState());
+        outState.putParcelable("connections", out.build());
     }
 
     @Override

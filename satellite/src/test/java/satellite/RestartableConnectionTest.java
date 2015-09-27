@@ -44,18 +44,17 @@ public class RestartableConnectionTest extends BaseRestartableConnectionTest {
     public void testSaveRestoreRestart() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection connection = new RestartableConnection();
+        StateMap.Builder out = new StateMap.Builder();
+        RestartableConnection connection = new RestartableConnection(out);
         Subscription subscription = connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         connection.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
 
-        StateMap state = connection.instanceState();
-
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection connection2 = new RestartableConnection(state);
+        RestartableConnection connection2 = new RestartableConnection(out.build(), out);
         Subscription subscription2 = connection2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
@@ -65,18 +64,17 @@ public class RestartableConnectionTest extends BaseRestartableConnectionTest {
     public void testSaveRestoreCompleted() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        RestartableConnection connection = new RestartableConnection();
+        StateMap.Builder out = new StateMap.Builder();
+        RestartableConnection connection = new RestartableConnection(out);
         Subscription subscription = connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
         connection.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
 
-        StateMap state = connection.instanceState();
-
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        RestartableConnection connection2 = new RestartableConnection(state);
+        RestartableConnection connection2 = new RestartableConnection(out.build(), out);
         Subscription subscription2 = connection2.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());

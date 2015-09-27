@@ -30,22 +30,23 @@ public class RestartableConnection {
     /**
      * Creates a new RestartableConnection.
      */
-    public RestartableConnection() {
+    public RestartableConnection(StateMap.Builder out) {
+        this.out = out;
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
-        arg = StateMap.empty();
-        out = StateMap.builder().put("key", key);
+        arg = null;
+        out.put("key", key);
     }
 
     /**
      * Creates a new RestartableConnection form a given state that has been received
      * from {@link #instanceState()}.
      */
-    public RestartableConnection(StateMap in) {
+    public RestartableConnection(StateMap in, StateMap.Builder out) {
+        this.out = out;
         key = in.get("key");
         restore = in.get("restore", false);
-        arg = in.get("arg", StateMap.empty());
-        out = in.toBuilder();
+        arg = in.get("arg");
     }
 
     /**
@@ -134,14 +135,6 @@ public class RestartableConnection {
         ReconnectableMap.INSTANCE.dismiss(key);
         out.remove("restore");
         out.remove("arg");
-    }
-
-    /**
-     * Returns the instance state that can be used to create a new
-     * RestartableConnection later, see {@link #RestartableConnection(StateMap)}.
-     */
-    public StateMap instanceState() {
-        return out.build();
     }
 
     private <T> Observable<Notification<T>> connection(Func1<Object, Observable<Notification<T>>> instantiate) {

@@ -14,11 +14,13 @@ import satellite.util.SubjectFactory;
 public class RestartableConnectionSet implements Launcher {
 
     private final SparseArray<RestartableConnection> connections = new SparseArray<>();
+    private final StateMap.Builder out;
 
     /**
      * Creates a new RestartableConnectionSet instance.
      */
-    public RestartableConnectionSet() {
+    public RestartableConnectionSet(StateMap.Builder out) {
+        this.out = out;
     }
 
     /**
@@ -26,9 +28,10 @@ public class RestartableConnectionSet implements Launcher {
      * from {@link #instanceState()}.
      * All instances of {@link RestartableConnection} will be restored as well.
      */
-    public RestartableConnectionSet(StateMap in) {
+    public RestartableConnectionSet(StateMap in, StateMap.Builder out) {
+        this.out = out;
         for (String sId : in.keys())
-            connections.put(Integer.valueOf(sId), new RestartableConnection((StateMap)in.get(sId)));
+            connections.put(Integer.valueOf(sId), new RestartableConnection((StateMap)in.get(sId), out.sub(sId)));
     }
 
     /**
@@ -118,22 +121,9 @@ public class RestartableConnectionSet implements Launcher {
             connections.valueAt(i).dismiss();
     }
 
-    /**
-     * Returns the instance state that can be used to create a restored instance of
-     * RestartableConnectionSet later.
-     *
-     * See {@link #RestartableConnectionSet(StateMap)}, {@link RestartableConnection#instanceState()}.
-     */
-    public StateMap instanceState() {
-        StateMap.Builder out = new StateMap.Builder();
-        for (int i = 0; i < connections.size(); i++)
-            out.put(Integer.toString(connections.keyAt(i)), connections.valueAt(i).instanceState());
-        return out.build();
-    }
-
     private RestartableConnection connection(int id) {
         if (connections.get(id) == null)
-            connections.put(id, new RestartableConnection());
+            connections.put(id, new RestartableConnection(out.sub(Integer.toString(id))));
         return connections.get(id);
     }
 }

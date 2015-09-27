@@ -97,16 +97,16 @@ public class StateMap implements Parcelable {
     }
 
     /**
-     * The builder that implements "output only" approach for handling state.
+     * A builder that implements "output only" approach for handling state.
      * It is not recommended to use {@link #build()} just to check what is inside -
      * this will invalidate the whole purpose of using {@link StateMap}.
      */
     public static class Builder {
 
-        private final Map<String, byte[]> map;
+        private final Map<String, byte[]> map = new HashMap<>();
+        private final Map<String, Builder> sub = new HashMap<>();
 
         public Builder() {
-            this.map = new HashMap<>();
         }
 
         /**
@@ -130,18 +130,44 @@ public class StateMap implements Parcelable {
          */
         public Builder remove(String key) {
             map.remove(key);
+            sub.remove(key);
             return this;
+        }
+
+        /**
+         * Returns a child builder.
+         *
+         * @param key a child builder key.
+         * @return
+         */
+        public Builder sub(String key) {
+            if (sub.containsKey(key)) {
+                return sub.get(key);
+            }
+            else if (map.containsKey(key)) {
+                Builder builder = ParcelFn.<StateMap>unmarshall(map.get(key)).toBuilder();
+                map.remove(key);
+                sub.put(key, builder);
+                return builder;
+            }
+
+            Builder builder = new Builder();
+            sub.put(key, builder);
+            return builder;
         }
 
         /**
          * Builds the {@link StateMap} instance using collected key-value pairs.
          */
         public StateMap build() {
-            return new StateMap(map);
+            Map<String, byte[]> m = new HashMap<>(map);
+            for (Map.Entry<String, Builder> entry : sub.entrySet())
+                m.put(entry.getKey(), ParcelFn.marshall(entry.getValue().build()));
+            return new StateMap(m);
         }
 
         private Builder(Map<String, byte[]> map) {
-            this.map = new HashMap<>(map);
+            this.map.putAll(map);
         }
     }
 
@@ -184,21 +210,13 @@ public class StateMap implements Parcelable {
         if (!(o instanceof StateMap))
             return false;
 
-        if (map == ((StateMap)o).map)
-            return true;
+        Map<String, byte[]> otherMap = ((StateMap)o).map;
 
-        if (map.size() != ((StateMap)o).map.size())
+        if (map.size() != otherMap.size())
             return false;
 
         for (Map.Entry<String, byte[]> entry : map.entrySet()) {
-            String key = entry.getKey();
-            byte[] value = entry.getValue();
-            byte[] value2 = ((StateMap)o).map.get(key);
-            if (value == null) {
-                if (value2 != null || !((StateMap)o).map.containsKey(key))
-                    return false;
-            }
-            else if (!Arrays.equals(value, value2))
+            if (!Arrays.equals(entry.getValue(), otherMap.get(entry.getKey())))
                 return false;
         }
 

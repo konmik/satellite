@@ -55,21 +55,21 @@ public class RestartableConnectionSetTest extends BaseRestartableConnectionTest 
 
     @Test
     public void testConnectionImmediate() throws Exception {
-        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
+        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet(new StateMap.Builder());
         testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
         testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
     }
 
     @Test
     public void testConnectionDelayed() throws Exception {
-        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
+        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet(new StateMap.Builder());
         testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
         testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
     }
 
     @Test
     public void testDismiss() throws Exception {
-        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet();
+        final RestartableConnectionSet restartableConnectionSet = new RestartableConnectionSet(new StateMap.Builder());
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 2));
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableConnectionSet, 1));
@@ -81,7 +81,8 @@ public class RestartableConnectionSetTest extends BaseRestartableConnectionTest 
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
 
-        final RestartableConnectionSet base = new RestartableConnectionSet();
+        StateMap.Builder out = new StateMap.Builder();
+        final RestartableConnectionSet base = new RestartableConnectionSet(out);
         Subscription subscription = base.connection(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         Subscription subscription2 = base.connection(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
         base.launch(1, "1");
@@ -90,13 +91,11 @@ public class RestartableConnectionSetTest extends BaseRestartableConnectionTest 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
 
-        StateMap state = base.instanceState();
-
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver21 = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver22 = new TestObserver<>();
-        final RestartableConnectionSet base2 = new RestartableConnectionSet(state);
+        final RestartableConnectionSet base2 = new RestartableConnectionSet(out.build(), out);
         Subscription subscription22 = base2.connection(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
         Subscription subscription21 = base2.connection(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
 
@@ -109,7 +108,8 @@ public class RestartableConnectionSetTest extends BaseRestartableConnectionTest 
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
 
-        final RestartableConnectionSet base = new RestartableConnectionSet();
+        StateMap.Builder out = new StateMap.Builder();
+        final RestartableConnectionSet base = new RestartableConnectionSet(out);
         Subscription subscription = base.connection(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
         Subscription subscription2 = base.connection(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
         base.launch(1, "1");
@@ -118,13 +118,11 @@ public class RestartableConnectionSetTest extends BaseRestartableConnectionTest 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
 
-        StateMap state = base.instanceState();
-
         resetStation();
 
         TestObserver<Notification<Integer>> testObserver21 = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver22 = new TestObserver<>();
-        final RestartableConnectionSet base2 = new RestartableConnectionSet(state);
+        final RestartableConnectionSet base2 = new RestartableConnectionSet(out.build(), out);
         Subscription subscription22 = base2.connection(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
         Subscription subscription21 = base2.connection(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
 

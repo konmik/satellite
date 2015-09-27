@@ -10,6 +10,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
+import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
@@ -43,7 +44,7 @@ public class BaseRestartableConnectionTest {
 
     public static class RestartableConnectionLauncher implements InstanceLauncher {
 
-        private final RestartableConnection connection = new RestartableConnection();
+        private final RestartableConnection connection = new RestartableConnection(new StateMap.Builder());
 
         @Override
         public Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory) {
