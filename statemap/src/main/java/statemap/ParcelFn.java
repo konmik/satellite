@@ -1,4 +1,4 @@
-package satellite.state;
+package statemap;
 
 import android.os.Parcel;
 

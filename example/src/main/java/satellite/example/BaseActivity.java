@@ -13,7 +13,7 @@ import satellite.Restartable;
 import satellite.RestartableFactory;
 import satellite.RestartableFactoryNoArg;
 import satellite.RestartableSet;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 /**
  * This is an example activity that eliminates code duplication when dealing with

@@ -1,4 +1,4 @@
-package satellite.state;
+package statemap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.HashSet;
 
-import info.android15.satellite.BuildConfig;
+import info.android15.statemap.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

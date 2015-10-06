@@ -10,7 +10,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 import static java.util.Arrays.asList;
 

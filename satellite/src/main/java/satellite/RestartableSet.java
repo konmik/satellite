@@ -4,7 +4,7 @@ import android.util.SparseArray;
 
 import rx.Notification;
 import rx.Observable;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 /**
  * RestartableSet represents a set of {@link Restartable}.

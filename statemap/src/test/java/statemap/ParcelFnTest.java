@@ -1,4 +1,4 @@
-package satellite.state;
+package statemap;
 
 import android.util.Pair;
 
@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import info.android15.satellite.BuildConfig;
+import info.android15.statemap.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 

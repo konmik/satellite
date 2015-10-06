@@ -12,7 +12,7 @@ import info.android15.satellite.BuildConfig;
 import rx.Notification;
 import rx.Subscription;
 import rx.observers.TestObserver;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 import static java.util.Arrays.asList;
 

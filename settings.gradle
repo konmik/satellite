@@ -1,1 +1,1 @@
-include ':satellite', ':example'
+include ':satellite', ':example', ':statemap'

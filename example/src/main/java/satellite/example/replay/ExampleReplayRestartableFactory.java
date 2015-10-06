@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import satellite.RestartableFactory;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 

@@ -1,11 +1,11 @@
-package satellite.state;
+package statemap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import info.android15.satellite.BuildConfig;
+import info.android15.statemap.BuildConfig;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

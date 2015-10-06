@@ -6,7 +6,7 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
-import satellite.state.StateMap;
+import statemap.StateMap;
 
 /**
  * Restartable controls only one restartable. A restartable is an
