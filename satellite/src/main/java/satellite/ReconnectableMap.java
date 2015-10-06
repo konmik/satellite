@@ -39,7 +39,7 @@ public enum ReconnectableMap {
      */
     public <T> Observable<Notification<T>> channel(
         final String key,
-        final ChannelType type,
+        final DeliveryMethod type,
         final Func0<Observable<T>> observableFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {

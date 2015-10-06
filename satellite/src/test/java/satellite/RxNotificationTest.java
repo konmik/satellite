@@ -1,11 +1,10 @@
-package satellite.util;
+package satellite;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import rx.Notification;
 import rx.exceptions.OnErrorNotImplementedException;
-import rx.functions.Action0;
 import rx.functions.Action1;
 
 import static org.mockito.Mockito.times;
@@ -46,33 +45,15 @@ public class RxNotificationTest {
     }
 
     @Test
-    public void testSplit3() throws Exception {
-        Action1<Integer> onNext = Mockito.mock(Action1.class);
-        Action1<Throwable> onError = Mockito.mock(Action1.class);
-
-        Action0 onCompleted = Mockito.mock(Action0.class);
-        Action1<Notification<Integer>> split = RxNotification.split(onNext, onError, onCompleted);
-
-        split.call(Notification.createOnNext(1));
-        RuntimeException exception = new RuntimeException();
-        split.call(Notification.<Integer>createOnError(exception));
-        split.call(Notification.<Integer>createOnCompleted());
-        verify(onNext, times(1)).call(1);
-        verify(onError, times(1)).call(exception);
-        verify(onCompleted, times(1)).call();
-        verifyNoMoreInteractions(onNext, onError, onCompleted);
-    }
-
-    @Test
     public void testNull() throws Exception {
-        Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
+        Action1<Notification<Integer>> split = RxNotification.split(null, null);
         split.call(Notification.createOnNext(1));
         split.call(Notification.<Integer>createOnCompleted());
     }
 
     @Test(expected = OnErrorNotImplementedException.class)
     public void testOnErrorNotImplemented() throws Exception {
-        Action1<Notification<Integer>> split = RxNotification.split(null, null, null);
+        Action1<Notification<Integer>> split = RxNotification.split(null, null);
         split.call(Notification.<Integer>createOnError(new Exception()));
     }
 }

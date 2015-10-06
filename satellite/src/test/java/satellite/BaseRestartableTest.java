@@ -47,7 +47,7 @@ public class BaseRestartableTest {
 
         @Override
         public Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory) {
-            return restartable.channel(ChannelType.LATEST, restartableFactory);
+            return restartable.channel(DeliveryMethod.LATEST, restartableFactory);
         }
 
         @Override

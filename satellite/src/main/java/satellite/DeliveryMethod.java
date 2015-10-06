@@ -5,7 +5,7 @@ import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 import rx.subjects.Subject;
 
-public enum ChannelType {
+public enum DeliveryMethod {
 
     SINGLE {
         @Override

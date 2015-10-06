@@ -57,7 +57,7 @@ public class Restartable {
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <T> Observable<Notification<T>> channel(
-        final ChannelType type,
+        final DeliveryMethod type,
         final RestartableFactoryNoArg<T> restartableFactory) {
 
         return channel(type, new Func1<Object, Observable<Notification<T>>>() {
@@ -84,7 +84,7 @@ public class Restartable {
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <A, T> Observable<Notification<T>> channel(
-        final ChannelType type,
+        final DeliveryMethod type,
         final RestartableFactory<A, T> restartableFactory) {
 
         return channel(type, new Func1<Object, Observable<Notification<T>>>() {
@@ -136,7 +136,7 @@ public class Restartable {
         out.remove("arg");
     }
 
-    private <T> Observable<Notification<T>> channel(final ChannelType type, Func1<Object, Observable<Notification<T>>> instantiate) {
+    private <T> Observable<Notification<T>> channel(final DeliveryMethod type, Func1<Object, Observable<Notification<T>>> instantiate) {
         return (restore ? launches.startWith(arg) : launches)
             .switchMap(instantiate)
             .doOnNext(new Action1<Notification<T>>() {

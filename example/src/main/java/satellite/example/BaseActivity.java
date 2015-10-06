@@ -7,7 +7,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
-import satellite.ChannelType;
+import satellite.DeliveryMethod;
 import satellite.Launcher;
 import satellite.Restartable;
 import satellite.RestartableFactory;
@@ -71,20 +71,20 @@ public class BaseActivity extends Activity implements Launcher {
     }
 
     public <T> Observable<Notification<T>> restartable(int id, RestartableFactoryNoArg<T> restartableFactory) {
-        return restartables.restartable(id, ChannelType.LATEST, restartableFactory);
+        return restartables.restartable(id, DeliveryMethod.LATEST, restartableFactory);
     }
 
     public <A, T> Observable<Notification<T>> restartable(int id, RestartableFactory<A, T> restartableFactory) {
-        return restartables.restartable(id, ChannelType.LATEST, restartableFactory);
+        return restartables.restartable(id, DeliveryMethod.LATEST, restartableFactory);
     }
 
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactoryNoArg<T> restartableFactory) {
+    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactoryNoArg<T> restartableFactory) {
         return restartables.restartable(id, type, restartableFactory);
     }
 
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactory<A, T> restartableFactory) {
+    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactory<A, T> restartableFactory) {
         return restartables.restartable(id, type, restartableFactory);
     }
 

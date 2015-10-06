@@ -44,7 +44,7 @@ public class RestartableSet implements Launcher {
      * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
      */
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactoryNoArg<T> restartableFactory) {
+    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactoryNoArg<T> restartableFactory) {
         return this.<T>restartable(id).channel(type, restartableFactory);
     }
 
@@ -65,7 +65,7 @@ public class RestartableSet implements Launcher {
      * @return an observable which emits {@link rx.Notification} of the observable emissions.
      */
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactory<A, T> restartableFactory) {
+    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactory<A, T> restartableFactory) {
         return this.<A, T>restartable(id).channel(type, restartableFactory);
     }
 

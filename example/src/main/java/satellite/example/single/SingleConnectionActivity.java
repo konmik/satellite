@@ -5,10 +5,10 @@ import android.widget.TextView;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-import satellite.ChannelType;
+import satellite.DeliveryMethod;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.util.RxNotification;
+import satellite.RxNotification;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
@@ -29,7 +29,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(SINGLE_RESTARTABLE_ID, ChannelType.SINGLE, new ExampleSingleRestartableFactory())
+            restartable(SINGLE_RESTARTABLE_ID, DeliveryMethod.SINGLE, new ExampleSingleRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

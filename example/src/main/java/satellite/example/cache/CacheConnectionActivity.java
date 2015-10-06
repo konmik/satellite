@@ -5,10 +5,10 @@ import android.widget.TextView;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-import satellite.ChannelType;
+import satellite.DeliveryMethod;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.util.RxNotification;
+import satellite.RxNotification;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
@@ -29,7 +29,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(CONNECTION_ID, ChannelType.LATEST, new ExampleCacheRestartableFactory())
+            restartable(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("CACHE: onNext " + value);

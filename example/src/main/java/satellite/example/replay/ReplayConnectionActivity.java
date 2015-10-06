@@ -5,10 +5,10 @@ import android.widget.TextView;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-import satellite.ChannelType;
+import satellite.DeliveryMethod;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.util.RxNotification;
+import satellite.RxNotification;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
@@ -29,7 +29,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(REPLAY_RESTARTABLE_ID, ChannelType.REPLAY, new ExampleReplayRestartableFactory())
+            restartable(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("REPLAY: onNext " + value);
