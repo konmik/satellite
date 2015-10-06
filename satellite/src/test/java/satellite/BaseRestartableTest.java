@@ -11,7 +11,6 @@ import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
 
@@ -48,7 +47,7 @@ public class BaseRestartableTest {
 
         @Override
         public Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory) {
-            return restartable.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
+            return restartable.channel(ChannelType.LATEST, restartableFactory);
         }
 
         @Override

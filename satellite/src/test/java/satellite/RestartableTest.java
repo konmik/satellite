@@ -13,7 +13,6 @@ import rx.Notification;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
 
@@ -46,7 +45,7 @@ public class RestartableTest extends BaseRestartableTest {
 
         StateMap.Builder out = new StateMap.Builder();
         Restartable restartable = new Restartable(out);
-        Subscription subscription = restartable.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
+        Subscription subscription = restartable.channel(ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         restartable.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1)));
@@ -55,7 +54,7 @@ public class RestartableTest extends BaseRestartableTest {
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
         Restartable connection2 = new Restartable(out.build(), out);
-        Subscription subscription2 = connection2.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
+        Subscription subscription2 = connection2.channel(ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(asList(Notification.createOnNext(1)));
     }
@@ -66,7 +65,7 @@ public class RestartableTest extends BaseRestartableTest {
 
         StateMap.Builder out = new StateMap.Builder();
         Restartable restartable = new Restartable(out);
-        Subscription subscription = restartable.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
+        Subscription subscription = restartable.channel(ChannelType.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver);
         restartable.launch("1");
 
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
@@ -75,7 +74,7 @@ public class RestartableTest extends BaseRestartableTest {
 
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
         Restartable connection2 = new Restartable(out.build(), out);
-        Subscription subscription2 = connection2.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
+        Subscription subscription2 = connection2.channel(ChannelType.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver2);
 
         testObserver2.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
     }

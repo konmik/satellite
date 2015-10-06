@@ -14,7 +14,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
 
@@ -34,7 +33,7 @@ public class RestartableSetTest extends BaseRestartableTest {
 
         @Override
         public Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory) {
-            return restartableSet.restartable(restartableId, SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
+            return restartableSet.restartable(restartableId, ChannelType.LATEST, restartableFactory);
         }
 
         @Override
@@ -83,8 +82,8 @@ public class RestartableSetTest extends BaseRestartableTest {
 
         StateMap.Builder out = new StateMap.Builder();
         final RestartableSet base = new RestartableSet(out);
-        Subscription subscription = base.restartable(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
-        Subscription subscription2 = base.restartable(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
+        Subscription subscription = base.restartable(1, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
+        Subscription subscription2 = base.restartable(2, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
         base.launch(1, "1");
         base.launch(2, "1");
 
@@ -96,8 +95,8 @@ public class RestartableSetTest extends BaseRestartableTest {
         TestObserver<Notification<Integer>> testObserver21 = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver22 = new TestObserver<>();
         final RestartableSet base2 = new RestartableSet(out.build(), out);
-        Subscription subscription22 = base2.restartable(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
-        Subscription subscription21 = base2.restartable(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
+        Subscription subscription22 = base2.restartable(2, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
+        Subscription subscription21 = base2.restartable(1, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
 
         testObserver21.assertReceivedOnNext(asList(Notification.createOnNext(1)));
         testObserver22.assertReceivedOnNext(asList(Notification.createOnNext(1)));
@@ -110,8 +109,8 @@ public class RestartableSetTest extends BaseRestartableTest {
 
         StateMap.Builder out = new StateMap.Builder();
         final RestartableSet base = new RestartableSet(out);
-        Subscription subscription = base.restartable(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver);
-        Subscription subscription2 = base.restartable(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), RESTARTABLE_FACTORY).subscribe(testObserver2);
+        Subscription subscription = base.restartable(1, ChannelType.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver);
+        Subscription subscription2 = base.restartable(2, ChannelType.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver2);
         base.launch(1, "1");
         base.launch(2, "1");
 
@@ -123,8 +122,8 @@ public class RestartableSetTest extends BaseRestartableTest {
         TestObserver<Notification<Integer>> testObserver21 = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver22 = new TestObserver<>();
         final RestartableSet base2 = new RestartableSet(out.build(), out);
-        Subscription subscription22 = base2.restartable(2, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
-        Subscription subscription21 = base2.restartable(1, SubjectFactory.<Notification<Integer>>behaviorSubject(), INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
+        Subscription subscription22 = base2.restartable(2, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver22);
+        Subscription subscription21 = base2.restartable(1, ChannelType.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver21);
 
         testObserver21.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
         testObserver22.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());

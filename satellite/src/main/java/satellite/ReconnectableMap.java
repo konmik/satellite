@@ -8,9 +8,10 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.subjects.Subject;
-import satellite.util.SubjectFactory;
 
 /**
  * ReconnectableMap keeps track of reconnectable observables (reconnectable observable is an
@@ -38,7 +39,7 @@ public enum ReconnectableMap {
      */
     public <T> Observable<Notification<T>> channel(
         final String key,
-        final SubjectFactory<Notification<T>> subjectFactory,
+        final ChannelType type,
         final Func0<Observable<T>> observableFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
@@ -47,9 +48,24 @@ public enum ReconnectableMap {
                 if (subscriptions.containsKey(key))
                     subscriber.add(subjects.get(key).subscribe(subscriber));
                 else {
-                    Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
+                    Subject<Notification<T>, Notification<T>> subject = type.createSubject();
                     subscriber.add(subject.subscribe(subscriber));
-                    subscriptions.put(key, observableFactory.call().materialize().subscribe(subject));
+                    subscriptions.put(key, observableFactory.call()
+                        .materialize()
+                        .doOnNext(new Action1<Notification<T>>() {
+                            @Override
+                            public void call(Notification<T> notification) {
+                                if (notification.isOnCompleted() || notification.isOnError())
+                                    dismiss(key);
+                            }
+                        })
+                        .filter(new Func1<Notification<T>, Boolean>() {
+                            @Override
+                            public Boolean call(Notification<T> notification) {
+                                return !notification.isOnCompleted();
+                            }
+                        })
+                        .subscribe(subject));
                     subjects.put(key, subject);
                 }
             }

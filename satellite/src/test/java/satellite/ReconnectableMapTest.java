@@ -10,10 +10,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.functions.Func0;
 import rx.observers.TestObserver;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
-import satellite.util.SubjectFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,22 +25,15 @@ public class ReconnectableMapTest {
 
     @Test
     public void testChannel() throws Exception {
-        final BehaviorSubject<Notification<Integer>> subject = BehaviorSubject.create();
         final PublishSubject<Integer> observable = PublishSubject.create();
 
-        SubjectFactory<Notification<Integer>> subjectFactory = new SubjectFactory<Notification<Integer>>() {
-            @Override
-            public Subject<Notification<Integer>, Notification<Integer>> call() {
-                return subject;
-            }
-        };
         Func0<Observable<Integer>> observableFactory = new Func0<Observable<Integer>>() {
             @Override
             public Observable<Integer> call() {
                 return observable;
             }
         };
-        Observable<Notification<Integer>> channel = ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory);
+        Observable<Notification<Integer>> channel = ReconnectableMap.INSTANCE.channel("1", ChannelType.LATEST, observableFactory);
 
         assertNotNull(channel);
         assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
@@ -54,16 +44,11 @@ public class ReconnectableMapTest {
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with the same key does not create a new connection
-        ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory).subscribe();
+        ReconnectableMap.INSTANCE.channel("1", ChannelType.LATEST, observableFactory).subscribe();
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with a different key creates a new connection
-        ReconnectableMap.INSTANCE.channel("2", new SubjectFactory<Notification<Integer>>() {
-            @Override
-            public Subject<Notification<Integer>, Notification<Integer>> call() {
-                return PublishSubject.create();
-            }
-        }, new Func0<Observable<Integer>>() {
+        ReconnectableMap.INSTANCE.channel("2", ChannelType.LATEST, new Func0<Observable<Integer>>() {
             @Override
             public Observable<Integer> call() {
                 return Observable.just(1);
@@ -77,7 +62,7 @@ public class ReconnectableMapTest {
 
         // secondary subscription to the same connection works
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory).subscribe(testObserver2);
+        ReconnectableMap.INSTANCE.channel("1", ChannelType.LATEST, observableFactory).subscribe(testObserver2);
         testObserver2.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
 
         // dismiss works

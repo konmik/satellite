@@ -5,7 +5,6 @@ import android.util.SparseArray;
 import rx.Notification;
 import rx.Observable;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 /**
  * RestartableSet represents a set of {@link Restartable}.
@@ -45,8 +44,8 @@ public class RestartableSet implements Launcher {
      * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
      */
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
-        return this.<T>restartable(id).channel(subjectFactory, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactoryNoArg<T> restartableFactory) {
+        return this.<T>restartable(id).channel(type, restartableFactory);
     }
 
     /**
@@ -66,8 +65,8 @@ public class RestartableSet implements Launcher {
      * @return an observable which emits {@link rx.Notification} of the observable emissions.
      */
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
-        return this.<A, T>restartable(id).channel(subjectFactory, restartableFactory);
+    public <A, T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactory<A, T> restartableFactory) {
+        return this.<A, T>restartable(id).channel(type, restartableFactory);
     }
 
     /**

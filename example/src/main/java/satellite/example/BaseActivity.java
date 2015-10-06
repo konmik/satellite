@@ -7,13 +7,13 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
+import satellite.ChannelType;
 import satellite.Launcher;
 import satellite.Restartable;
-import satellite.RestartableSet;
 import satellite.RestartableFactory;
 import satellite.RestartableFactoryNoArg;
+import satellite.RestartableSet;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 /**
  * This is an example activity that eliminates code duplication when dealing with
@@ -71,21 +71,21 @@ public class BaseActivity extends Activity implements Launcher {
     }
 
     public <T> Observable<Notification<T>> restartable(int id, RestartableFactoryNoArg<T> restartableFactory) {
-        return restartables.restartable(id, SubjectFactory.behaviorSubject(), restartableFactory);
+        return restartables.restartable(id, ChannelType.LATEST, restartableFactory);
     }
 
     public <A, T> Observable<Notification<T>> restartable(int id, RestartableFactory<A, T> restartableFactory) {
-        return restartables.restartable(id, SubjectFactory.behaviorSubject(), restartableFactory);
+        return restartables.restartable(id, ChannelType.LATEST, restartableFactory);
     }
 
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
-        return restartables.restartable(id, subjectFactory, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactoryNoArg<T> restartableFactory) {
+        return restartables.restartable(id, type, restartableFactory);
     }
 
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
-        return restartables.restartable(id, subjectFactory, restartableFactory);
+    public <A, T> Observable<Notification<T>> restartable(int id, ChannelType type, RestartableFactory<A, T> restartableFactory) {
+        return restartables.restartable(id, type, restartableFactory);
     }
 
     @Override

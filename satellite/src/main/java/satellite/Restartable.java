@@ -7,7 +7,6 @@ import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
 
 /**
  * Restartable controls only one restartable. A restartable is an
@@ -58,13 +57,13 @@ public class Restartable {
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <T> Observable<Notification<T>> channel(
-        final SubjectFactory<Notification<T>> subjectFactory,
+        final ChannelType type,
         final RestartableFactoryNoArg<T> restartableFactory) {
 
-        return channel(new Func1<Object, Observable<Notification<T>>>() {
+        return channel(type, new Func1<Object, Observable<Notification<T>>>() {
             @Override
             public Observable<Notification<T>> call(Object ignored) {
-                return ReconnectableMap.INSTANCE.channel(key, subjectFactory, restartableFactory);
+                return ReconnectableMap.INSTANCE.channel(key, type, restartableFactory);
             }
         });
     }
@@ -85,13 +84,13 @@ public class Restartable {
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <A, T> Observable<Notification<T>> channel(
-        final SubjectFactory<Notification<T>> subjectFactory,
+        final ChannelType type,
         final RestartableFactory<A, T> restartableFactory) {
 
-        return channel(new Func1<Object, Observable<Notification<T>>>() {
+        return channel(type, new Func1<Object, Observable<Notification<T>>>() {
             @Override
             public Observable<Notification<T>> call(final Object arg) {
-                return ReconnectableMap.INSTANCE.channel(key, subjectFactory, new Func0<Observable<T>>() {
+                return ReconnectableMap.INSTANCE.channel(key, type, new Func0<Observable<T>>() {
                     @Override
                     public Observable<T> call() {
                         return restartableFactory.call((A)arg);
@@ -137,14 +136,13 @@ public class Restartable {
         out.remove("arg");
     }
 
-    private <T> Observable<Notification<T>> channel(Func1<Object, Observable<Notification<T>>> instantiate) {
+    private <T> Observable<Notification<T>> channel(final ChannelType type, Func1<Object, Observable<Notification<T>>> instantiate) {
         return (restore ? launches.startWith(arg) : launches)
             .switchMap(instantiate)
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
                 public void call(Notification<T> notification) {
-                    if (notification.isOnCompleted() || notification.isOnError())
-                        dismiss();
+                    type.onNext(key);
                 }
             });
     }

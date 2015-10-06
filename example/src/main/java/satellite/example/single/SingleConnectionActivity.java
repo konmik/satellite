@@ -3,17 +3,16 @@ package satellite.example.single;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import satellite.Restartable;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+import satellite.ChannelType;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.state.StateMap;
 import satellite.util.RxNotification;
-import satellite.util.SubjectFactory;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private Restartable connection;
-    private StateMap.Builder out;
+    public static final int SINGLE_RESTARTABLE_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,41 +21,20 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> connection.launch(ExampleSingleRestartableFactory.argument(10)));
-        findViewById(R.id.drop).setOnClickListener(v -> connection.dismiss());
-
-        if (savedInstanceState == null)
-            this.connection = new Restartable(out = new StateMap.Builder());
-        else {
-            StateMap map = savedInstanceState.getParcelable("connection");
-            this.connection = new Restartable(map, out = map.toBuilder());
-        }
+        findViewById(R.id.launch).setOnClickListener(v -> launch(SINGLE_RESTARTABLE_ID, ExampleSingleRestartableFactory.argument(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> dismiss(SINGLE_RESTARTABLE_ID));
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("connection", out.build());
-    }
+    protected Subscription onConnect() {
+        return new CompositeSubscription(super.onConnect(),
 
-    @Override
-    protected void onCreateConnections() {
-        super.onCreateConnections();
-
-        unsubscribeOnDestroy(
-            connection.channel(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
+            restartable(SINGLE_RESTARTABLE_ID, ChannelType.SINGLE, new ExampleSingleRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);
                         onNext(value);
                     },
                     throwable -> log("SINGLE: onError " + throwable))));
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (isFinishing())
-            connection.dismiss();
     }
 }
