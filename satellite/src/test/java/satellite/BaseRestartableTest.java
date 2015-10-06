@@ -15,7 +15,7 @@ import satellite.util.SubjectFactory;
 
 import static java.util.Arrays.asList;
 
-public class BaseRestartableConnectionTest {
+public class BaseRestartableTest {
 
     public static final RestartableFactory<String, Integer> RESTARTABLE_FACTORY = new RestartableFactory<String, Integer>() {
         @Override
@@ -37,34 +37,34 @@ public class BaseRestartableConnectionTest {
     };
 
     public interface InstanceLauncher {
-        Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory);
+        Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory);
         void launch(String arg);
         void dismiss();
     }
 
-    public static class RestartableConnectionLauncher implements InstanceLauncher {
+    public static class RestartableLauncher implements InstanceLauncher {
 
-        private final RestartableConnection connection = new RestartableConnection(new StateMap.Builder());
+        private final Restartable restartable = new Restartable(new StateMap.Builder());
 
         @Override
-        public Observable<Notification<Integer>> connection(RestartableFactory<String, Integer> restartableFactory) {
-            return connection.connection(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
+        public Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory) {
+            return restartable.channel(SubjectFactory.<Notification<Integer>>behaviorSubject(), restartableFactory);
         }
 
         @Override
         public void launch(String arg) {
-            connection.launch(arg);
+            restartable.launch(arg);
         }
 
         @Override
         public void dismiss() {
-            connection.dismiss();
+            restartable.dismiss();
         }
     }
 
-    public void testConnectionImmediateStrategy(BaseRestartableConnectionTest.InstanceLauncher launcher) throws Exception {
+    public void testConnectionImmediateStrategy(BaseRestartableTest.InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
-        Subscription subscription = launcher.connection(BaseRestartableConnectionTest.RESTARTABLE_FACTORY).subscribe(testObserver);
+        Subscription subscription = launcher.channel(BaseRestartableTest.RESTARTABLE_FACTORY).subscribe(testObserver);
         launcher.launch("1");
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
     }
@@ -77,19 +77,19 @@ public class BaseRestartableConnectionTest {
         }
     };
 
-    public void testConnectionDelayedStrategy(BaseRestartableConnectionTest.InstanceLauncher launcher) throws Exception {
+    public void testConnectionDelayedStrategy(BaseRestartableTest.InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
-        Subscription subscription = launcher.connection(scheduledRestartableFactory).subscribe(testObserver);
+        Subscription subscription = launcher.channel(scheduledRestartableFactory).subscribe(testObserver);
         launcher.launch("1");
         testObserver.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());
         testScheduler.advanceTimeBy(6, TimeUnit.SECONDS);
         testObserver.assertReceivedOnNext(asList(Notification.createOnNext(1), Notification.<Integer>createOnCompleted()));
     }
 
-    public void testDismissStrategy(BaseRestartableConnectionTest.InstanceLauncher launcher) throws Exception {
+    public void testDismissStrategy(BaseRestartableTest.InstanceLauncher launcher) throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        Subscription subscription = launcher.connection(scheduledRestartableFactory).subscribe(testObserver);
+        Subscription subscription = launcher.channel(scheduledRestartableFactory).subscribe(testObserver);
 
         launcher.launch("1");
         testObserver.assertReceivedOnNext(Collections.<Notification<Integer>>emptyList());

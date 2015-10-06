@@ -3,7 +3,7 @@ package satellite.example.single;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import satellite.RestartableConnection;
+import satellite.Restartable;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
 import satellite.state.StateMap;
@@ -12,7 +12,7 @@ import satellite.util.SubjectFactory;
 
 public class SingleConnectionActivity extends BaseLaunchActivity {
 
-    private RestartableConnection connection;
+    private Restartable connection;
     private StateMap.Builder out;
 
     @Override
@@ -26,10 +26,10 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         findViewById(R.id.drop).setOnClickListener(v -> connection.dismiss());
 
         if (savedInstanceState == null)
-            this.connection = new RestartableConnection(out = new StateMap.Builder());
+            this.connection = new Restartable(out = new StateMap.Builder());
         else {
             StateMap map = savedInstanceState.getParcelable("connection");
-            this.connection = new RestartableConnection(map, out = map.toBuilder());
+            this.connection = new Restartable(map, out = map.toBuilder());
         }
     }
 
@@ -44,7 +44,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         super.onCreateConnections();
 
         unsubscribeOnDestroy(
-            connection.connection(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
+            connection.channel(SubjectFactory.behaviorSubject(), new ExampleSingleRestartableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

@@ -27,7 +27,7 @@ public class ReconnectableMapTest {
     }
 
     @Test
-    public void testConnection() throws Exception {
+    public void testChannel() throws Exception {
         final BehaviorSubject<Notification<Integer>> subject = BehaviorSubject.create();
         final PublishSubject<Integer> observable = PublishSubject.create();
 
@@ -43,22 +43,22 @@ public class ReconnectableMapTest {
                 return observable;
             }
         };
-        Observable<Notification<Integer>> connection = ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory);
+        Observable<Notification<Integer>> channel = ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory);
 
-        assertNotNull(connection);
+        assertNotNull(channel);
         assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
 
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
-        connection.subscribe(testObserver);
+        channel.subscribe(testObserver);
 
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with the same key does not create a new connection
-        ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory).subscribe();
+        ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory).subscribe();
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
         // second connection with a different key creates a new connection
-        ReconnectableMap.INSTANCE.connection("2", new SubjectFactory<Notification<Integer>>() {
+        ReconnectableMap.INSTANCE.channel("2", new SubjectFactory<Notification<Integer>>() {
             @Override
             public Subject<Notification<Integer>, Notification<Integer>> call() {
                 return PublishSubject.create();
@@ -77,7 +77,7 @@ public class ReconnectableMapTest {
 
         // secondary subscription to the same connection works
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
-        ReconnectableMap.INSTANCE.connection("1", subjectFactory, observableFactory).subscribe(testObserver2);
+        ReconnectableMap.INSTANCE.channel("1", subjectFactory, observableFactory).subscribe(testObserver2);
         testObserver2.assertReceivedOnNext(Collections.singletonList(Notification.createOnNext(1)));
 
         // dismiss works

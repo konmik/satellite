@@ -10,13 +10,13 @@ import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
- * RestartableConnection controls only one restartable. A restartable is an
+ * Restartable controls only one restartable. A restartable is an
  * {@link Observable} which should be restarted after a process (not application) restart.
  *
- * RestartableConnection saves restartable arguments and restarts the observable in
+ * Restartable saves restartable arguments and restarts the observable in
  * case of a process restart.
  */
-public class RestartableConnection {
+public class Restartable {
 
     private final String key;
     private final boolean restore;
@@ -28,9 +28,9 @@ public class RestartableConnection {
     private static long id;
 
     /**
-     * Creates a new RestartableConnection.
+     * Creates a new Restartable.
      */
-    public RestartableConnection(StateMap.Builder out) {
+    public Restartable(StateMap.Builder out) {
         this.out = out;
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
@@ -39,10 +39,10 @@ public class RestartableConnection {
     }
 
     /**
-     * Creates a new RestartableConnection form a given state that has been received
+     * Creates a new Restartable form a given state that has been received
      * from previous instance out.
      */
-    public RestartableConnection(StateMap in, StateMap.Builder out) {
+    public Restartable(StateMap in, StateMap.Builder out) {
         this.out = out;
         key = in.get("key");
         restore = in.get("restore", false);
@@ -57,14 +57,14 @@ public class RestartableConnection {
      * @param restartableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
-    public <T> Observable<Notification<T>> connection(
+    public <T> Observable<Notification<T>> channel(
         final SubjectFactory<Notification<T>> subjectFactory,
         final RestartableFactoryNoArg<T> restartableFactory) {
 
-        return connection(new Func1<Object, Observable<Notification<T>>>() {
+        return channel(new Func1<Object, Observable<Notification<T>>>() {
             @Override
             public Observable<Notification<T>> call(Object ignored) {
-                return ReconnectableMap.INSTANCE.connection(key, subjectFactory, restartableFactory);
+                return ReconnectableMap.INSTANCE.channel(key, subjectFactory, restartableFactory);
             }
         });
     }
@@ -72,7 +72,7 @@ public class RestartableConnection {
     /**
      * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory.
      *
-     * This {@link #connection(SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
+     * This {@link #channel(SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.
      *
      * Note that to make use of arguments, both
@@ -84,14 +84,14 @@ public class RestartableConnection {
      * @param restartableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
-    public <A, T> Observable<Notification<T>> connection(
+    public <A, T> Observable<Notification<T>> channel(
         final SubjectFactory<Notification<T>> subjectFactory,
         final RestartableFactory<A, T> restartableFactory) {
 
-        return connection(new Func1<Object, Observable<Notification<T>>>() {
+        return channel(new Func1<Object, Observable<Notification<T>>>() {
             @Override
             public Observable<Notification<T>> call(final Object arg) {
-                return ReconnectableMap.INSTANCE.connection(key, subjectFactory, new Func0<Observable<T>>() {
+                return ReconnectableMap.INSTANCE.channel(key, subjectFactory, new Func0<Observable<T>>() {
                     @Override
                     public Observable<T> call() {
                         return restartableFactory.call((A)arg);
@@ -137,7 +137,7 @@ public class RestartableConnection {
         out.remove("arg");
     }
 
-    private <T> Observable<Notification<T>> connection(Func1<Object, Observable<Notification<T>>> instantiate) {
+    private <T> Observable<Notification<T>> channel(Func1<Object, Observable<Notification<T>>> instantiate) {
         return (restore ? launches.startWith(arg) : launches)
             .switchMap(instantiate)
             .doOnNext(new Action1<Notification<T>>() {

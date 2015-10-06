@@ -17,7 +17,7 @@ import satellite.util.SubjectFactory;
  * {@link Observable} that emits materialized values into a {@link Subject}). The
  * subject is used to (re)connect to the observable.
  *
- * Reconnectable observables are used by {@link RestartableConnection}.
+ * Reconnectable observables are used by {@link Restartable}.
  */
 public enum ReconnectableMap {
 
@@ -27,16 +27,16 @@ public enum ReconnectableMap {
     private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
     /**
-     * This is the core method that connects an observable with {@link RestartableConnection}.
+     * This is the core method that connects an observable with {@link Restartable}.
      * The observable gets created if it does not exist yet.
      *
      * @param key               a unique key of the connection.
-     * @param subjectFactory    a factory for creating an intermediate subject that lies between the observable and {@link RestartableConnection}.
+     * @param subjectFactory    a factory for creating an intermediate subject that lies between the observable and {@link Restartable}.
      * @param observableFactory an observable factory.
      * @param <T>               a type of observable`s onNext values
      * @return an observable that emits materialized notifications
      */
-    public <T> Observable<Notification<T>> connection(
+    public <T> Observable<Notification<T>> channel(
         final String key,
         final SubjectFactory<Notification<T>> subjectFactory,
         final Func0<Observable<T>> observableFactory) {

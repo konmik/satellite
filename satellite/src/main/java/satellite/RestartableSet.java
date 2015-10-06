@@ -8,52 +8,52 @@ import satellite.state.StateMap;
 import satellite.util.SubjectFactory;
 
 /**
- * RestartableConnectionSet represents a set of {@link RestartableConnection}.
- * Each RestartableConnection is indexed by its id.
+ * RestartableSet represents a set of {@link Restartable}.
+ * Each Restartable is indexed by its id.
  */
-public class RestartableConnectionSet implements Launcher {
+public class RestartableSet implements Launcher {
 
-    private final SparseArray<RestartableConnection> connections = new SparseArray<>();
+    private final SparseArray<Restartable> restartables = new SparseArray<>();
     private final StateMap.Builder out;
 
     /**
-     * Creates a new RestartableConnectionSet instance.
+     * Creates a new RestartableSet instance.
      */
-    public RestartableConnectionSet(StateMap.Builder out) {
+    public RestartableSet(StateMap.Builder out) {
         this.out = out;
     }
 
     /**
-     * Creates an RestartableConnectionSet instance form a given state that has been received
+     * Creates an RestartableSet instance form a given state that has been received
      * from previous instance out.
-     * All instances of {@link RestartableConnection} will be restored as well.
+     * All instances of {@link Restartable} will be restored as well.
      */
-    public RestartableConnectionSet(StateMap in, StateMap.Builder out) {
+    public RestartableSet(StateMap in, StateMap.Builder out) {
         this.out = out;
         for (String sId : in.keys())
-            connections.put(Integer.valueOf(sId), new RestartableConnection((StateMap)in.get(sId), out.child(sId)));
+            restartables.put(Integer.valueOf(sId), new Restartable((StateMap)in.get(sId), out.child(sId)));
     }
 
     /**
      * Provides a connection to an observable through a given observable factory and a given intermediate subject factory,
-     * see {@link RestartableConnection#connection(SubjectFactory, RestartableFactoryNoArg)}.
+     * see {@link Restartable#channel(SubjectFactory, RestartableFactoryNoArg)}.
      *
-     * @param id                 a {@link RestartableConnection} id.
+     * @param id                 a {@link Restartable} id.
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
      * @param restartableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
      */
     @Override
-    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
-        return this.<T>connection(id).connection(subjectFactory, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
+        return this.<T>restartable(id).channel(subjectFactory, restartableFactory);
     }
 
     /**
      * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory,
-     * see {@link RestartableConnection#connection(SubjectFactory, RestartableFactory)}.
+     * see {@link Restartable#channel(SubjectFactory, RestartableFactory)}.
      *
-     * This {@link #connection(int, SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
+     * This {@link #restartable(int, SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.
      *
      * Note that to make use of arguments, both
@@ -66,26 +66,26 @@ public class RestartableConnectionSet implements Launcher {
      * @return an observable which emits {@link rx.Notification} of the observable emissions.
      */
     @Override
-    public <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
-        return this.<A, T>connection(id).connection(subjectFactory, restartableFactory);
+    public <A, T> Observable<Notification<T>> restartable(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
+        return this.<A, T>restartable(id).channel(subjectFactory, restartableFactory);
     }
 
     /**
      * Launches a restartable without providing arguments.
      * Dismisses the previous observable instance if it is not completed yet.
      *
-     * See {@link RestartableConnection#launch()}.
+     * See {@link Restartable#launch()}.
      */
     @Override
     public void launch(int id) {
-        this.connection(id).launch();
+        this.restartable(id).launch();
     }
 
     /**
      * Launches a restartable observable, providing an argument.
      * Dismisses the previous observable instance if it is not completed yet.
      *
-     * See {@link RestartableConnection#launch(Object)}.
+     * See {@link Restartable#launch(Object)}.
      *
      * Note that to make use of arguments, both
      * {@code #connection(SubjectFactory, RestartableFactory)} and
@@ -97,33 +97,33 @@ public class RestartableConnectionSet implements Launcher {
      */
     @Override
     public void launch(int id, Object arg) {
-        this.connection(id).launch(arg);
+        this.restartable(id).launch(arg);
     }
 
     /**
      * Unsubscribes and dismisses a restartable observable.
      *
-     * See {@link RestartableConnection#dismiss()}.
+     * See {@link Restartable#dismiss()}.
      */
     @Override
     public void dismiss(int id) {
-        if (connections.get(id) != null)
-            connections.get(id).dismiss();
+        if (restartables.get(id) != null)
+            restartables.get(id).dismiss();
     }
 
     /**
      * Unsubscribes and dismisses all controlled restartable observables.
      *
-     * See {@link RestartableConnection#dismiss()}.
+     * See {@link Restartable#dismiss()}.
      */
     public void dismiss() {
-        for (int i = 0; i < connections.size(); i++)
-            connections.valueAt(i).dismiss();
+        for (int i = 0; i < restartables.size(); i++)
+            restartables.valueAt(i).dismiss();
     }
 
-    private RestartableConnection connection(int id) {
-        if (connections.get(id) == null)
-            connections.put(id, new RestartableConnection(out.child(Integer.toString(id))));
-        return connections.get(id);
+    private Restartable restartable(int id) {
+        if (restartables.get(id) == null)
+            restartables.put(id, new Restartable(out.child(Integer.toString(id))));
+        return restartables.get(id);
     }
 }
