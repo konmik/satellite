@@ -223,6 +223,11 @@ In your project:
 * `compile 'info.android15.satellite:satellite:0.1.0-SNAPSHOT'`
 * Don't forget to mention `mavenLocal()` in the list of your project's repositories.
 
+## Development
+
+The development version is in the `develop` branch. Tests do not always work there,
+everything is bad, but there is a light in the end!
+
 ## Feedback
 
 Any feedback is welcome. :)
