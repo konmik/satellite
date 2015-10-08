@@ -48,7 +48,7 @@ public class ValueMap implements Parcelable {
      * Keys should be String, values should fit {@link Parcel#writeValue(Object)} argument
      * requirements.
      */
-    public static ValueMap sequence(Object... map) {
+    public static ValueMap map(Object... map) {
         if (map.length / 2 * 2 != map.length)
             throw new IllegalArgumentException("Arguments should be <String> key - <?> value pairs");
 

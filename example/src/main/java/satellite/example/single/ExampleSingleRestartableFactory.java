@@ -11,7 +11,7 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 public class ExampleSingleRestartableFactory implements RestartableFactory<ValueMap, Integer> {
 
     public static ValueMap argument(int from) {
-        return ValueMap.sequence("from", from);
+        return ValueMap.map("from", from);
     }
 
     @Override

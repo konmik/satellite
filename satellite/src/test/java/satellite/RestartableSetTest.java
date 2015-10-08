@@ -38,9 +38,6 @@ public class RestartableSetTest {
         subscriber.assertNoValues();
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
-        scheduler.advanceTimeBy(1500, TimeUnit.MILLISECONDS);
-        subscriber.assertReceivedOnNext(singletonList(Notification.createOnNext(0L)));
-
         scheduler.advanceTimeBy(1000, TimeUnit.MILLISECONDS);
         subscriber.assertReceivedOnNext(singletonList(Notification.createOnNext(0L)));
 

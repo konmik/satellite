@@ -35,12 +35,12 @@ public class ValueMapTest {
 
     @Test(expected = Exception.class)
     public void testSequenceWrongSequence() {
-        ValueMap.sequence("1", 1, "2");
+        ValueMap.map("1", 1, "2");
     }
 
     @Test(expected = Exception.class)
     public void testSequenceWrongType() {
-        ValueMap.sequence(1, 1, "2");
+        ValueMap.map(1, 1, "2");
     }
 
     @Test
@@ -77,15 +77,15 @@ public class ValueMapTest {
 
     @Test
     public void testEquals() throws Exception {
-        ValueMap map1 = ValueMap.sequence("1", 1, "2", 2);
-        ValueMap map2 = ValueMap.sequence("1", 1, "2", 2);
-        ValueMap map3 = ValueMap.sequence("1", 1, "3", 2);
-        ValueMap map4 = ValueMap.sequence("1", 1);
+        ValueMap map1 = ValueMap.map("1", 1, "2", 2);
+        ValueMap map2 = ValueMap.map("1", 1, "2", 2);
+        ValueMap map3 = ValueMap.map("1", 1, "3", 2);
+        ValueMap map4 = ValueMap.map("1", 1);
         assertTrue(map1.equals(map2));
         assertFalse(map1.equals(map3));
         assertFalse(map1.equals(map4));
         assertTrue(ValueMap.empty().equals(ValueMap.empty()));
-        assertTrue(ValueMap.sequence(null, null).equals(ValueMap.sequence(null, null)));
+        assertTrue(ValueMap.map(null, null).equals(ValueMap.map(null, null)));
     }
 
     @Test
@@ -102,6 +102,6 @@ public class ValueMapTest {
     }
 
     private ValueMap getSequence123() {
-        return ValueMap.sequence("1", 1, "2", 2, "3", 3);
+        return ValueMap.map("1", 1, "2", 2, "3", 3);
     }
 }
