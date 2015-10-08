@@ -1,4 +1,4 @@
-package info.android15.statemap;
+package info.android15.valuemap;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

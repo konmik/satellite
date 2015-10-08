@@ -1,4 +1,4 @@
-package statemap;
+package valuemap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.HashSet;
 
-import info.android15.statemap.BuildConfig;
+import info.android15.valuemap.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -16,17 +16,17 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class StateMapTest {
+public class ValueMapTest {
 
     @Test
     public void testEmpty() throws Exception {
-        assertEquals(0, StateMap.empty().keys().size());
+        assertEquals(0, ValueMap.empty().keys().size());
     }
 
     @Test
     public void testSequence() throws Exception {
         HashSet hashSet = getSetString123();
-        StateMap map = getSequence123();
+        ValueMap map = getSequence123();
         assertTrue(hashSet.equals(map.keys()));
         assertEquals(1, map.get("1"));
         assertEquals(2, map.get("2"));
@@ -35,12 +35,12 @@ public class StateMapTest {
 
     @Test(expected = Exception.class)
     public void testSequenceWrongSequence() {
-        StateMap.sequence("1", 1, "2");
+        ValueMap.sequence("1", 1, "2");
     }
 
     @Test(expected = Exception.class)
     public void testSequenceWrongType() {
-        StateMap.sequence(1, 1, "2");
+        ValueMap.sequence(1, 1, "2");
     }
 
     @Test
@@ -68,7 +68,7 @@ public class StateMapTest {
 
     @Test
     public void testToOutput() throws Exception {
-        StateMap.Builder out = new StateMap.Builder();
+        ValueMap.Builder out = new ValueMap.Builder();
         out.put("1", 1);
         out.put("2", 2);
         out.put("3", 3);
@@ -77,20 +77,20 @@ public class StateMapTest {
 
     @Test
     public void testEquals() throws Exception {
-        StateMap map1 = StateMap.sequence("1", 1, "2", 2);
-        StateMap map2 = StateMap.sequence("1", 1, "2", 2);
-        StateMap map3 = StateMap.sequence("1", 1, "3", 2);
-        StateMap map4 = StateMap.sequence("1", 1);
+        ValueMap map1 = ValueMap.sequence("1", 1, "2", 2);
+        ValueMap map2 = ValueMap.sequence("1", 1, "2", 2);
+        ValueMap map3 = ValueMap.sequence("1", 1, "3", 2);
+        ValueMap map4 = ValueMap.sequence("1", 1);
         assertTrue(map1.equals(map2));
         assertFalse(map1.equals(map3));
         assertFalse(map1.equals(map4));
-        assertTrue(StateMap.empty().equals(StateMap.empty()));
-        assertTrue(StateMap.sequence(null, null).equals(StateMap.sequence(null, null)));
+        assertTrue(ValueMap.empty().equals(ValueMap.empty()));
+        assertTrue(ValueMap.sequence(null, null).equals(ValueMap.sequence(null, null)));
     }
 
     @Test
     public void testBuilder() throws Exception {
-        assertNotNull(StateMap.builder());
+        assertNotNull(ValueMap.builder());
     }
 
     private HashSet getSetString123() {
@@ -101,7 +101,7 @@ public class StateMapTest {
         return hashSet;
     }
 
-    private StateMap getSequence123() {
-        return StateMap.sequence("1", 1, "2", 2, "3", 3);
+    private ValueMap getSequence123() {
+        return ValueMap.sequence("1", 1, "2", 2, "3", 3);
     }
 }

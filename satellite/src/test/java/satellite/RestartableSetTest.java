@@ -14,7 +14,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +31,7 @@ public class RestartableSetTest {
 
     @Test
     public void test_basic_usage() throws Exception {
-        StateMap.Builder builder = StateMap.builder();
+        ValueMap.Builder builder = ValueMap.builder();
         RestartableSet set = launchRestartable(DeliveryMethod.SINGLE, builder, subscriber, scheduler);
 
         set.launch(1);
@@ -47,7 +47,7 @@ public class RestartableSetTest {
         assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
     }
 
-    private static RestartableSet launchRestartable(DeliveryMethod method, StateMap.Builder builder, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler) {
+    private static RestartableSet launchRestartable(DeliveryMethod method, ValueMap.Builder builder, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler) {
         RestartableSet set = new RestartableSet(builder);
         set
             .restartable(RESTARTABLE_ID, method, new RestartableFactoryNoArg<Long>() {

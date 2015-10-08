@@ -1,4 +1,4 @@
-package statemap;
+package valuemap;
 
 import android.os.Parcel;
 

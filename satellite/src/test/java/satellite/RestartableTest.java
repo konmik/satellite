@@ -12,7 +12,7 @@ import info.android15.satellite.BuildConfig;
 import rx.Notification;
 import rx.Subscription;
 import rx.observers.TestObserver;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 import static java.util.Arrays.asList;
 
@@ -43,7 +43,7 @@ public class RestartableTest extends BaseRestartableTest {
     public void testSaveRestoreRestart() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        StateMap.Builder out = new StateMap.Builder();
+        ValueMap.Builder out = new ValueMap.Builder();
         Restartable restartable = new Restartable(out);
         Subscription subscription = restartable.channel(DeliveryMethod.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         restartable.launch("1");
@@ -63,7 +63,7 @@ public class RestartableTest extends BaseRestartableTest {
     public void testSaveRestoreCompleted() throws Exception {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
 
-        StateMap.Builder out = new StateMap.Builder();
+        ValueMap.Builder out = new ValueMap.Builder();
         Restartable restartable = new Restartable(out);
         Subscription subscription = restartable.channel(DeliveryMethod.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver);
         restartable.launch("1");

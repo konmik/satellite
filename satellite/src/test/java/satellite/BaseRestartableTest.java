@@ -10,7 +10,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.observers.TestObserver;
 import rx.schedulers.TestScheduler;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 import static java.util.Arrays.asList;
 
@@ -43,7 +43,7 @@ public class BaseRestartableTest {
 
     public static class RestartableLauncher implements InstanceLauncher {
 
-        private final Restartable restartable = new Restartable(new StateMap.Builder());
+        private final Restartable restartable = new Restartable(new ValueMap.Builder());
 
         @Override
         public Observable<Notification<Integer>> channel(RestartableFactory<String, Integer> restartableFactory) {

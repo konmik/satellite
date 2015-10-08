@@ -1,4 +1,4 @@
-package statemap;
+package valuemap;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,28 +14,28 @@ import java.util.Set;
  * Activity fields, prompting a programmer to reuse the state and get all the side-effects
  * of this act.
  *
- * {@link StateMap} represents a "map" storage that can be used to remove more state off the view logic.
+ * {@link ValueMap} represents a "map" storage that can be used to remove more state off the view logic.
  * It is immutable and Parcelable, thus it can be safely used without side effects.
  *
  * If you need to save Activity instance state, it is a good idea to create a
- * {@link StateMap.Builder} and use it to push data out for the next activity instance.
- * {@link StateMap.Builder} is write-only, so no troubles with the state mutability can be created
+ * {@link ValueMap.Builder} and use it to push data out for the next activity instance.
+ * {@link ValueMap.Builder} is write-only, so no troubles with the state mutability can be created
  * this way.
  *
- * {@link StateMap} allows to keep the instance state out of activity code, isolating it by strictly allowing
- * to make write ({@link StateMap.Builder}) or read ({@link StateMap}) operations only.
+ * {@link ValueMap} allows to keep the instance state out of activity code, isolating it by strictly allowing
+ * to make write ({@link ValueMap.Builder}) or read ({@link ValueMap}) operations only.
  *
- * {@link StateMap} automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
+ * {@link ValueMap} automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
  * immutable data completely immutable. Every time set/get is called a corresponding
  * {@link Parcel#marshall()}/{@link Parcel#unmarshall(byte[], int, int)} is called,
  * providing you with a fresh instance of the stored value.
- * Thus, it is not recommended to use {@link StateMap} on performance critical application parts.
+ * Thus, it is not recommended to use {@link ValueMap} on performance critical application parts.
  */
-public class StateMap implements Parcelable {
+public class ValueMap implements Parcelable {
 
     private final Map<String, byte[]> map;
 
-    public static StateMap empty() {
+    public static ValueMap empty() {
         return EMPTY;
     }
 
@@ -44,11 +44,11 @@ public class StateMap implements Parcelable {
     }
 
     /**
-     * Constructs StateMap using a sequence of key-value arguments.
+     * Constructs ValueMap using a sequence of key-value arguments.
      * Keys should be String, values should fit {@link Parcel#writeValue(Object)} argument
      * requirements.
      */
-    public static StateMap sequence(Object... map) {
+    public static ValueMap sequence(Object... map) {
         if (map.length / 2 * 2 != map.length)
             throw new IllegalArgumentException("Arguments should be <String> key - <?> value pairs");
 
@@ -56,18 +56,18 @@ public class StateMap implements Parcelable {
         for (int i = 0; i < map.length; i += 2)
             hashMap.put((String)map[i], ParcelFn.marshall(map[i + 1]));
 
-        return new StateMap(hashMap);
+        return new ValueMap(hashMap);
     }
 
     /**
-     * Returns an immutable set of keys contained in this {@link StateMap}.
+     * Returns an immutable set of keys contained in this {@link ValueMap}.
      */
     public Set<String> keys() {
         return Collections.unmodifiableSet(map.keySet());
     }
 
     /**
-     * Returns whether this {@link StateMap} contains the specified key.
+     * Returns whether this {@link ValueMap} contains the specified key.
      */
     public boolean containsKey(String key) {
         return map.containsKey(key);
@@ -90,7 +90,7 @@ public class StateMap implements Parcelable {
     }
 
     /**
-     * Returns the output map which contains the current {@link StateMap} values.
+     * Returns the output map which contains the current {@link ValueMap} values.
      */
     public Builder toBuilder() {
         return new Builder(map);
@@ -99,7 +99,7 @@ public class StateMap implements Parcelable {
     /**
      * A builder that implements "output only" approach for handling state.
      * It is not recommended to use {@link #build()} just to check what is inside -
-     * this will invalidate the whole purpose of using {@link StateMap}.
+     * this will invalidate the whole purpose of using {@link ValueMap}.
      */
     public static class Builder {
 
@@ -135,7 +135,7 @@ public class StateMap implements Parcelable {
         }
 
         /**
-         * Returns a child builder. The child builder will be marshalled into a {@link StateMap}
+         * Returns a child builder. The child builder will be marshalled into a {@link ValueMap}
          * instance with the key during the {@link #build()} call.
          *
          * @param key a child builder key.
@@ -146,7 +146,7 @@ public class StateMap implements Parcelable {
                 return sub.get(key);
             }
             else if (map.containsKey(key)) {
-                Builder builder = ParcelFn.<StateMap>unmarshall(map.get(key)).toBuilder();
+                Builder builder = ParcelFn.<ValueMap>unmarshall(map.get(key)).toBuilder();
                 map.remove(key);
                 sub.put(key, builder);
                 return builder;
@@ -158,13 +158,13 @@ public class StateMap implements Parcelable {
         }
 
         /**
-         * Builds the {@link StateMap} instance using collected key-value pairs.
+         * Builds the {@link ValueMap} instance using collected key-value pairs.
          */
-        public StateMap build() {
+        public ValueMap build() {
             Map<String, byte[]> m = new HashMap<>(map);
             for (Map.Entry<String, Builder> entry : sub.entrySet())
                 m.put(entry.getKey(), ParcelFn.marshall(entry.getValue().build()));
-            return new StateMap(m);
+            return new ValueMap(m);
         }
 
         private Builder(Map<String, byte[]> map) {
@@ -172,15 +172,15 @@ public class StateMap implements Parcelable {
         }
     }
 
-    StateMap(Map<String, byte[]> map) {
+    ValueMap(Map<String, byte[]> map) {
         this.map = new HashMap<>(map);
     }
 
-    private static final StateMap EMPTY = new StateMap(Collections.<String, byte[]>emptyMap());
+    private static final ValueMap EMPTY = new ValueMap(Collections.<String, byte[]>emptyMap());
 
-    private static final ClassLoader CLASS_LOADER = StateMap.class.getClassLoader();
+    private static final ClassLoader CLASS_LOADER = ValueMap.class.getClassLoader();
 
-    protected StateMap(Parcel in) {
+    protected ValueMap(Parcel in) {
         map = in.readHashMap(CLASS_LOADER);
     }
 
@@ -194,24 +194,24 @@ public class StateMap implements Parcelable {
         return 0;
     }
 
-    public static final Creator<StateMap> CREATOR = new Creator<StateMap>() {
+    public static final Creator<ValueMap> CREATOR = new Creator<ValueMap>() {
         @Override
-        public StateMap createFromParcel(Parcel in) {
-            return new StateMap(in);
+        public ValueMap createFromParcel(Parcel in) {
+            return new ValueMap(in);
         }
 
         @Override
-        public StateMap[] newArray(int size) {
-            return new StateMap[size];
+        public ValueMap[] newArray(int size) {
+            return new ValueMap[size];
         }
     };
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof StateMap))
+        if (!(o instanceof ValueMap))
             return false;
 
-        Map<String, byte[]> otherMap = ((StateMap)o).map;
+        Map<String, byte[]> otherMap = ((ValueMap)o).map;
 
         if (map.size() != otherMap.size())
             return false;

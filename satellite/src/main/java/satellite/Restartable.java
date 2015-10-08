@@ -6,7 +6,7 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 /**
  * Restartable controls only one restartable. A restartable is an
@@ -20,7 +20,7 @@ public class Restartable {
     private final String key;
     private final boolean restore;
     private final Object arg;
-    private final StateMap.Builder out;
+    private final ValueMap.Builder out;
 
     private final PublishSubject<Object> launches = PublishSubject.create();
 
@@ -29,7 +29,7 @@ public class Restartable {
     /**
      * Creates a new Restartable.
      */
-    public Restartable(StateMap.Builder out) {
+    public Restartable(ValueMap.Builder out) {
         this.out = out;
         key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
         restore = false;
@@ -41,7 +41,7 @@ public class Restartable {
      * Creates a new Restartable form a given state that has been received
      * from previous instance out.
      */
-    public Restartable(StateMap in, StateMap.Builder out) {
+    public Restartable(ValueMap in, ValueMap.Builder out) {
         this.out = out;
         key = in.get("key");
         restore = in.get("restore", false);

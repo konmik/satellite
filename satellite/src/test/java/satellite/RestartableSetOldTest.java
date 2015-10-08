@@ -13,7 +13,7 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.observers.TestObserver;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 import static java.util.Arrays.asList;
 
@@ -54,21 +54,21 @@ public class RestartableSetOldTest extends BaseRestartableTest {
 
     @Test
     public void testConnectionImmediate() throws Exception {
-        final RestartableSet restartableSet = new RestartableSet(new StateMap.Builder());
+        final RestartableSet restartableSet = new RestartableSet(new ValueMap.Builder());
         testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableSet, 1));
         testConnectionImmediateStrategy(new RestartableConnectionSetLauncher(restartableSet, 2));
     }
 
     @Test
     public void testConnectionDelayed() throws Exception {
-        final RestartableSet restartableSet = new RestartableSet(new StateMap.Builder());
+        final RestartableSet restartableSet = new RestartableSet(new ValueMap.Builder());
         testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableSet, 1));
         testConnectionDelayedStrategy(new RestartableConnectionSetLauncher(restartableSet, 2));
     }
 
     @Test
     public void testDismiss() throws Exception {
-        final RestartableSet restartableSet = new RestartableSet(new StateMap.Builder());
+        final RestartableSet restartableSet = new RestartableSet(new ValueMap.Builder());
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableSet, 1));
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableSet, 2));
         testDismissStrategy(new RestartableConnectionSetLauncher(restartableSet, 1));
@@ -80,7 +80,7 @@ public class RestartableSetOldTest extends BaseRestartableTest {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
 
-        StateMap.Builder out = new StateMap.Builder();
+        ValueMap.Builder out = new ValueMap.Builder();
         final RestartableSet base = new RestartableSet(out);
         Subscription subscription = base.restartable(1, DeliveryMethod.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver);
         Subscription subscription2 = base.restartable(2, DeliveryMethod.LATEST, INFINITE_RESTARTABLE_FACTORY).subscribe(testObserver2);
@@ -107,7 +107,7 @@ public class RestartableSetOldTest extends BaseRestartableTest {
         TestObserver<Notification<Integer>> testObserver = new TestObserver<>();
         TestObserver<Notification<Integer>> testObserver2 = new TestObserver<>();
 
-        StateMap.Builder out = new StateMap.Builder();
+        ValueMap.Builder out = new ValueMap.Builder();
         final RestartableSet base = new RestartableSet(out);
         Subscription subscription = base.restartable(1, DeliveryMethod.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver);
         Subscription subscription2 = base.restartable(2, DeliveryMethod.LATEST, RESTARTABLE_FACTORY).subscribe(testObserver2);

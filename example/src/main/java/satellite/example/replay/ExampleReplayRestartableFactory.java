@@ -4,18 +4,18 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import satellite.RestartableFactory;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleReplayRestartableFactory implements RestartableFactory<StateMap, Integer> {
+public class ExampleReplayRestartableFactory implements RestartableFactory<ValueMap, Integer> {
 
-    public static StateMap argument(int from) {
-        return StateMap.sequence("from", from);
+    public static ValueMap argument(int from) {
+        return ValueMap.sequence("from", from);
     }
 
     @Override
-    public Observable<Integer> call(StateMap arg) {
+    public Observable<Integer> call(ValueMap arg) {
         return Observable.interval(0, 1, TimeUnit.SECONDS, mainThread())
             .map(tick -> (int)(long)(tick) + (int)arg.get("from"));
     }

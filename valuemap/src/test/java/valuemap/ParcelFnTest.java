@@ -1,4 +1,4 @@
-package statemap;
+package valuemap;
 
 import android.util.Pair;
 
@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import info.android15.statemap.BuildConfig;
+import info.android15.valuemap.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 

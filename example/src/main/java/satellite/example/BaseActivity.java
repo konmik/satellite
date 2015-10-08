@@ -13,7 +13,7 @@ import satellite.Restartable;
 import satellite.RestartableFactory;
 import satellite.RestartableFactoryNoArg;
 import satellite.RestartableSet;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 /**
  * This is an example activity that eliminates code duplication when dealing with
@@ -24,15 +24,15 @@ public class BaseActivity extends Activity implements Launcher {
     private RestartableSet restartables;
     private Subscription subscription;
     private boolean connect = true;
-    private StateMap.Builder out;
+    private ValueMap.Builder out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null)
-            this.restartables = new RestartableSet(out = new StateMap.Builder());
+            this.restartables = new RestartableSet(out = new ValueMap.Builder());
         else {
-            StateMap map = savedInstanceState.getParcelable("restartables");
+            ValueMap map = savedInstanceState.getParcelable("restartables");
             this.restartables = new RestartableSet(map, out = map.toBuilder());
         }
     }

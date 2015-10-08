@@ -4,7 +4,7 @@ import android.util.SparseArray;
 
 import rx.Notification;
 import rx.Observable;
-import statemap.StateMap;
+import valuemap.ValueMap;
 
 /**
  * RestartableSet represents a set of {@link Restartable}.
@@ -13,12 +13,12 @@ import statemap.StateMap;
 public class RestartableSet implements Launcher {
 
     private final SparseArray<Restartable> restartables = new SparseArray<>();
-    private final StateMap.Builder out;
+    private final ValueMap.Builder out;
 
     /**
      * Creates a new RestartableSet instance.
      */
-    public RestartableSet(StateMap.Builder out) {
+    public RestartableSet(ValueMap.Builder out) {
         this.out = out;
     }
 
@@ -27,10 +27,10 @@ public class RestartableSet implements Launcher {
      * from previous instance out.
      * All instances of {@link Restartable} will be restored as well.
      */
-    public RestartableSet(StateMap in, StateMap.Builder out) {
+    public RestartableSet(ValueMap in, ValueMap.Builder out) {
         this.out = out;
         for (String sId : in.keys())
-            restartables.put(Integer.valueOf(sId), new Restartable((StateMap)in.get(sId), out.child(sId)));
+            restartables.put(Integer.valueOf(sId), new Restartable((ValueMap)in.get(sId), out.child(sId)));
     }
 
     /**
