@@ -37,15 +37,15 @@ public class RestartableSet implements Launcher {
      * Provides a connection to an observable through a given observable factory and a given intermediate subject factory,
      * see {@link Restartable#channel(SubjectFactory, ObservableFactoryNoArg)}.
      *
-     * @param id                 a {@link Restartable} id.
-     * @param subjectFactory     a subject factory which creates a subject to
-     *                           transmit observable emissions to views.
+     * @param id                     a {@link Restartable} id.
+     * @param subjectFactory         a subject factory which creates a subject to
+     *                               transmit observable emissions to views.
      * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
-     * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
+     * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return this.<T>restartable(id).channel(type, observableFactoryNoArg);
+    public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return this.<T>channel(id).channel(type, observableFactoryNoArg);
     }
 
     /**
@@ -59,14 +59,14 @@ public class RestartableSet implements Launcher {
      * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(int, Object)} variants should be used.
      *
-     * @param subjectFactory     a subject factory which creates a subject to
-     *                           transmit observable emissions to views.
+     * @param subjectFactory    a subject factory which creates a subject to
+     *                          transmit observable emissions to views.
      * @param observableFactory an observable factory which will be used to create an observable per launch.
-     * @return an observable which emits {@link rx.Notification} of the observable emissions.
+     * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
-        return this.<A, T>restartable(id).channel(type, observableFactory);
+    public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return this.<A, T>channel(id).channel(type, observableFactory);
     }
 
     /**
@@ -77,7 +77,7 @@ public class RestartableSet implements Launcher {
      */
     @Override
     public void launch(int id) {
-        this.restartable(id).launch();
+        this.channel(id).launch();
     }
 
     /**
@@ -96,7 +96,7 @@ public class RestartableSet implements Launcher {
      */
     @Override
     public void launch(int id, Object arg) {
-        this.restartable(id).launch(arg);
+        this.channel(id).launch(arg);
     }
 
     /**
@@ -120,7 +120,7 @@ public class RestartableSet implements Launcher {
             dismiss(restartables.keyAt(i));
     }
 
-    private Restartable restartable(int id) {
+    private Restartable channel(int id) {
         if (restartables.get(id) == null)
             restartables.put(id, new Restartable(out.child(Integer.toString(id))));
         return restartables.get(id);

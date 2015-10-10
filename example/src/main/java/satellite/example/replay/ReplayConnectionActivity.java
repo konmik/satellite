@@ -29,7 +29,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayObservableFactory())
+            channel(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("REPLAY: onNext " + value);

@@ -176,7 +176,7 @@ public class RestartableSetTest {
 
         final RuntimeException exception = new RuntimeException();
         set
-            .restartable(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
+            .channel(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
                 @Override
                 public Observable<Long> call(String a) {
                     return Observable.<Long>error(exception).delay(1, TimeUnit.SECONDS, scheduler);
@@ -257,7 +257,7 @@ public class RestartableSetTest {
         @Override
         public Subscription invoke(DeliveryMethod method, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler, RestartableSet set) {
             return set
-                .restartable(RESTARTABLE_ID, method, new ObservableFactoryNoArg<Long>() {
+                .channel(RESTARTABLE_ID, method, new ObservableFactoryNoArg<Long>() {
                     @Override
                     public Observable<Long> call() {
                         return interval(1, 1, TimeUnit.SECONDS, scheduler);
@@ -276,7 +276,7 @@ public class RestartableSetTest {
         @Override
         public Subscription invoke(DeliveryMethod method, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler, RestartableSet set) {
             return set
-                .restartable(RESTARTABLE_ID, method, new ObservableFactoryNoArg<Long>() {
+                .channel(RESTARTABLE_ID, method, new ObservableFactoryNoArg<Long>() {
                     @Override
                     public Observable<Long> call() {
                         return Observable.just(0L).delay(1, TimeUnit.SECONDS, scheduler);
@@ -295,7 +295,7 @@ public class RestartableSetTest {
         @Override
         public Subscription invoke(DeliveryMethod method, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler, RestartableSet set) {
             return set
-                .restartable(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
+                .channel(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
                     @Override
                     public Observable<Long> call(final String a) {
                         return interval(1, 1, TimeUnit.SECONDS, scheduler).map(new Func1<Long, Long>() {
@@ -319,7 +319,7 @@ public class RestartableSetTest {
         @Override
         public Subscription invoke(DeliveryMethod method, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler, RestartableSet set) {
             return set
-                .restartable(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
+                .channel(RESTARTABLE_ID, method, new ObservableFactory<String, Long>() {
                     @Override
                     public Observable<Long> call(String a) {
                         return Observable.just(Long.parseLong(a)).delay(1, TimeUnit.SECONDS, scheduler);

@@ -70,22 +70,22 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
-    public <T> Observable<Notification<T>> restartable(int id, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return restartables.restartable(id, DeliveryMethod.LATEST, observableFactoryNoArg);
+    public <T> Observable<Notification<T>> channel(int id, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.channel(id, DeliveryMethod.LATEST, observableFactoryNoArg);
     }
 
-    public <A, T> Observable<Notification<T>> restartable(int id, ObservableFactory<A, T> observableFactory) {
-        return restartables.restartable(id, DeliveryMethod.LATEST, observableFactory);
-    }
-
-    @Override
-    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return restartables.restartable(id, type, observableFactoryNoArg);
+    public <A, T> Observable<Notification<T>> channel(int id, ObservableFactory<A, T> observableFactory) {
+        return restartables.channel(id, DeliveryMethod.LATEST, observableFactory);
     }
 
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
-        return restartables.restartable(id, type, observableFactory);
+    public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.channel(id, type, observableFactoryNoArg);
+    }
+
+    @Override
+    public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return restartables.channel(id, type, observableFactory);
     }
 
     @Override

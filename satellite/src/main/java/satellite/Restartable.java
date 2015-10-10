@@ -56,9 +56,9 @@ public class Restartable {
     /**
      * Provides a connection to an observable through a given observable factory and a given intermediate subject factory.
      *
-     * @param type               a type of the channel.
+     * @param type                   a type of the channel.
      * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
-     * @return an observable which emits {@link rx.Notification} of the restartable emissions.
+     * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     public <T> Observable<Notification<T>> channel(
         final DeliveryMethod type,
@@ -82,10 +82,10 @@ public class Restartable {
      * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(Object)} variants should be used.
      *
-     * @param subjectFactory     a subject factory which creates a subject to
-     *                           transmit observable emissions to views.
+     * @param subjectFactory    a subject factory which creates a subject to
+     *                          transmit observable emissions to views.
      * @param observableFactory an observable factory which will be used to create an observable per launch.
-     * @return an observable which emits {@link rx.Notification} of the restartable emissions.
+     * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     public <A, T> Observable<Notification<T>> channel(
         final DeliveryMethod type,

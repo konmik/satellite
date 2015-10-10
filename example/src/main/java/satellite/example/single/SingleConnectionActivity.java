@@ -29,7 +29,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(SINGLE_RESTARTABLE_ID, DeliveryMethod.SINGLE, new ExampleSingleObservableFactory())
+            channel(SINGLE_RESTARTABLE_ID, DeliveryMethod.SINGLE, new ExampleSingleObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

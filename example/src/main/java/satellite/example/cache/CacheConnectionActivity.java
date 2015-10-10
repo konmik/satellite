@@ -29,7 +29,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheObservableFactory())
+            channel(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("CACHE: onNext " + value);
