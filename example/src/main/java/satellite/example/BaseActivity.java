@@ -30,10 +30,10 @@ public class BaseActivity extends Activity implements Launcher {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null)
-            this.restartables = new RestartableSet(out = new ValueMap.Builder());
+            restartables = new RestartableSet(out = new ValueMap.Builder());
         else {
             ValueMap map = savedInstanceState.getParcelable("restartables");
-            this.restartables = new RestartableSet(map, out = map.toBuilder());
+            restartables = new RestartableSet(map, out = map.toBuilder());
         }
     }
 

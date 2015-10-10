@@ -46,14 +46,20 @@ public enum ReconnectableMap {
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
             public void call(final Subscriber<? super Notification<T>> subscriber) {
-                if (subscriptions.containsKey(key))
-                    subscriber.add(subjects.get(key).subscribe(subscriber));
+                if (subjects.containsKey(key))
+                    subjects.get(key).subscribe(subscriber);
                 else {
-                    Subject<Notification<T>, Notification<T>> subject = type.createSubject();
+                    final Subject<Notification<T>, Notification<T>> subject = type.createSubject();
+                    subjects.put(key, subject);
                     subject.subscribe(subscriber);
 
-                    Subscriber<Notification<T>> subscriber1 = Subscribers.from(subject);
-                    subscriptions.put(key, subscriber1);
+                    final Subscriber<Notification<T>> subjectSubscriber = Subscribers.create(new Action1<Notification<T>>() {
+                        @Override
+                        public void call(Notification<T> notification) {
+                            subject.onNext(notification);
+                        }
+                    });
+                    subscriptions.put(key, subjectSubscriber);
 
                     observableFactory.call()
                         .materialize()
@@ -61,7 +67,7 @@ public enum ReconnectableMap {
                             @Override
                             public void call(Notification<T> notification) {
                                 if (notification.isOnCompleted() || notification.isOnError())
-                                    dismiss(key);
+                                    removeSubscription(key);
                             }
                         })
                         .filter(new Func1<Notification<T>, Boolean>() {
@@ -70,9 +76,7 @@ public enum ReconnectableMap {
                                 return !notification.isOnCompleted();
                             }
                         })
-                        .subscribe(subscriber1);
-
-                    subjects.put(key, subject);
+                        .subscribe(subjectSubscriber);
                 }
             }
         });
@@ -84,11 +88,8 @@ public enum ReconnectableMap {
      * @param key a unique key of the connection.
      */
     public void dismiss(String key) {
-        if (subscriptions.containsKey(key)) {
-            subscriptions.get(key).unsubscribe();
-            subscriptions.remove(key);
-            subjects.remove(key);
-        }
+        removeSubscription(key);
+        subjects.remove(key);
     }
 
     /**
@@ -96,5 +97,12 @@ public enum ReconnectableMap {
      */
     public Set<String> keys() {
         return Collections.unmodifiableSet(subscriptions.keySet());
+    }
+
+    private void removeSubscription(String key) {
+        if (subscriptions.containsKey(key)) {
+            subscriptions.get(key).unsubscribe();
+            subscriptions.remove(key);
+        }
     }
 }

@@ -32,30 +32,36 @@ public class RestartableSetTest {
     TestSubscriber<Notification<Long>> subscriber2 = new TestSubscriber<>();
     TestScheduler scheduler = new TestScheduler();
 
+    private final int restartableI, methodI;
     private final ISubscribeRestartable subscribeRestartable;
     private final boolean noArg;
     private final DeliveryMethod method;
+    private final int emit;
 
-    public RestartableSetTest(int i) {
+    public RestartableSetTest(int restartableI, int methodI) {
+        this.restartableI = restartableI;
+        this.methodI = methodI;
+
         this.subscribeRestartable =
-            i % 10 == 0 ? new SubscribeRestartable_NoArg_Infinitive() :
-                i % 10 == 1 ? new SubscribeRestartable_NoArg() :
-                    i % 10 == 2 ? new SubscribeRestartable_Infinitive() :
+            restartableI == 0 ? new SubscribeRestartable_NoArg_Infinitive() :
+                restartableI == 1 ? new SubscribeRestartable_NoArg() :
+                    restartableI == 2 ? new SubscribeRestartable_Infinitive() :
                         new SubscribeRestartable();
-        this.noArg = i % 10 <= 1;
+        this.noArg = restartableI < 2;
         this.method =
-            i / 10 == 0 ? DeliveryMethod.SINGLE :
-                i / 10 == 1 ? DeliveryMethod.LATEST :
-                    i / 10 == 2 ? DeliveryMethod.REPLAY :
+            methodI == 0 ? DeliveryMethod.SINGLE :
+                methodI == 1 ? DeliveryMethod.LATEST :
+                    methodI == 2 ? DeliveryMethod.REPLAY :
                         DeliveryMethod.PUBLISH;
+        this.emit = this.method == DeliveryMethod.SINGLE ? 1 : subscribeRestartable.single() ? 1 : 5;
     }
 
-    @ParameterizedRobolectricTestRunner.Parameters(name = "SubscribeRestartable = {0}")
-    public static Collection<Object[]> data() {
+    @ParameterizedRobolectricTestRunner.Parameters(name = "{0} {1}")
+    public static Collection<Object[]> parameters() {
         ArrayList<Object[]> variants = new ArrayList<>();
         for (int restartable = 0; restartable < 4; restartable++)
             for (int method = 0; method < 4; method++)
-                variants.add(new Object[]{restartable + method * 10});
+                variants.add(new Object[]{restartable, method});
         return variants;
     }
 
@@ -68,9 +74,9 @@ public class RestartableSetTest {
         subscriber1.assertNoValues();
         assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
 
-        advanceOneEmission();
-        verifyReceived(subscriber1, 0L);
-        verifyNoLeakedObservables(1);
+        advanceEmission();
+        verifyReceived(subscriber1);
+        verifyNoLeakedObservables();
     }
 
     @Test
@@ -81,9 +87,9 @@ public class RestartableSetTest {
 
         set.dismiss();
 
-        advanceOneEmission();
+        advanceEmission();
         subscriber1.assertNoValues();
-        verifyNoLeakedObservables(0);
+        verifyNoLeakedObservables();
     }
 
     @Test
@@ -98,9 +104,46 @@ public class RestartableSetTest {
         RestartableSet set = new RestartableSet(builder.build(), builder);
         subscribeRestartable(method, subscriber2, scheduler, set);
 
-        advanceOneEmission();
-        verifyReceived(subscriber2, 0L);
-        verifyNoLeakedObservables(1);
+        advanceEmission();
+        verifyReceived(subscriber2);
+        verifyNoLeakedObservables();
+    }
+
+    @Test
+    public void test_emit_then_reconnect() throws Exception {
+        ValueMap.Builder builder = ValueMap.builder();
+        RestartableSet set1 = new RestartableSet(builder);
+
+        Subscription subscription = subscribeRestartable(method, subscriber1, scheduler, set1);
+        launch(set1);
+        subscription.unsubscribe();
+
+        advanceEmission();
+
+        RestartableSet set = new RestartableSet(builder.build(), builder);
+        subscribeRestartable(method, subscriber2, scheduler, set);
+
+        if (method == DeliveryMethod.SINGLE) {
+            if (subscribeRestartable.single())
+                subscriber2.assertReceivedOnNext(valuesToNotifications(0L));
+            else
+                subscriber2.assertReceivedOnNext(valuesToNotifications(0L));
+        }
+        else if (method == DeliveryMethod.LATEST) {
+            if (subscribeRestartable.single())
+                subscriber2.assertReceivedOnNext(valuesToNotifications(0L));
+            else
+                subscriber2.assertReceivedOnNext(valuesToNotifications(4L));
+        }
+        else if (method == DeliveryMethod.REPLAY) {
+            if (subscribeRestartable.single())
+                subscriber2.assertReceivedOnNext(valuesToNotifications(0L));
+            else
+                subscriber2.assertReceivedOnNext(valuesToNotifications(0L, 1L, 2L, 3L, 4L));
+        }
+        else if (method == DeliveryMethod.PUBLISH) {
+            subscriber2.assertNoValues();
+        }
     }
 
     @Test
@@ -118,9 +161,9 @@ public class RestartableSetTest {
         RestartableSet set = new RestartableSet(state, state.toBuilder());
         subscribeRestartable(method, subscriber2, scheduler, set);
 
-        advanceOneEmission();
-        verifyReceived(subscriber2, 0L);
-        verifyNoLeakedObservables(1);
+        advanceEmission();
+        verifyReceived(subscriber2);
+        verifyNoLeakedObservables();
     }
 
     private void launch(RestartableSet set) {
@@ -135,35 +178,36 @@ public class RestartableSetTest {
             ReconnectableMap.INSTANCE.dismiss(key);
     }
 
-    private void verifyReceived(TestSubscriber<Notification<Long>> subscriber2, Long... values) {
-        subscriber2.assertReceivedOnNext(valuesToNotifications(values));
+    private void verifyReceived(TestSubscriber<Notification<Long>> subscriber2) {
+        subscriber2.assertReceivedOnNext(emittedValue());
     }
 
-    private void verifyNoLeakedObservables(int receivedAmount) {
-        if (subscribeRestartable.capacity() <= receivedAmount) {
+    private void verifyNoLeakedObservables() {
+        if (subscribeRestartable.single()) {
             assertEquals(0, ReconnectableMap.INSTANCE.keys().size());
         }
     }
 
-    private <T> ArrayList<Notification<T>> valuesToNotifications(T... values) {
-        ArrayList<Notification<T>> list = new ArrayList<>();
-        for (T v : values)
-            list.add(Notification.createOnNext(v));
+    private ArrayList<Notification<Long>> emittedValue() {
+        ArrayList<Notification<Long>> list = new ArrayList<>();
+        for (long i = 0; i < emit; i++)
+            list.add(Notification.createOnNext(i));
         return list;
     }
 
-    private void advanceOneEmission() {
-        scheduler.advanceTimeBy(1000, TimeUnit.MILLISECONDS);
+    private <T> ArrayList<Notification<T>> valuesToNotifications(T... values) {
+        ArrayList<Notification<T>> list = new ArrayList<>();
+        for (T t : values)
+            list.add(Notification.createOnNext(t));
+        return list;
+    }
+
+    private void advanceEmission() {
+        scheduler.advanceTimeBy(emit * 1000, TimeUnit.MILLISECONDS);
     }
 
     private RestartableSet restartableSet(DeliveryMethod method, ValueMap.Builder builder, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler) {
         RestartableSet set = new RestartableSet(builder);
-        subscribeRestartable(method, testSubscriber, scheduler, set);
-        return set;
-    }
-
-    private RestartableSet restartableSet(DeliveryMethod method, ValueMap state, ValueMap.Builder builder, TestSubscriber<Notification<Long>> testSubscriber, final TestScheduler scheduler) {
-        RestartableSet set = new RestartableSet(state, builder);
         subscribeRestartable(method, testSubscriber, scheduler, set);
         return set;
     }
@@ -179,7 +223,7 @@ public class RestartableSetTest {
 
     private interface ISubscribeRestartable {
         Subscription invoke(DeliveryMethod method, TestSubscriber<Notification<Long>> testSubscriber, TestScheduler scheduler, RestartableSet set);
-        int capacity();
+        boolean single();
     }
 
     private static class SubscribeRestartable_NoArg_Infinitive implements ISubscribeRestartable {
@@ -196,8 +240,8 @@ public class RestartableSetTest {
         }
 
         @Override
-        public int capacity() {
-            return Integer.MAX_VALUE;
+        public boolean single() {
+            return false;
         }
     }
 
@@ -215,8 +259,8 @@ public class RestartableSetTest {
         }
 
         @Override
-        public int capacity() {
-            return 1;
+        public boolean single() {
+            return true;
         }
     }
 
@@ -239,8 +283,8 @@ public class RestartableSetTest {
         }
 
         @Override
-        public int capacity() {
-            return Integer.MAX_VALUE;
+        public boolean single() {
+            return false;
         }
     }
 
@@ -258,8 +302,8 @@ public class RestartableSetTest {
         }
 
         @Override
-        public int capacity() {
-            return 1;
+        public boolean single() {
+            return true;
         }
     }
 }
