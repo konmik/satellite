@@ -100,8 +100,9 @@ public enum ReconnectableMap {
     }
 
     private void removeSubscription(String key) {
-        if (subscriptions.containsKey(key)) {
-            subscriptions.get(key).unsubscribe();
+        Subscription subscription = subscriptions.get(key);
+        if (subscription != null) {
+            subscription.unsubscribe();
             subscriptions.remove(key);
         }
     }
