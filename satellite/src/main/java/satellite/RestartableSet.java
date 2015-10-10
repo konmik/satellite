@@ -117,7 +117,7 @@ public class RestartableSet implements Launcher {
      */
     public void dismiss() {
         for (int i = 0; i < restartables.size(); i++)
-            restartables.valueAt(i).dismiss();
+            dismiss(restartables.keyAt(i));
     }
 
     private Restartable restartable(int id) {

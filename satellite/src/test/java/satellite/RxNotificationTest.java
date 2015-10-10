@@ -56,4 +56,9 @@ public class RxNotificationTest {
         Action1<Notification<Integer>> split = RxNotification.split(null, null);
         split.call(Notification.<Integer>createOnError(new Exception()));
     }
+
+    @Test
+    public void coverage() {
+        new RxNotification();
+    }
 }

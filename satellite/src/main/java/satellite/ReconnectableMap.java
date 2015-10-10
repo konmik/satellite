@@ -11,6 +11,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
+import rx.observers.Subscribers;
 import rx.subjects.Subject;
 
 /**
@@ -44,13 +45,17 @@ public enum ReconnectableMap {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
-            public void call(Subscriber<? super Notification<T>> subscriber) {
+            public void call(final Subscriber<? super Notification<T>> subscriber) {
                 if (subscriptions.containsKey(key))
                     subscriber.add(subjects.get(key).subscribe(subscriber));
                 else {
                     Subject<Notification<T>, Notification<T>> subject = type.createSubject();
-                    subscriber.add(subject.subscribe(subscriber));
-                    subscriptions.put(key, observableFactory.call()
+                    subject.subscribe(subscriber);
+
+                    Subscriber<Notification<T>> subscriber1 = Subscribers.from(subject);
+                    subscriptions.put(key, subscriber1);
+
+                    observableFactory.call()
                         .materialize()
                         .doOnNext(new Action1<Notification<T>>() {
                             @Override
@@ -65,7 +70,8 @@ public enum ReconnectableMap {
                                 return !notification.isOnCompleted();
                             }
                         })
-                        .subscribe(subject));
+                        .subscribe(subscriber1);
+
                     subjects.put(key, subject);
                 }
             }
