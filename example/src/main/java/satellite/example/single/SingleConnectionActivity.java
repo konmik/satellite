@@ -21,7 +21,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Single result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> launch(SINGLE_RESTARTABLE_ID, ExampleSingleRestartableFactory.argument(10)));
+        findViewById(R.id.launch).setOnClickListener(v -> launch(SINGLE_RESTARTABLE_ID, ExampleSingleObservableFactory.argument(10)));
         findViewById(R.id.drop).setOnClickListener(v -> dismiss(SINGLE_RESTARTABLE_ID));
     }
 
@@ -29,7 +29,7 @@ public class SingleConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(SINGLE_RESTARTABLE_ID, DeliveryMethod.SINGLE, new ExampleSingleRestartableFactory())
+            restartable(SINGLE_RESTARTABLE_ID, DeliveryMethod.SINGLE, new ExampleSingleObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("SINGLE: onNext " + value);

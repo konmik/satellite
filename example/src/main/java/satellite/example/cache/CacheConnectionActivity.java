@@ -21,7 +21,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> launch(CONNECTION_ID, ExampleCacheRestartableFactory.argument(10)));
+        findViewById(R.id.launch).setOnClickListener(v -> launch(CONNECTION_ID, ExampleCacheObservableFactory.argument(10)));
         findViewById(R.id.drop).setOnClickListener(v -> dismiss(CONNECTION_ID));
     }
 
@@ -29,7 +29,7 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheRestartableFactory())
+            restartable(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("CACHE: onNext " + value);

@@ -9,9 +9,9 @@ import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 import satellite.DeliveryMethod;
 import satellite.Launcher;
+import satellite.ObservableFactory;
+import satellite.ObservableFactoryNoArg;
 import satellite.Restartable;
-import satellite.RestartableFactory;
-import satellite.RestartableFactoryNoArg;
 import satellite.RestartableSet;
 import valuemap.ValueMap;
 
@@ -70,22 +70,22 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
-    public <T> Observable<Notification<T>> restartable(int id, RestartableFactoryNoArg<T> restartableFactory) {
-        return restartables.restartable(id, DeliveryMethod.LATEST, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.restartable(id, DeliveryMethod.LATEST, observableFactoryNoArg);
     }
 
-    public <A, T> Observable<Notification<T>> restartable(int id, RestartableFactory<A, T> restartableFactory) {
-        return restartables.restartable(id, DeliveryMethod.LATEST, restartableFactory);
-    }
-
-    @Override
-    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactoryNoArg<T> restartableFactory) {
-        return restartables.restartable(id, type, restartableFactory);
+    public <A, T> Observable<Notification<T>> restartable(int id, ObservableFactory<A, T> observableFactory) {
+        return restartables.restartable(id, DeliveryMethod.LATEST, observableFactory);
     }
 
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactory<A, T> restartableFactory) {
-        return restartables.restartable(id, type, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.restartable(id, type, observableFactoryNoArg);
+    }
+
+    @Override
+    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return restartables.restartable(id, type, observableFactory);
     }
 
     @Override

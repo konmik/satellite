@@ -9,11 +9,11 @@ import rx.subjects.PublishSubject;
 import valuemap.ValueMap;
 
 /**
- * Restartable controls only one restartable. A restartable is an
+ * {@link Restartable} controls only one restartable. A restartable is an
  * {@link Observable} which should be restarted after a process (not application) restart.
  *
- * Restartable saves restartable arguments and restarts the observable in
- * case of a process restart.
+ * {@link Restartable} saves observable`s arguments and restarts the observable in
+ * the case of a process restart.
  */
 public class Restartable {
 
@@ -28,6 +28,8 @@ public class Restartable {
 
     /**
      * Creates a new Restartable.
+     *
+     * @param out an output that will be used to reconstruct the restartable later.
      */
     public Restartable(ValueMap.Builder out) {
         this.out = out;
@@ -39,7 +41,10 @@ public class Restartable {
 
     /**
      * Creates a new Restartable form a given state that has been received
-     * from previous instance out.
+     * from the previous instance out argument.
+     *
+     * @param in  a value that has been constructed using the out argument of the previous Restartable`s instance.
+     * @param out an output that will be used to reconstruct the restartable later.
      */
     public Restartable(ValueMap in, ValueMap.Builder out) {
         this.out = out;
@@ -51,19 +56,18 @@ public class Restartable {
     /**
      * Provides a connection to an observable through a given observable factory and a given intermediate subject factory.
      *
-     * @param subjectFactory     a subject factory which creates a subject to
-     *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @param type               a type of the channel.
+     * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <T> Observable<Notification<T>> channel(
         final DeliveryMethod type,
-        final RestartableFactoryNoArg<T> restartableFactory) {
+        final ObservableFactoryNoArg<T> observableFactoryNoArg) {
 
         return channel(type, new Func1<Object, Observable<Notification<T>>>() {
             @Override
             public Observable<Notification<T>> call(Object ignored) {
-                return ReconnectableMap.INSTANCE.channel(key, type, restartableFactory);
+                return ReconnectableMap.INSTANCE.channel(key, type, observableFactoryNoArg);
             }
         });
     }
@@ -71,21 +75,21 @@ public class Restartable {
     /**
      * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory.
      *
-     * This {@link #channel(SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
+     * This {@link #channel(SubjectFactory, ObservableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, RestartableFactory)} and
+     * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(Object)} variants should be used.
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @param observableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the restartable emissions.
      */
     public <A, T> Observable<Notification<T>> channel(
         final DeliveryMethod type,
-        final RestartableFactory<A, T> restartableFactory) {
+        final ObservableFactory<A, T> observableFactory) {
 
         return channel(type, new Func1<Object, Observable<Notification<T>>>() {
             @Override
@@ -93,7 +97,7 @@ public class Restartable {
                 return ReconnectableMap.INSTANCE.channel(key, type, new Func0<Observable<T>>() {
                     @Override
                     public Observable<T> call() {
-                        return restartableFactory.call((A)arg);
+                        return observableFactory.call((A)arg);
                     }
                 });
             }
@@ -113,7 +117,7 @@ public class Restartable {
      * Dismisses the previous observable instance if it is not completed yet.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, RestartableFactory)} and
+     * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(Object)} variants should be used.
      *
      * @param arg an argument for the new observable.

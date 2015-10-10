@@ -12,10 +12,6 @@ android {
     }
 }
 
-configurations {
-    compileJavadoc
-}
-
 dependencies {
     compile project(':valuemap')
     compile "com.android.support:support-annotations:23.0.0"

@@ -14,26 +14,27 @@ import static valuemap.ParcelFn.marshall;
 import static valuemap.ParcelFn.unmarshall;
 
 /**
- * The typical state in Android applications is the state that is being kept inside of
- * Activity fields, prompting a programmer to reuse the state and get all the side-effects
- * of this act.
+ * {@link ValueMap} is like {@link android.os.Bundle} but it is immutable.
  *
- * {@link ValueMap} represents a "map" storage that can be used to remove more state off the view logic.
- * It is immutable and Parcelable, thus it can be safely used without side effects.
+ * {@link ValueMap} allows to keep the instance state out of activity code, isolating it by strictly allowing
+ * to make write ({@link ValueMap.Builder}) or read ({@link ValueMap}) operations only.
  *
  * If you need to save Activity instance state, it is a good idea to create a
  * {@link ValueMap.Builder} and use it to push data out for the next activity instance.
  * {@link ValueMap.Builder} is write-only, so no troubles with the state mutability can be created
  * this way.
  *
- * {@link ValueMap} allows to keep the instance state out of activity code, isolating it by strictly allowing
- * to make write ({@link ValueMap.Builder}) or read ({@link ValueMap}) operations only.
- *
  * {@link ValueMap} automatically marshalls/unmarshalls all data to avoid third-party modifications and to keep
- * immutable data completely immutable. Every time set/get is called a corresponding
+ * immutable data completely immutable.
+ *
+ * Every time set/get is called a corresponding
  * {@link Parcel#marshall()}/{@link Parcel#unmarshall(byte[], int, int)} is called,
  * providing you with a fresh instance of the stored value.
  * Thus, it is not recommended to use {@link ValueMap} on performance critical application parts.
+ *
+ * Basic immutable Java types, BigInteger, BigDecimal and ValueMap are not automatically
+ * marshalled/unmarshalled for performance reasons,
+ * so you can use them without performance penalty.
  */
 public class ValueMap implements Parcelable {
 
@@ -96,7 +97,7 @@ public class ValueMap implements Parcelable {
     }
 
     /**
-     * Returns the output map which contains the current {@link ValueMap} values.
+     * Returns a {@link Builder} which contains the current {@link ValueMap} values.
      */
     public Builder toBuilder() {
         return new Builder(map);
@@ -110,11 +111,11 @@ public class ValueMap implements Parcelable {
     public static class Builder {
 
         private final Map<String, Object> map;
-        private final Map<String, Builder> sub;
+        private final Map<String, Builder> children;
 
         public Builder() {
             this.map = new HashMap<>();
-            this.sub = new HashMap<>();
+            this.children = new HashMap<>();
         }
 
         /**
@@ -138,7 +139,7 @@ public class ValueMap implements Parcelable {
          */
         public Builder remove(String key) {
             map.remove(key);
-            sub.remove(key);
+            children.remove(key);
             return this;
         }
 
@@ -150,17 +151,17 @@ public class ValueMap implements Parcelable {
          * @return a new builder instance or an existing one.
          */
         public Builder child(String key) {
-            if (sub.containsKey(key))
-                return sub.get(key);
+            if (children.containsKey(key))
+                return children.get(key);
 
             else if (map.containsKey(key)) {
                 Builder builder = ParcelFn.<ValueMap>unmarshall((byte[])map.remove(key)).toBuilder();
-                sub.put(key, builder);
+                children.put(key, builder);
                 return builder;
             }
 
             Builder builder = new Builder();
-            sub.put(key, builder);
+            children.put(key, builder);
             return builder;
         }
 
@@ -168,15 +169,15 @@ public class ValueMap implements Parcelable {
          * Builds the {@link ValueMap} instance using collected key-value pairs.
          */
         public ValueMap build() {
-            Map<String, Object> m = new HashMap<>(map);
-            for (Map.Entry<String, Builder> entry : sub.entrySet())
-                m.put(entry.getKey(), marshall(entry.getValue().build()));
-            return new ValueMap(m);
+            Map<String, Object> map1 = new HashMap<>(this.map);
+            for (Map.Entry<String, Builder> entry : children.entrySet())
+                map1.put(entry.getKey(), marshall(entry.getValue().build()));
+            return new ValueMap(map1);
         }
 
         private Builder(Map<String, Object> map) {
             this.map = new HashMap<>(map);
-            this.sub = new HashMap<>();
+            this.children = new HashMap<>();
         }
     }
 

@@ -35,38 +35,38 @@ public class RestartableSet implements Launcher {
 
     /**
      * Provides a connection to an observable through a given observable factory and a given intermediate subject factory,
-     * see {@link Restartable#channel(SubjectFactory, RestartableFactoryNoArg)}.
+     * see {@link Restartable#channel(SubjectFactory, ObservableFactoryNoArg)}.
      *
      * @param id                 a {@link Restartable} id.
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the observable`s emissions.
      */
     @Override
-    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactoryNoArg<T> restartableFactory) {
-        return this.<T>restartable(id).channel(type, restartableFactory);
+    public <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return this.<T>restartable(id).channel(type, observableFactoryNoArg);
     }
 
     /**
      * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory,
-     * see {@link Restartable#channel(SubjectFactory, RestartableFactory)}.
+     * see {@link Restartable#channel(SubjectFactory, ObservableFactory)}.
      *
-     * This {@link #restartable(int, SubjectFactory, RestartableFactoryNoArg)} variant is intended for observable factories that
+     * This {@link #restartable(int, SubjectFactory, ObservableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, RestartableFactory)} and
+     * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(int, Object)} variants should be used.
      *
      * @param subjectFactory     a subject factory which creates a subject to
      *                           transmit observable emissions to views.
-     * @param restartableFactory an observable factory which will be used to create an observable per launch.
+     * @param observableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of the observable emissions.
      */
     @Override
-    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactory<A, T> restartableFactory) {
-        return this.<A, T>restartable(id).channel(type, restartableFactory);
+    public <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return this.<A, T>restartable(id).channel(type, observableFactory);
     }
 
     /**
@@ -87,7 +87,7 @@ public class RestartableSet implements Launcher {
      * See {@link Restartable#launch(Object)}.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, RestartableFactory)} and
+     * {@code #connection(SubjectFactory, ObservableFactory)} and
      * {@link #launch(int, Object)} variants should be used.
      *
      * @param arg an argument for the new observable.

@@ -10,8 +10,8 @@ import rx.Observable;
  * See {@link RestartableSet} for JavaDoc.
  */
 public interface Launcher {
-    <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactoryNoArg<T> restartableFactory);
-    <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, RestartableFactory<A, T> restartableFactory);
+    <T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg);
+    <A, T> Observable<Notification<T>> restartable(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory);
     void launch(int id);
     void launch(int id, Object arg);
     void dismiss(int id);

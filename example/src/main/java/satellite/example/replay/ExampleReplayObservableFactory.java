@@ -3,12 +3,12 @@ package satellite.example.replay;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import satellite.RestartableFactory;
+import satellite.ObservableFactory;
 import valuemap.ValueMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleReplayRestartableFactory implements RestartableFactory<ValueMap, Integer> {
+public class ExampleReplayObservableFactory implements ObservableFactory<ValueMap, Integer> {
 
     public static ValueMap argument(int from) {
         return ValueMap.map("from", from);

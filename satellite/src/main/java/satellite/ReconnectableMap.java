@@ -30,17 +30,17 @@ public enum ReconnectableMap {
 
     /**
      * This is the core method that connects an observable with {@link Restartable}.
-     * The observable gets created if it does not exist yet.
+     * If the channel does not exist yet it will be created.
      *
      * @param key               a unique key of the connection.
-     * @param subjectFactory    a factory for creating an intermediate subject that lies between the observable and {@link Restartable}.
+     * @param method            a delivery method which will be used for the channel.
      * @param observableFactory an observable factory.
      * @param <T>               a type of observable`s onNext values
      * @return an observable that emits materialized notifications
      */
     public <T> Observable<Notification<T>> channel(
         final String key,
-        final DeliveryMethod type,
+        final DeliveryMethod method,
         final Func0<Observable<T>> observableFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
@@ -49,7 +49,7 @@ public enum ReconnectableMap {
                 if (subjects.containsKey(key))
                     subjects.get(key).subscribe(subscriber);
                 else {
-                    final Subject<Notification<T>, Notification<T>> subject = type.createSubject();
+                    final Subject<Notification<T>, Notification<T>> subject = method.createSubject();
                     subjects.put(key, subject);
                     subject.subscribe(subscriber);
 
@@ -83,9 +83,9 @@ public enum ReconnectableMap {
     }
 
     /**
-     * Unsubscribes a given observable and removes its subject.
+     * Dismisses a channel.
      *
-     * @param key a unique key of the connection.
+     * @param key a unique key of the channel.
      */
     public void dismiss(String key) {
         removeSubscription(key);
@@ -93,7 +93,7 @@ public enum ReconnectableMap {
     }
 
     /**
-     * Return a current list of connection keys.
+     * Return the current list of channel keys.
      */
     public Set<String> keys() {
         return Collections.unmodifiableSet(subscriptions.keySet());

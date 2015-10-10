@@ -1,14 +1,14 @@
-package satellite.example.single;
+package satellite.example.cache;
 
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import satellite.RestartableFactory;
+import satellite.ObservableFactory;
 import valuemap.ValueMap;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-public class ExampleSingleRestartableFactory implements RestartableFactory<ValueMap, Integer> {
+public class ExampleCacheObservableFactory implements ObservableFactory<ValueMap, Integer> {
 
     public static ValueMap argument(int from) {
         return ValueMap.map("from", from);
@@ -16,8 +16,7 @@ public class ExampleSingleRestartableFactory implements RestartableFactory<Value
 
     @Override
     public Observable<Integer> call(ValueMap arg) {
-        return Observable.just((int)arg.get("from"))
-            .delay(1, TimeUnit.SECONDS, mainThread())
-            .first();
+        return Observable.interval(1, 1, TimeUnit.SECONDS, mainThread())
+            .map(time -> (int)(time + (int)arg.get("from")));
     }
 }

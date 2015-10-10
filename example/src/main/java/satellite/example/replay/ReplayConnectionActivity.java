@@ -21,7 +21,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> launch(REPLAY_RESTARTABLE_ID, ExampleReplayRestartableFactory.argument(10)));
+        findViewById(R.id.launch).setOnClickListener(v -> launch(REPLAY_RESTARTABLE_ID, ExampleReplayObservableFactory.argument(10)));
         findViewById(R.id.drop).setOnClickListener(v -> dismiss(REPLAY_RESTARTABLE_ID));
     }
 
@@ -29,7 +29,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
     protected Subscription onConnect() {
         return new CompositeSubscription(super.onConnect(),
 
-            restartable(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayRestartableFactory())
+            restartable(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("REPLAY: onNext " + value);
