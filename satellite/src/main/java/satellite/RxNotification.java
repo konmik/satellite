@@ -7,18 +7,18 @@ import rx.exceptions.OnErrorNotImplementedException;
 import rx.functions.Action1;
 
 /**
- * This collection of functions makes it easy to split {@link rx.Notification} into
+ * This collection of functions makes it easy to split {@link Notification} into
  * onNext and onError lambdas.
  */
 public class RxNotification {
 
     /**
-     * Returns an {@link Action1} that can be used to split {@link Notification} to appropriate
+     * Returns an {@link Action1} which can be used to split a {@link Notification} into appropriate
      * dematerialized onNext calls.
      *
      * @param onNext a method that will be called in case of onNext notification, or null.
-     * @param <T>    a type of onNext value.
-     * @return an {@link Action1} that can be used to split {@link Notification} to appropriate
+     * @param <T>    a type of onNext values.
+     * @return an {@link Action1} that can be used to split a {@link Notification} into appropriate
      * onNext calls.
      */
     public static <T> Action1<Notification<T>> split(
@@ -34,7 +34,7 @@ public class RxNotification {
      * @param onNext  a method that will be called in case of onNext notification, or null.
      * @param onError a method that will be called in case of onError notification, or null.
      * @param <T>     a type of onNext value.
-     * @return an {@link Action1} that can be used to split {@link Notification} to appropriate
+     * @return an {@link Action1} that can be used to split a {@link Notification} into appropriate
      * onNext, onError calls.
      */
     public static <T> Action1<Notification<T>> split(

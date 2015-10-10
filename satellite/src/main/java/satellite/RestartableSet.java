@@ -7,8 +7,8 @@ import rx.Observable;
 import valuemap.ValueMap;
 
 /**
- * RestartableSet represents a set of {@link Restartable}.
- * Each Restartable is indexed by its id.
+ * {@link RestartableSet} represents a set of {@link Restartable}.
+ * Each {@link Restartable} is indexed by an id.
  */
 public class RestartableSet implements Launcher {
 
@@ -17,15 +17,20 @@ public class RestartableSet implements Launcher {
 
     /**
      * Creates a new RestartableSet instance.
+     *
+     * @param out an output that will be used to reconstruct the RestartableSet later.
      */
     public RestartableSet(ValueMap.Builder out) {
         this.out = out;
     }
 
     /**
-     * Creates an RestartableSet instance form a given state that has been received
-     * from previous instance out.
+     * Creates a RestartableSet instance form a given state that has been received
+     * from the previous instance`s out argument.
      * All instances of {@link Restartable} will be restored as well.
+     *
+     * @param in  a value that has been constructed using the out argument of the previous RestartableSet`s instance.
+     * @param out an output that will be used to reconstruct the RestartableSet later.
      */
     public RestartableSet(ValueMap in, ValueMap.Builder out) {
         this.out = out;
@@ -34,75 +39,71 @@ public class RestartableSet implements Launcher {
     }
 
     /**
-     * Provides a connection to an observable through a given observable factory and a given intermediate subject factory,
-     * see {@link Restartable#channel(SubjectFactory, ObservableFactoryNoArg)}.
+     * Provides a channel to an observable that can be created with a given observable factory.
      *
      * @param id                     a {@link Restartable} id.
-     * @param subjectFactory         a subject factory which creates a subject to
-     *                               transmit observable emissions to views.
+     * @param type                   a type of the channel.
      * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     @Override
     public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return this.<T>channel(id).channel(type, observableFactoryNoArg);
+        return this.<T>restartable(id).channel(type, observableFactoryNoArg);
     }
 
     /**
-     * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory,
-     * see {@link Restartable#channel(SubjectFactory, ObservableFactory)}.
+     * Provides a channel to an observable that can be created with a given observable factory.
      *
-     * This {@link #restartable(int, SubjectFactory, ObservableFactoryNoArg)} variant is intended for observable factories that
+     * This {@link #channel(int, DeliveryMethod, ObservableFactoryNoArg)} variant is intended for observable factories that
      * require arguments.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, ObservableFactory)} and
+     * {@link #channel(int, DeliveryMethod, ObservableFactory)} and
      * {@link #launch(int, Object)} variants should be used.
      *
-     * @param subjectFactory    a subject factory which creates a subject to
-     *                          transmit observable emissions to views.
+     * @param id                a {@link Restartable} id.
+     * @param type              a type of the channel.
      * @param observableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
     @Override
     public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
-        return this.<A, T>channel(id).channel(type, observableFactory);
+        return this.<A, T>restartable(id).channel(type, observableFactory);
     }
 
     /**
-     * Launches a restartable without providing arguments.
+     * Launches an observable without providing arguments.
      * Dismisses the previous observable instance if it is not completed yet.
      *
-     * See {@link Restartable#launch()}.
+     * @param id a {@link Restartable} id.
      */
     @Override
     public void launch(int id) {
-        this.channel(id).launch();
+        restartable(id).launch();
     }
 
     /**
-     * Launches a restartable observable, providing an argument.
+     * Launches an observable providing an argument.
      * Dismisses the previous observable instance if it is not completed yet.
      *
-     * See {@link Restartable#launch(Object)}.
-     *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, ObservableFactory)} and
+     * {@link #channel(int, DeliveryMethod, ObservableFactory)} and
      * {@link #launch(int, Object)} variants should be used.
      *
+     * @param id  a {@link Restartable} id.
      * @param arg an argument for the new observable.
      *            It must satisfy {@link android.os.Parcel#writeValue(Object)}
-     *            method requirements.
+     *            method argument requirements.
      */
     @Override
     public void launch(int id, Object arg) {
-        this.channel(id).launch(arg);
+        restartable(id).launch(arg);
     }
 
     /**
-     * Unsubscribes and dismisses a restartable observable.
+     * Unsubscribes and dismisses the current observable of a given {@link Restartable}.
      *
-     * See {@link Restartable#dismiss()}.
+     * @param id a {@link Restartable} id.
      */
     @Override
     public void dismiss(int id) {
@@ -111,16 +112,14 @@ public class RestartableSet implements Launcher {
     }
 
     /**
-     * Unsubscribes and dismisses all controlled restartable observables.
-     *
-     * See {@link Restartable#dismiss()}.
+     * Unsubscribes and dismisses all controlled observables.
      */
     public void dismiss() {
         for (int i = 0; i < restartables.size(); i++)
             dismiss(restartables.keyAt(i));
     }
 
-    private Restartable channel(int id) {
+    private Restartable restartable(int id) {
         if (restartables.get(id) == null)
             restartables.put(id, new Restartable(out.child(Integer.toString(id))));
         return restartables.get(id);

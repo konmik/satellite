@@ -54,7 +54,7 @@ public class Restartable {
     }
 
     /**
-     * Provides a connection to an observable through a given observable factory and a given intermediate subject factory.
+     * Provides a channel to an observable that can be created with a given observable factory.
      *
      * @param type                   a type of the channel.
      * @param observableFactoryNoArg an observable factory which will be used to create an observable per launch.
@@ -73,17 +73,13 @@ public class Restartable {
     }
 
     /**
-     * Provides a connection to the given observable through a given observable factory and a given intermediate subject factory.
-     *
-     * This {@link #channel(SubjectFactory, ObservableFactoryNoArg)} variant is intended for observable factories that
-     * require arguments.
+     * Provides a channel to an observable that can be created with a given observable factory.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, ObservableFactory)} and
+     * {@link #channel(DeliveryMethod, ObservableFactory)} and
      * {@link #launch(Object)} variants should be used.
      *
-     * @param subjectFactory    a subject factory which creates a subject to
-     *                          transmit observable emissions to views.
+     * @param type              a type of the channel.
      * @param observableFactory an observable factory which will be used to create an observable per launch.
      * @return an observable which emits {@link rx.Notification} of onNext and onError observable emissions.
      */
@@ -105,7 +101,7 @@ public class Restartable {
     }
 
     /**
-     * Launches a restartable without providing arguments.
+     * Launches an observable without providing arguments.
      * Dismisses the previous observable instance if it is not completed yet.
      */
     public void launch() {
@@ -113,16 +109,16 @@ public class Restartable {
     }
 
     /**
-     * Launches a restartable observable, providing an argument.
+     * Launches an observable providing an argument.
      * Dismisses the previous observable instance if it is not completed yet.
      *
      * Note that to make use of arguments, both
-     * {@code #connection(SubjectFactory, ObservableFactory)} and
+     * {@link #channel(DeliveryMethod, ObservableFactory)} and
      * {@link #launch(Object)} variants should be used.
      *
      * @param arg an argument for the new observable.
      *            It must satisfy {@link android.os.Parcel#writeValue(Object)}
-     *            method requirements.
+     *            method argument requirements.
      */
     public void launch(Object arg) {
         ReconnectableMap.INSTANCE.dismiss(key);
@@ -132,7 +128,7 @@ public class Restartable {
     }
 
     /**
-     * Unsubscribes and dismisses the observable.
+     * Unsubscribes and dismisses the current observable.
      */
     public void dismiss() {
         ReconnectableMap.INSTANCE.dismiss(key);

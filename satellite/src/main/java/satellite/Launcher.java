@@ -7,7 +7,7 @@ import rx.Observable;
  * This is an abstraction for the easier implementation of classes that
  * are able to launch restartables.
  *
- * See {@link RestartableSet} for JavaDoc.
+ * See {@link RestartableSet} for docs.
  */
 public interface Launcher {
     <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg);

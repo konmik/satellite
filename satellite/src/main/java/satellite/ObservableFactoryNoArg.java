@@ -5,7 +5,7 @@ import rx.functions.Func0;
 
 /**
  * {@code ObservableFactoryNoArg} defines an interface which can be used to instantiate
- * restartable observables without arguments.
+ * observables without arguments.
  *
  * @param <T> a type of constructed observable`s onNext value.
  */
