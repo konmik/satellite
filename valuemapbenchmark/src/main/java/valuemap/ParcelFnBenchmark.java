@@ -2,12 +2,14 @@ package valuemap;
 
 import android.os.Bundle;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 
 public class ParcelFnBenchmark {
 
     private static final String STRING = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-    public static final ValueMap MAP = ValueMap.map("1", 1, "2", STRING, "3", new Bundle());
+    private static final ValueMap MAP_COMBINED = ValueMap.map("1", 1, "2", STRING, "3", new Bundle());
+    private static final ValueMap MAP_IMMUTABLE = ValueMap.map("1", 1, "2", STRING, "3", new BigInteger("12"));
     private static final Integer INTEGER = 1;
     private static final HashMap<String, Object> JAVA_MAP = new HashMap<String, Object>() {{
         put("1", INTEGER);
@@ -27,11 +29,18 @@ public class ParcelFnBenchmark {
         int i = 1;
     }
 
-    public static void testCombined() {
-        MAP.get("1");
-        MAP.get("2");
-        MAP.get("3");
-        MAP.get("4");
+    public static void testCombinedMap() {
+        MAP_COMBINED.get("1");
+        MAP_COMBINED.get("2");
+        MAP_COMBINED.get("3");
+        MAP_COMBINED.get("4");
+    }
+
+    public static void testImmutableMap() {
+        MAP_IMMUTABLE.get("1");
+        MAP_IMMUTABLE.get("2");
+        MAP_IMMUTABLE.get("3");
+        MAP_IMMUTABLE.get("4");
     }
 
     public static void testJavaMap() {

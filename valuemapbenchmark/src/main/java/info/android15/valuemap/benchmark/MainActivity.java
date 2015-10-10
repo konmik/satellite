@@ -48,15 +48,21 @@ public class MainActivity extends AppCompatActivity {
 
         long time3 = System.nanoTime() / 1000000;
         for (int i = 0; i < ITERATIONS; i++)
-            ParcelFnBenchmark.testCombined();
+            ParcelFnBenchmark.testCombinedMap();
 
-        printResult("combined", time3, result);
+        printResult("combinedMap", time3, result);
 
         long time4 = System.nanoTime() / 1000000;
         for (int i = 0; i < ITERATIONS; i++)
             ParcelFnBenchmark.testJavaMap();
 
         printResult("javaMap", time4, result);
+
+        long time5 = System.nanoTime() / 1000000;
+        for (int i = 0; i < ITERATIONS; i++)
+            ParcelFnBenchmark.testImmutableMap();
+
+        printResult("immutableMap", time5, result);
     }
 
     private void printResult(String prefix, long time1, TextView result) {
