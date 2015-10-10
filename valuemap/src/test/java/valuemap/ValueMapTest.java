@@ -11,6 +11,7 @@ import info.android15.valuemap.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -86,11 +87,27 @@ public class ValueMapTest {
         assertFalse(map1.equals(map4));
         assertTrue(ValueMap.empty().equals(ValueMap.empty()));
         assertTrue(ValueMap.map(null, null).equals(ValueMap.map(null, null)));
+        assertFalse(map1.equals(1));
+    }
+
+    @Test
+    public void testHashCode() throws Exception {
+        assertEquals(ValueMap.map("1", 1, "2", 2).hashCode(), ValueMap.map("1", 1, "2", 2).hashCode());
+        assertNotEquals(ValueMap.map().hashCode(), ValueMap.map("1", 1, "2", 2).hashCode());
     }
 
     @Test
     public void testBuilder() throws Exception {
         assertNotNull(ValueMap.builder());
+    }
+
+    @Test
+    public void testParcelable() throws Exception {
+        ValueMap map = ValueMap.map("1", 1, "2", 2);
+        assertEquals(map, ParcelFn.unmarshall(ParcelFn.marshall(map)));
+        ValueMap[] array = ValueMap.CREATOR.newArray(12);
+        assertEquals(12, array.length);
+        assertEquals(0, map.describeContents());
     }
 
     private HashSet getSetString123() {

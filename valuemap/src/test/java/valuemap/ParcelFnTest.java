@@ -27,7 +27,7 @@ public class ParcelFnTest {
     }
 
     @Test
-    public void testClone() throws Exception {
-        assertEquals(1, ParcelFn.clone(1));
+    public void coverage() throws Exception {
+        new ParcelFn();
     }
 }

@@ -6,10 +6,6 @@ class ParcelFn {
 
     private static final ClassLoader CLASS_LOADER = ParcelFn.class.getClassLoader();
 
-    static <T> T clone(Object o) {
-        return unmarshall(marshall(o));
-    }
-
     static <T> T unmarshall(byte[] array) {
         Parcel parcel = Parcel.obtain();
         parcel.unmarshall(array, 0, array.length);

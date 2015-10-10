@@ -5,12 +5,13 @@ import android.os.Parcelable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static valuemap.ParcelFn.marshall;
+import static valuemap.ParcelFn.unmarshall;
 
 /**
  * The typical state in Android applications is the state that is being kept inside of
@@ -36,9 +37,7 @@ import java.util.Set;
  */
 public class ValueMap implements Parcelable {
 
-    private final Map<String, byte[]> map;
-    private final Map<String, Object> imMap;
-    private final Set<String> keys;
+    private final Map<String, Object> map;
 
     public static ValueMap empty() {
         return EMPTY;
@@ -68,14 +67,14 @@ public class ValueMap implements Parcelable {
      * Returns an immutable set of keys contained in this {@link ValueMap}.
      */
     public Set<String> keys() {
-        return keys;
+        return map.keySet();
     }
 
     /**
      * Returns whether this {@link ValueMap} contains the specified key.
      */
     public boolean containsKey(String key) {
-        return keys.contains(key);
+        return map.containsKey(key);
     }
 
     /**
@@ -89,10 +88,10 @@ public class ValueMap implements Parcelable {
      * Returns the value of the mapping with the specified key, or the given default value.
      */
     public <T> T get(String key, T defaultValue) {
-        if (imMap.containsKey(key))
-            return (T)imMap.get(key);
-        if (map.containsKey(key))
-            return ParcelFn.unmarshall(map.get(key));
+        if (map.containsKey(key)) {
+            Object value = map.get(key);
+            return (T)(value instanceof byte[] ? unmarshall((byte[])value) : value);
+        }
         return defaultValue;
     }
 
@@ -100,7 +99,7 @@ public class ValueMap implements Parcelable {
      * Returns the output map which contains the current {@link ValueMap} values.
      */
     public Builder toBuilder() {
-        return new Builder(map, imMap);
+        return new Builder(map);
     }
 
     /**
@@ -110,13 +109,11 @@ public class ValueMap implements Parcelable {
      */
     public static class Builder {
 
-        private final Map<String, byte[]> map;
-        private final Map<String, Object> imMap;
+        private final Map<String, Object> map;
         private final Map<String, Builder> sub;
 
         public Builder() {
             this.map = new HashMap<>();
-            this.imMap = new HashMap<>();
             this.sub = new HashMap<>();
         }
 
@@ -129,26 +126,7 @@ public class ValueMap implements Parcelable {
          * @return the same builder instance.
          */
         public Builder put(String key, Object value) {
-            if (value == null)
-                remove(key);
-            else {
-                if (value instanceof Integer ||
-                    value instanceof String ||
-                    value instanceof Boolean ||
-                    value instanceof ValueMap ||
-                    value instanceof Long ||
-                    value instanceof Double ||
-                    value instanceof Float ||
-                    value instanceof Byte ||
-                    value instanceof Character ||
-                    value instanceof Short ||
-                    value instanceof BigDecimal ||
-                    value instanceof BigInteger)
-
-                    imMap.put(key, value);
-                else
-                    map.put(key, ParcelFn.marshall(value));
-            }
+            map.put(key, isImmutable(value) ? value : marshall(value));
             return this;
         }
 
@@ -160,7 +138,6 @@ public class ValueMap implements Parcelable {
          */
         public Builder remove(String key) {
             map.remove(key);
-            imMap.remove(key);
             sub.remove(key);
             return this;
         }
@@ -177,8 +154,7 @@ public class ValueMap implements Parcelable {
                 return sub.get(key);
 
             else if (map.containsKey(key)) {
-                Builder builder = ParcelFn.<ValueMap>unmarshall(map.get(key)).toBuilder();
-                map.remove(key);
+                Builder builder = ParcelFn.<ValueMap>unmarshall((byte[])map.remove(key)).toBuilder();
                 sub.put(key, builder);
                 return builder;
             }
@@ -192,45 +168,49 @@ public class ValueMap implements Parcelable {
          * Builds the {@link ValueMap} instance using collected key-value pairs.
          */
         public ValueMap build() {
-            Map<String, byte[]> m = new HashMap<>(map);
+            Map<String, Object> m = new HashMap<>(map);
             for (Map.Entry<String, Builder> entry : sub.entrySet())
-                m.put(entry.getKey(), ParcelFn.marshall(entry.getValue().build()));
-            return new ValueMap(m, imMap);
+                m.put(entry.getKey(), marshall(entry.getValue().build()));
+            return new ValueMap(m);
         }
 
-        private Builder(Map<String, byte[]> map, Map<String, Object> imMap) {
+        private Builder(Map<String, Object> map) {
             this.map = new HashMap<>(map);
-            this.imMap = new HashMap<>(imMap);
             this.sub = new HashMap<>();
         }
     }
 
-    ValueMap(Map<String, byte[]> map, Map<String, Object> imMap) {
-        this.map = new HashMap<>(map);
-        this.imMap = new HashMap<>(imMap);
-        this.keys = joinKeys(map, imMap);
+    private static boolean isImmutable(Object value) {
+        return value == null ||
+            value instanceof Integer ||
+            value instanceof String ||
+            value instanceof Boolean ||
+            value instanceof ValueMap ||
+            value instanceof Long ||
+            value instanceof Double ||
+            value instanceof Float ||
+            value instanceof Byte ||
+            value instanceof Character ||
+            value instanceof Short ||
+            value instanceof BigDecimal ||
+            value instanceof BigInteger;
     }
 
-    private static final ValueMap EMPTY = new ValueMap(Collections.<String, byte[]>emptyMap(), Collections.<String, Object>emptyMap());
+    ValueMap(Map<String, Object> map) {
+        this.map = Collections.unmodifiableMap(new HashMap<>(map));
+    }
+
+    private static final ValueMap EMPTY = new ValueMap(Collections.<String, Object>emptyMap());
 
     private static final ClassLoader CLASS_LOADER = ValueMap.class.getClassLoader();
 
     protected ValueMap(Parcel in) {
-        this.map = in.readHashMap(CLASS_LOADER);
-        this.imMap = in.readHashMap(CLASS_LOADER);
-        this.keys = joinKeys(map, imMap);
-    }
-
-    private static Set<String> joinKeys(Map<String, ?> map1, Map<String, ?> map2) {
-        HashSet<String> keysTemp = new HashSet<>(map1.keySet());
-        keysTemp.addAll(map2.keySet());
-        return Collections.unmodifiableSet(keysTemp);
+        this.map = Collections.unmodifiableMap(in.readHashMap(CLASS_LOADER));
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeMap(map);
-        dest.writeMap(imMap);
     }
 
     @Override
@@ -251,22 +231,19 @@ public class ValueMap implements Parcelable {
     };
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ValueMap))
+    public boolean equals(Object other) {
+        if (!(other instanceof ValueMap))
             return false;
 
-        Map<String, byte[]> otherMap = ((ValueMap)o).map;
-        Map<String, Object> otherPrimitive = ((ValueMap)o).imMap;
+        Map<String, Object> otherMap = ((ValueMap)other).map;
 
         if (map.size() != otherMap.size())
             return false;
 
-        for (Map.Entry<String, byte[]> entry : map.entrySet()) {
-            if (!Arrays.equals(entry.getValue(), otherMap.get(entry.getKey())))
-                return false;
-        }
-        for (Map.Entry<String, Object> entry : imMap.entrySet()) {
-            if (!entry.getValue().equals(otherPrimitive.get(entry.getKey())))
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            Object otherValue = otherMap.get(entry.getKey());
+            if (value != otherValue && (value == null || !value.equals(otherValue)))
                 return false;
         }
 
