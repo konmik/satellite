@@ -8,6 +8,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import info.android15.satellite.BuildConfig;
@@ -144,6 +145,8 @@ public class RestartableSetTest {
         else if (method == DeliveryMethod.PUBLISH) {
             subscriber2.assertNoValues();
         }
+
+        verifyNoLeakedObservables();
     }
 
     @Test
@@ -163,6 +166,30 @@ public class RestartableSetTest {
 
         advanceEmission();
         verifyReceived(subscriber2);
+        verifyNoLeakedObservables();
+    }
+
+    @Test
+    public void test_OnError() throws Exception {
+        ValueMap.Builder builder = ValueMap.builder();
+        RestartableSet set = new RestartableSet(builder);
+
+        final RuntimeException exception = new RuntimeException();
+        set
+            .restartable(RESTARTABLE_ID, method, new RestartableFactory<String, Long>() {
+                @Override
+                public Observable<Long> call(String a) {
+                    return Observable.<Long>error(exception).delay(1, TimeUnit.SECONDS, scheduler);
+                }
+            })
+            .subscribe(subscriber1);
+
+        launch(set);
+        subscriber1.assertNoValues();
+        assertEquals(1, ReconnectableMap.INSTANCE.keys().size());
+
+        advanceEmission();
+        subscriber1.assertReceivedOnNext(Collections.singletonList(Notification.<Long>createOnError(exception)));
         verifyNoLeakedObservables();
     }
 
