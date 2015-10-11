@@ -12,6 +12,10 @@ android {
     }
 }
 
+configurations {
+    compileJavadoc
+}
+
 dependencies {
     testCompile "org.robolectric:robolectric:3.0"
     testCompile 'junit:junit:4.12'
