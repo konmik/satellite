@@ -1,1 +1,1 @@
-include ':satellite', ':example', ':valuemap', ':valuemapbenchmark'
+include ':valuemap', ':satellite', ':example', ':valuemapbenchmark'
