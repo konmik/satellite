@@ -153,9 +153,9 @@ Unfortunately, Java does not allow us to have multiple inheritance, so the
 [BaseActivity](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/base/BaseActivity.java)
 code should be copy/pasted into your project. You can change its code to inherit from `AppCompatActivity` or any 
 other base Activity you want. There are also
-[BaseFragment](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/base/BaseActivity.java)
+[BaseFragment](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/base/BaseFragment.java)
 and
-[BaseLayout](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/base/BaseActivity.java)
+[BaseLayout](https://github.com/konmik/satellite/blob/master/example/src/main/java/satellite/example/base/BaseLayout.java)
 implementations for the same purpose.
 
 ##### split
@@ -185,8 +185,8 @@ However, sometimes you want to remove the fragment and all of its background tas
 forever. For this scenario there is `BaseFragment.dismissRestartables()` method.
 
 It is impossible to know when a specific fragment or view gets detached for the last time, so you need to call this
-cleanup method manually. However, there is a smart trick which allows to skip this step most of the times:
-when `BaseFragment` gets detached, it checks if its activity is finalizing. It it is then it calls `dismissRestartables()`
+cleanup method manually. There is a smart trick which allows to skip this step most of the times:
+when `BaseFragment` gets detached, it checks if its activity is finalizing. If it is then it calls `dismissRestartables()`
 by itself.
 
 ## Installation
