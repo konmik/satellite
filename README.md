@@ -86,7 +86,7 @@ this is our land base inside of `Activity` which manages all
 the restartable stuff and guarantees that the observable will be completed despite of any lifecycle events.
 
 We also have
-[RestartableFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/RestartableFactory.java)
+[ObservableFactory](https://github.com/konmik/satellite/blob/master/satellite/src/main/java/satellite/ObservableFactory.java)
 interface - we're implementing it to instantiate our satellite code
 from a given argument. It is a good idea to declare the factory outside of `Activity` to
 prevent memory leaks during long requests and time consuming operations.
@@ -115,7 +115,7 @@ Here is a typical code that is used to launch restartable requests.
 Some parts can be extracted into a base class to eliminate code duplication.
 
 ```java
-public class SignIn implements RestartableFactory<StateMap, Boolean> {
+public class SignIn implements ObservableFactory<StateMap, Boolean> {
 
     public static StateMap argument(String username, String password) {
         return StateMap.sequence("username", username, "password", password);

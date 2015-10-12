@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 14
@@ -12,18 +12,11 @@ android {
     }
 }
 
-repositories {
-    mavenLocal()
-}
-
 configurations {
     compileJavadoc
 }
 
 dependencies {
-    compile 'info.android15.valuemap:valuemap:0.4.0-SNAPSHOT'
-    compile "com.android.support:support-annotations:23.0.0"
-    compile 'io.reactivex:rxjava:1.0.13'
     testCompile "org.robolectric:robolectric:3.0"
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.10.19'

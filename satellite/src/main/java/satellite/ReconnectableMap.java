@@ -8,16 +8,18 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.functions.Func0;
+import rx.functions.Func1;
+import rx.observers.Subscribers;
 import rx.subjects.Subject;
-import satellite.util.SubjectFactory;
 
 /**
  * ReconnectableMap keeps track of reconnectable observables (reconnectable observable is an
  * {@link Observable} that emits materialized values into a {@link Subject}). The
  * subject is used to (re)connect to the observable.
  *
- * Reconnectable observables are used by {@link RestartableConnection}.
+ * Reconnectable observables are used by {@link Restartable}.
  */
 public enum ReconnectableMap {
 
@@ -27,52 +29,81 @@ public enum ReconnectableMap {
     private HashMap<String, Subscription> subscriptions = new HashMap<>();
 
     /**
-     * This is the core method that connects an observable with {@link RestartableConnection}.
-     * The observable gets created if it does not exist yet.
+     * This is the core method that connects an observable with {@link Restartable}.
+     * If the channel does not exist yet it will be created.
      *
      * @param key               a unique key of the connection.
-     * @param subjectFactory    a factory for creating an intermediate subject that lies between the observable and {@link RestartableConnection}.
+     * @param method            a delivery method which will be used for the channel.
      * @param observableFactory an observable factory.
      * @param <T>               a type of observable`s onNext values
      * @return an observable that emits materialized notifications
      */
-    public <T> Observable<Notification<T>> connection(
+    public <T> Observable<Notification<T>> channel(
         final String key,
-        final SubjectFactory<Notification<T>> subjectFactory,
+        final DeliveryMethod method,
         final Func0<Observable<T>> observableFactory) {
 
         return Observable.create(new Observable.OnSubscribe<Notification<T>>() {
             @Override
-            public void call(Subscriber<? super Notification<T>> subscriber) {
-                if (subscriptions.containsKey(key))
-                    subscriber.add(subjects.get(key).subscribe(subscriber));
+            public void call(final Subscriber<? super Notification<T>> subscriber) {
+                if (subjects.containsKey(key))
+                    subjects.get(key).subscribe(subscriber);
                 else {
-                    Subject<Notification<T>, Notification<T>> subject = subjectFactory.call();
-                    subscriber.add(subject.subscribe(subscriber));
-                    subscriptions.put(key, observableFactory.call().materialize().subscribe(subject));
+                    final Subject<Notification<T>, Notification<T>> subject = method.createSubject();
                     subjects.put(key, subject);
+                    subject.subscribe(subscriber);
+
+                    final Subscriber<Notification<T>> subjectSubscriber = Subscribers.create(new Action1<Notification<T>>() {
+                        @Override
+                        public void call(Notification<T> notification) {
+                            subject.onNext(notification);
+                        }
+                    });
+                    subscriptions.put(key, subjectSubscriber);
+
+                    observableFactory.call()
+                        .materialize()
+                        .doOnNext(new Action1<Notification<T>>() {
+                            @Override
+                            public void call(Notification<T> notification) {
+                                if (notification.isOnCompleted() || notification.isOnError())
+                                    removeSubscription(key);
+                            }
+                        })
+                        .filter(new Func1<Notification<T>, Boolean>() {
+                            @Override
+                            public Boolean call(Notification<T> notification) {
+                                return !notification.isOnCompleted();
+                            }
+                        })
+                        .subscribe(subjectSubscriber);
                 }
             }
         });
     }
 
     /**
-     * Unsubscribes a given observable and removes its subject.
+     * Dismisses a channel.
      *
-     * @param key a unique key of the connection.
+     * @param key a unique key of the channel.
      */
     public void dismiss(String key) {
-        if (subscriptions.containsKey(key)) {
-            subscriptions.get(key).unsubscribe();
-            subscriptions.remove(key);
-            subjects.remove(key);
-        }
+        removeSubscription(key);
+        subjects.remove(key);
     }
 
     /**
-     * Return a current list of connection keys.
+     * Return the current list of channel keys.
      */
     public Set<String> keys() {
         return Collections.unmodifiableSet(subscriptions.keySet());
+    }
+
+    private void removeSubscription(String key) {
+        Subscription subscription = subscriptions.get(key);
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscriptions.remove(key);
+        }
     }
 }

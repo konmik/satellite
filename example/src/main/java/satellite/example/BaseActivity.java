@@ -7,40 +7,40 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
+import satellite.DeliveryMethod;
 import satellite.Launcher;
-import satellite.RestartableConnection;
-import satellite.RestartableConnectionSet;
-import satellite.RestartableFactory;
-import satellite.RestartableFactoryNoArg;
-import satellite.state.StateMap;
-import satellite.util.SubjectFactory;
+import satellite.ObservableFactory;
+import satellite.ObservableFactoryNoArg;
+import satellite.Restartable;
+import satellite.RestartableSet;
+import valuemap.ValueMap;
 
 /**
  * This is an example activity that eliminates code duplication when dealing with
- * {@link RestartableConnection} and {@link RestartableConnectionSet}.
+ * {@link Restartable} and {@link RestartableSet}.
  */
 public class BaseActivity extends Activity implements Launcher {
 
-    private RestartableConnectionSet connections;
+    private RestartableSet restartables;
     private Subscription subscription;
     private boolean connect = true;
-    private StateMap.Builder out;
+    private ValueMap.Builder out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null)
-            this.connections = new RestartableConnectionSet(out = new StateMap.Builder());
+            restartables = new RestartableSet(out = new ValueMap.Builder());
         else {
-            StateMap map = savedInstanceState.getParcelable("connections");
-            this.connections = new RestartableConnectionSet(map, out = map.toBuilder());
+            ValueMap map = savedInstanceState.getParcelable("restartables");
+            restartables = new RestartableSet(map, out = map.toBuilder());
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("connections", out.build());
+        outState.putParcelable("restartables", out.build());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BaseActivity extends Activity implements Launcher {
         super.onDestroy();
         subscription.unsubscribe();
         if (isFinishing())
-            connections.dismiss();
+            restartables.dismiss();
     }
 
     /**
@@ -70,36 +70,36 @@ public class BaseActivity extends Activity implements Launcher {
         return Subscriptions.empty();
     }
 
-    public <T> Observable<Notification<T>> connection(int id, RestartableFactoryNoArg<T> restartableFactory) {
-        return connections.connection(id, SubjectFactory.behaviorSubject(), restartableFactory);
+    public <T> Observable<Notification<T>> channel(int id, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.channel(id, DeliveryMethod.LATEST, observableFactoryNoArg);
     }
 
-    public <A, T> Observable<Notification<T>> connection(int id, RestartableFactory<A, T> restartableFactory) {
-        return connections.connection(id, SubjectFactory.behaviorSubject(), restartableFactory);
-    }
-
-    @Override
-    public <T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactoryNoArg<T> restartableFactory) {
-        return connections.connection(id, subjectFactory, restartableFactory);
+    public <A, T> Observable<Notification<T>> channel(int id, ObservableFactory<A, T> observableFactory) {
+        return restartables.channel(id, DeliveryMethod.LATEST, observableFactory);
     }
 
     @Override
-    public <A, T> Observable<Notification<T>> connection(int id, SubjectFactory<Notification<T>> subjectFactory, RestartableFactory<A, T> restartableFactory) {
-        return connections.connection(id, subjectFactory, restartableFactory);
+    public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.channel(id, type, observableFactoryNoArg);
+    }
+
+    @Override
+    public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return restartables.channel(id, type, observableFactory);
     }
 
     @Override
     public void launch(int id, Object arg) {
-        connections.launch(id, arg);
+        restartables.launch(id, arg);
     }
 
     @Override
     public void launch(int id) {
-        connections.launch(id);
+        restartables.launch(id);
     }
 
     @Override
     public void dismiss(int id) {
-        connections.dismiss(id);
+        restartables.dismiss(id);
     }
 }
