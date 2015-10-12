@@ -10,8 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 import satellite.ReconnectableMap;
+import satellite.example.base.BaseActivity;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -26,7 +27,7 @@ public abstract class BaseLaunchActivity extends BaseActivity {
 
     @Override
     protected Subscription onConnect() {
-        return new CompositeSubscription(super.onConnect(),
+        return Subscriptions.from(super.onConnect(),
 
             Observable.interval(500, 500, TimeUnit.MILLISECONDS, mainThread())
                 .subscribe(ignored -> {

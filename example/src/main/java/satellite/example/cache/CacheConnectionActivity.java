@@ -4,15 +4,15 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 import satellite.DeliveryMethod;
+import satellite.RxNotification;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.RxNotification;
 
 public class CacheConnectionActivity extends BaseLaunchActivity {
 
-    public static final int CONNECTION_ID = 1;
+    public static final int CHANNEL_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +21,15 @@ public class CacheConnectionActivity extends BaseLaunchActivity {
         setContentView(R.layout.activity_satellite);
         ((TextView)findViewById(R.id.title)).setText("Cache result connection");
 
-        findViewById(R.id.launch).setOnClickListener(v -> launch(CONNECTION_ID, ExampleCacheObservableFactory.argument(10)));
-        findViewById(R.id.drop).setOnClickListener(v -> dismiss(CONNECTION_ID));
+        findViewById(R.id.launch).setOnClickListener(v -> launch(CHANNEL_ID, ExampleCacheObservableFactory.argument(10)));
+        findViewById(R.id.drop).setOnClickListener(v -> dismiss(CHANNEL_ID));
     }
 
     @Override
     protected Subscription onConnect() {
-        return new CompositeSubscription(super.onConnect(),
+        return Subscriptions.from(super.onConnect(),
 
-            channel(CONNECTION_ID, DeliveryMethod.LATEST, new ExampleCacheObservableFactory())
+            channel(CHANNEL_ID, DeliveryMethod.LATEST, new ExampleCacheObservableFactory())
                 .subscribe(RxNotification.split(
                     value -> {
                         log("CACHE: onNext " + value);

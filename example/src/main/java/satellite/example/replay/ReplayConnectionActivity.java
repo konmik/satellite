@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 import satellite.DeliveryMethod;
+import satellite.RxNotification;
 import satellite.example.BaseLaunchActivity;
 import satellite.example.R;
-import satellite.RxNotification;
 
 public class ReplayConnectionActivity extends BaseLaunchActivity {
 
@@ -27,7 +27,7 @@ public class ReplayConnectionActivity extends BaseLaunchActivity {
 
     @Override
     protected Subscription onConnect() {
-        return new CompositeSubscription(super.onConnect(),
+        return Subscriptions.from(super.onConnect(),
 
             channel(REPLAY_RESTARTABLE_ID, DeliveryMethod.REPLAY, new ExampleReplayObservableFactory())
                 .subscribe(RxNotification.split(

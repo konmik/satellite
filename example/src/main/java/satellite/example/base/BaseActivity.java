@@ -1,4 +1,4 @@
-package satellite.example;
+package satellite.example.base;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -25,6 +25,41 @@ public class BaseActivity extends Activity implements Launcher {
     private Subscription subscription;
     private boolean connect = true;
     private ValueMap.Builder out;
+
+    /**
+     * This method is being called during the first {@link #onResume()} call.
+     * The returned {@link Subscription} will be unsubscribed during {@link #onDestroy()}.
+     *
+     * You can combine multiple subscriptions with {@link Subscriptions#from(Subscription...)} method.
+     */
+    protected Subscription onConnect() {
+        return Subscriptions.empty();
+    }
+
+    @Override
+    public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
+        return restartables.channel(id, type, observableFactoryNoArg);
+    }
+
+    @Override
+    public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
+        return restartables.channel(id, type, observableFactory);
+    }
+
+    @Override
+    public void launch(int id, Object arg) {
+        restartables.launch(id, arg);
+    }
+
+    @Override
+    public void launch(int id) {
+        restartables.launch(id);
+    }
+
+    @Override
+    public void dismiss(int id) {
+        restartables.dismiss(id);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,48 +93,5 @@ public class BaseActivity extends Activity implements Launcher {
         subscription.unsubscribe();
         if (isFinishing())
             restartables.dismiss();
-    }
-
-    /**
-     * This method is being called during the first {@link #onResume()} call.
-     * The returned {@link Subscription} will be unsubscribed during {@link #onDestroy()}.
-     *
-     * You can combine multiple subscriptions with {@link Subscriptions#from(Subscription...)}.
-     */
-    protected Subscription onConnect() {
-        return Subscriptions.empty();
-    }
-
-    public <T> Observable<Notification<T>> channel(int id, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return restartables.channel(id, DeliveryMethod.LATEST, observableFactoryNoArg);
-    }
-
-    public <A, T> Observable<Notification<T>> channel(int id, ObservableFactory<A, T> observableFactory) {
-        return restartables.channel(id, DeliveryMethod.LATEST, observableFactory);
-    }
-
-    @Override
-    public <T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactoryNoArg<T> observableFactoryNoArg) {
-        return restartables.channel(id, type, observableFactoryNoArg);
-    }
-
-    @Override
-    public <A, T> Observable<Notification<T>> channel(int id, DeliveryMethod type, ObservableFactory<A, T> observableFactory) {
-        return restartables.channel(id, type, observableFactory);
-    }
-
-    @Override
-    public void launch(int id, Object arg) {
-        restartables.launch(id, arg);
-    }
-
-    @Override
-    public void launch(int id) {
-        restartables.launch(id);
-    }
-
-    @Override
-    public void dismiss(int id) {
-        restartables.dismiss(id);
     }
 }
