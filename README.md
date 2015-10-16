@@ -9,10 +9,8 @@ to properly connect background tasks with visual parts of an application.
 ## Introduction
 
 If you've already seen my [Nucleus](https://github.com/konmik/nucleus) library:
-Satellite is basically the same but is much simpler because it does NOT utilize MVP pattern
+Satellite is basically the same but is much simpler because it does NOT utilize the MVP pattern
 to do the same job.
-
-**WARNING!** The project is in Alpha stage, the API is a subject to change.
 
 ### Problem
 
@@ -191,17 +189,11 @@ by itself.
 
 ## Installation
 
-This is a development version of the library.
-If you want to try it - clone the repository and compile it yourself.
-
-* Go to `gradle.properties`.
-* Change `SNAPSHOT_REPOSITORY_URL` to your local repository.
-* Run `gradle clean build uploadArchives`.
-
-In your project:
-
-* `compile 'info.android15.satellite:satellite:0.4.0-SNAPSHOT'`
-* Don't forget to mention `mavenLocal()` in the list of your project's repositories.
+``` groovy
+dependencies {
+    compile 'info.android15.satellite:satellite:0.4.0'
+}
+```
 
 ## Feedback
 
