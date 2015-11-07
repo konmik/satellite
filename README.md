@@ -191,7 +191,7 @@ by itself.
 
 ``` groovy
 dependencies {
-    compile 'info.android15.satellite:satellite:0.4.0'
+    compile 'info.android15.satellite:satellite:0.4.1'
 }
 ```
 
