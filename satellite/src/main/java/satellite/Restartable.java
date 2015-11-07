@@ -33,7 +33,7 @@ public class Restartable {
      */
     public Restartable(ValueMap.Builder out) {
         this.out = out;
-        key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int)(Math.random() * Long.MAX_VALUE);
+        key = "id:" + ++id + " /time:" + System.nanoTime() + " /random:" + (int) (Math.random() * Long.MAX_VALUE);
         restore = false;
         arg = null;
         out.put("key", key);
@@ -93,7 +93,7 @@ public class Restartable {
                 return ReconnectableMap.INSTANCE.channel(key, type, new Func0<Observable<T>>() {
                     @Override
                     public Observable<T> call() {
-                        return observableFactory.call((A)arg);
+                        return observableFactory.call((A) arg);
                     }
                 });
             }
@@ -142,7 +142,7 @@ public class Restartable {
             .doOnNext(new Action1<Notification<T>>() {
                 @Override
                 public void call(Notification<T> notification) {
-                    type.onNext(key);
+                    type.onNext(Restartable.this);
                 }
             });
     }

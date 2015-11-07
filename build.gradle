@@ -29,7 +29,7 @@ ext {
     targetSdkVersion = 23
 
     supportLibraryVersion = '23.0.1'
-    rxVersion = '1.0.14'
+    rxVersion = '1.0.15'
 
     robolectricVersion = '3.0'
     junitVersion = '4.12'

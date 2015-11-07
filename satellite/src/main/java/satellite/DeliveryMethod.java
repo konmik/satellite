@@ -17,8 +17,8 @@ public enum DeliveryMethod {
      */
     SINGLE {
         @Override
-        void onNext(String key) {
-            ReconnectableMap.INSTANCE.dismiss(key);
+        void onNext(Restartable restartable) {
+            restartable.dismiss();
         }
     },
 
@@ -53,6 +53,6 @@ public enum DeliveryMethod {
         return BehaviorSubject.create();
     }
 
-    void onNext(String key) {
+    void onNext(Restartable restartable) {
     }
 }
