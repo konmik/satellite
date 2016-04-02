@@ -1,5 +1,7 @@
-Satellite
+Satellite [NO LONGER DEVELOPED]
 =======
+
+# See [Phlux](https://github.com/konmik/Phlux) for a better option
 
 Satellite is a simple (for those who are familiar with RxJava) Android library, which allows
 to properly connect background tasks with visual parts of an application.
